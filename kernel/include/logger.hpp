@@ -1,0 +1,70 @@
+#ifndef LOGGER_HPP
+#define LOGGER_HPP
+
+#include <cstdint>
+
+extern "C" void outb(int, char val);
+
+class logger{
+  private:
+    int m_port;
+
+  public:
+    logger(int port):
+      m_port{port}
+    {
+
+    }
+
+    void log(char ch){
+      outb(m_port, ch);
+    }
+
+    void log(int x){
+      char buffer[100];
+      int index = 0;
+      if(x == 0){
+        outb(m_port, 48); // ascii table, digit start at 48
+        return;
+      }
+      else while(x > 0){
+        int digit = x % 10;
+        x = x / 10;
+        buffer[index++] = digit + 48;
+      }
+      for(int i = index - 1; i >= 0; i--){
+        outb(m_port, buffer[i]);
+      }
+    }
+
+    void log(std::uint64_t x){
+      char buffer[100];
+      int index = 0;
+      if(x == 0){
+        outb(m_port, 48); // ascii table, digit start at 48
+        return;
+      }
+      else while(x > 0){
+        int digit = x % 10;
+        x = x / 10;
+        buffer[index++] = digit + 48;
+      }
+      for(int i = index - 1; i >= 0; i--){
+        outb(m_port, buffer[i]);
+      }
+    }
+
+    void log(const char* st){
+      for(const char* ch = &st[0]; *ch != '\0'; ch++){
+        if(*ch == '\n'){
+          outb(m_port, '\r');
+          outb(m_port, '\n');
+        }
+        else{
+          outb(m_port, *ch);
+        }
+      }
+    }
+};
+
+#endif
