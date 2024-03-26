@@ -2,6 +2,7 @@
 #define LOGGER_HPP
 
 #include <cstdint>
+#include <cstdlib>
 
 extern "C" void outb(int, char val);
 
@@ -38,7 +39,7 @@ class logger{
     }
 
     void log(std::uint64_t x){
-      char buffer[100];
+      char buffer[30];
       int index = 0;
       if(x == 0){
         outb(m_port, 48); // ascii table, digit start at 48
@@ -48,6 +49,30 @@ class logger{
         int digit = x % 10;
         x = x / 10;
         buffer[index++] = digit + 48;
+      }
+      for(int i = index - 1; i >= 0; i--){
+        outb(m_port, buffer[i]);
+      }
+
+    }
+
+    void log_hex(std::uint64_t x){
+      char buffer[20];
+      int index = 0;
+      if(x == 0){
+        outb(m_port, 48); // ascii table, digit start at 48
+        return;
+      }
+      else while(x > 0){
+        int digit = x % 16;
+        x = x / 16;
+        if(digit < 0xA){
+          buffer[index++] = digit + 48;
+        }
+        else{ 
+          // digit >= 10 = 0x0A
+          buffer[index++] = digit + 55;
+        }
       }
       for(int i = index - 1; i >= 0; i--){
         outb(m_port, buffer[i]);

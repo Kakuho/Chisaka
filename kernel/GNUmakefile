@@ -46,7 +46,7 @@ override DEFAULT_NASMFLAGS := -F dwarf -g
 $(eval $(call DEFAULT_VAR,NASMFLAGS,$(DEFAULT_NASMFLAGS)))
 
 # User controllable linker flags. We set none by default.
-override DEFAULT_LDFLAGS :=
+override DEFAULT_LDFLAGS := -Map=output.map 
 $(eval $(call DEFAULT_VAR,LDFLAGS,$(DEFAULT_LDFLAGS)))
 
 # Internal flags shared by both C and C++ compilers.
