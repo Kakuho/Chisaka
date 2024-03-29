@@ -79,6 +79,30 @@ class logger{
       }
     }
 
+
+    void log_bin(std::uint64_t x){
+      char buffer[20];
+      int index = 0;
+      if(x == 0){
+        outb(m_port, 48);
+        return;
+      }
+      else while(x > 0){
+        int digit = x % 2;
+        x = x / 2;
+        if(digit == 0){
+          buffer[index++] = 48;
+        }
+        else{ 
+          // digit >= 10 = 0x0A
+          buffer[index++] = 49;
+        }
+      }
+      for(int i = index - 1; i >= 0; i--){
+        outb(m_port, buffer[i]);
+      }
+    }
+
     void log(const char* st){
       for(const char* ch = &st[0]; *ch != '\0'; ch++){
         if(*ch == '\n'){

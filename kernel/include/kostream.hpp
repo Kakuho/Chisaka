@@ -3,7 +3,7 @@
 
 #include <logger.hpp>
 
-enum class intmode{dec, hex};
+enum class intmode{dec, hex, bin};
 
 class kostream{
   logger serial_logger{0x3F8};
@@ -16,11 +16,17 @@ class kostream{
     }
 
     kostream& operator<<(std::uint64_t i){
-      if(m_mode == intmode::hex)
-        serial_logger.log_hex(i);
-      else
-        serial_logger.log(i);
-      return *this;
+      switch(m_mode){
+        case intmode::dec:
+          serial_logger.log(i); 
+          return *this;
+        case intmode::hex:
+          serial_logger.log_hex(i); 
+          return *this;
+        case intmode::bin:
+          serial_logger.log_bin(i); 
+          return *this;
+      }
     }
 
     kostream& operator<<(char ch){
@@ -46,11 +52,14 @@ class kostream{
         case intmode::hex:
           m_mode = intmode::hex;
           return *this;
+        case intmode::bin:
+          m_mode = intmode::bin;
+          return *this;
       }
     }
 };
 
 // GLOBAL VARIABLE kout - represents a serial console output stream
-kostream kout;
+extern kostream kout;
 
 #endif
