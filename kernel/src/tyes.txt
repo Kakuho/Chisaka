@@ -1,0 +1,59 @@
+ld: obj/memory/pmm.cpp.o: in function `req::is_limine_supported()':
+/home/ka/C++/projects/Chisaka/kernel/src/limine_services.hpp:14: multiple definition of `req::is_limine_supported()'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/limine_services.hpp:14: first defined here
+
+ld: obj/memory/pmm.cpp.o:(.data+0xf0): multiple definition of `req::limine_base_revision'; obj/main.cpp.o:(.data+0xf0): first defined here
+
+ld: obj/memory/pmm.cpp.o: in function `mem::printMemoryMap()':
+/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:26: multiple definition of `mem::printMemoryMap()'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:26: first defined here
+
+ld: obj/memory/pmm.cpp.o:(.data+0x80): multiple definition of `req::memorymap_request'; obj/main.cpp.o:(.data+0x80): first defined here
+
+ld: obj/memory/pmm.cpp.o:(.data+0x40): multiple definition of `req::hhdm_request'; obj/main.cpp.o:(.data+0x40): first defined here
+
+ld: obj/memory/pmm.cpp.o:/home/ka/C++/projects/Chisaka/kernel/include/kostream.hpp:54: multiple definition of `kout'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/include/kostream.hpp:54: first defined here
+
+ld: obj/memory/pmm.cpp.o: in function `mem::probeMemory(unsigned long)':
+/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:46: multiple definition of `mem::probeMemory(unsigned long)'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:46: first defined here
+
+ld: obj/memory/pmm.cpp.o: in function `mem::calculateAvailableMemory()':
+/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:76: multiple definition of `mem::calculateAvailableMemory()'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:76: first defined here
+
+ld: obj/memory/pmm.cpp.o: in function `mem::printPageFrames()':
+/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:93: multiple definition of `mem::printPageFrames()'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:93: first defined here
+
+ld: obj/memory/pmm.cpp.o:(.data+0x0): multiple definition of `req::kernel_addr_req'; obj/main.cpp.o:(.data+0x0): first defined here
+
+ld: obj/memory/pmm.cpp.o:(.data+0xc0): multiple definition of `req::framebuffer_request'; obj/main.cpp.o:(.data+0xc0): first defined here
+
+//---------------------------------------------------------------/
+
+ld obj/gdt.cpp.o obj/main.cpp.o obj/memory/memory.cpp.o obj/memory/pmm.cpp.o obj/coms.S.o obj/serial.S.o -Map=output.map  -m elf_x86_64 -nostdlib -static -pie --no-dynamic-linker -z text -z max-page-size=0x1000 -T linker.ld -o bin/kernel
+ld: obj/memory/memory.cpp.o: in function `req::is_limine_supported()':
+/home/ka/C++/projects/Chisaka/kernel/src/limine_services.hpp:14: multiple definition of `req::is_limine_supported()'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/limine_services.hpp:14: first defined here
+ld: obj/memory/memory.cpp.o:(.data+0xf0): multiple definition of `req::limine_base_revision'; obj/main.cpp.o:(.data+0xf0): first defined here
+ld: obj/memory/memory.cpp.o: in function `mem::probeMemory(unsigned long)':
+/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:28: multiple definition of `mem::probeMemory(unsigned long)'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:28: first defined here
+ld: obj/memory/memory.cpp.o:(.data+0x80): multiple definition of `req::memorymap_request'; obj/main.cpp.o:(.data+0x80): first defined here
+ld: obj/memory/memory.cpp.o:(.data+0x40): multiple definition of `req::hhdm_request'; obj/main.cpp.o:(.data+0x40): first defined here
+ld: obj/memory/memory.cpp.o:/home/ka/C++/projects/Chisaka/kernel/include/kostream.hpp:54: multiple definition of `kout'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/include/kostream.hpp:54: first defined here
+ld: obj/memory/memory.cpp.o: in function `mem::calculateAvailableMemory()':
+/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:58: multiple definition of `mem::calculateAvailableMemory()'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:58: first defined here
+ld: obj/memory/memory.cpp.o: in function `mem::printPageFrames()':
+/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:75: multiple definition of `mem::printPageFrames()'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:75: first defined here
+ld: obj/memory/memory.cpp.o:(.data+0x0): multiple definition of `req::kernel_addr_req'; obj/main.cpp.o:(.data+0x0): first defined here
+ld: obj/memory/memory.cpp.o:(.data+0xc0): multiple definition of `req::framebuffer_request'; obj/main.cpp.o:(.data+0xc0): first defined here
+ld: obj/memory/pmm.cpp.o: in function `req::is_limine_supported()':
+/home/ka/C++/projects/Chisaka/kernel/src/limine_services.hpp:14: multiple definition of `req::is_limine_supported()'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/limine_services.hpp:14: first defined here
+ld: obj/memory/pmm.cpp.o:(.data+0xf0): multiple definition of `req::limine_base_revision'; obj/main.cpp.o:(.data+0xf0): first defined here
+ld: obj/memory/pmm.cpp.o: in function `mem::probeMemory(unsigned long)':
+/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:28: multiple definition of `mem::probeMemory(unsigned long)'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:28: first defined here
+ld: obj/memory/pmm.cpp.o:(.data+0x80): multiple definition of `req::memorymap_request'; obj/main.cpp.o:(.data+0x80): first defined here
+ld: obj/memory/pmm.cpp.o:(.data+0x40): multiple definition of `req::hhdm_request'; obj/main.cpp.o:(.data+0x40): first defined here
+ld: obj/memory/pmm.cpp.o:/home/ka/C++/projects/Chisaka/kernel/include/kostream.hpp:54: multiple definition of `kout'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/include/kostream.hpp:54: first defined here
+ld: obj/memory/pmm.cpp.o: in function `mem::calculateAvailableMemory()':
+/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:58: multiple definition of `mem::calculateAvailableMemory()'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:58: first defined here
+ld: obj/memory/pmm.cpp.o: in function `mem::printPageFrames()':
+/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:75: multiple definition of `mem::printPageFrames()'; obj/main.cpp.o:/home/ka/C++/projects/Chisaka/kernel/src/memory/memory.hpp:75: first defined here
+ld: obj/memory/pmm.cpp.o:(.data+0x0): multiple definition of `req::kernel_addr_req'; obj/main.cpp.o:(.data+0x0): first defined here
+ld: obj/memory/pmm.cpp.o:(.data+0xc0): multiple definition of `req::framebuffer_request'; obj/main.cpp.o:(.data+0xc0): first defined here
+

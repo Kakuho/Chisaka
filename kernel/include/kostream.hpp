@@ -24,7 +24,7 @@ class kostream{
           serial_logger.log_hex(i); 
           return *this;
         case intmode::bin:
-          serial_logger.log_bin(i); 
+          serial_logger.log_bin(i,0); 
           return *this;
       }
     }

@@ -3,25 +3,21 @@
 #include <cstddef>
 #include <stdio.h>
 #include <string.h>
+#include <cassert>
 #include <limine.h>
 #include <logger.hpp>
 #include <gdt.hpp>
-#include <memory.hpp>
+#include <memory/memory.hpp>
 #include <kostream.hpp>
 #include <limine_services.hpp>
+#include <memory/pmm.hpp>
+#include <cpu/features.hpp>
 
 extern "C" void outb(int, char val);
 extern "C" unsigned int memory_low();
 
 const int port = 0x3F8;
 logger serialLogger{port};
-
-namespace req{
-// limine requests
-extern volatile limine_framebuffer_request framebuffer_request;
-extern volatile limine_memmap_request memorymap_request;
-extern volatile limine_hhdm_request hhdm_request;
-}
 
 // Halt and catch fire function.
 namespace {
@@ -52,12 +48,9 @@ extern void (*__init_array_end[])();
 // If renaming _start() to something else, make sure to change the
 // linker script accordingly.
 extern "C" void _start() {
-  // Ensure the bootloader actually understands our base revision (see spec).
-  /*
-  if (LIMINE_BASE_REVISION_SUPPORTED == false) {
-      hcf();
+  if(req::is_limine_supported()){
+    hcf();
   }
-  */
 
   // Call global constructors.
   // global ctors are just ctors for global objects
@@ -83,9 +76,25 @@ extern "C" void _start() {
       //kout << static_cast<std::uint32_t>(fb_ptr[i]);
   }
 
-  //mem::printMemoryMap();
-  mem::probeMemory(4);
+  mem::printMemoryMap();
+  //mem::printPageFrames();
+  mem::vaddr64_t kerneladdr = mem::getKernelVirtualAddress();
+  kout << kerneladdr << '\n';
+  mem::pmm yay{};
+  mem::vaddr64_t pmmaddr = reinterpret_cast<mem::vaddr64_t>(&yay);
+  //kout << pmmaddr << '\n';
 
-  // We're done, just hang...
+  features::probecr3();
+  kout << intmode::hex << features::getPML4() << '\n';
+
+  features::probecr4();
+  features::probecr0();
+  //features::disablePaging();
+  //features::probecr0();
+  mem::paddr64_t paddr = 0x4e000;
+  char* pchar = reinterpret_cast<char*>(mem::paddrToVaddr(paddr));
+  *pchar = 'C';
+  //kout << *pchar << '\n';
+  // done now, hang around a bit :D
   hcf();
 }

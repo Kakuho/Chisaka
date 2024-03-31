@@ -9,6 +9,12 @@ void features::probeMemory(){
   kout << intmode::dec << "MAXPHYSADDR = " << width << '\n';
 }
 
+bool features::disablePaging(){
+  std::uint32_t newcr0 = readcr0();
+  newcr0 &= 1 << 31;
+  writecr0(newcr0);
+}
+
 void features::probeLinearWidth(){
   //cpuid normally references 32 bit registers eax, ebx ect.
   std::uint32_t eax, ebx, ecx, edx;
@@ -46,10 +52,27 @@ void features::probeLapic(){
   }
 }
 
+mem::paddr64_t features::getPML4(){
+  // the physical address of the pml4 table is located in bits 54:12 of cr3
+  std::uint64_t cr3 = readcr3();
+  std::uint64_t mask = (0xFFFFFFF << 12);
+  mem::paddr64_t addr = (cr3 & mask) >> 12;
+  return addr;
+} 
+
 void features::probecr4(){
   std::uint64_t result = readcr4();
   kout << intmode::dec << "cr4 = " << result << intmode::bin << ' ' << result << 
        '\n';
+}
+
+void features::probecr0(){
+  std::uint64_t result = readcr0();
+  kout << "cr0 =" 
+       << intmode::dec << ' '  << result << ' '
+       << intmode::hex << "0x" << result << ' ' 
+       << intmode::bin << "0b" << result 
+       <<  '\n';
 }
 
 // 4.5.2 details the fields of cr3
@@ -61,3 +84,5 @@ void features::probecr3(){
        << intmode::bin << "0b" << result 
        <<  '\n';
 }
+
+

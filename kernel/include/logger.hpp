@@ -80,7 +80,7 @@ class logger{
     }
 
 
-    void log_bin(std::uint64_t x){
+    void log_bin(std::uint64_t x, int sep){
       char buffer[20];
       int index = 0;
       if(x == 0){
