@@ -7,7 +7,7 @@
 
 #include "serial/kostream.hpp"
 #include "include/kassert.hpp"
-#include "memory/memory.hpp"
+#include "memory/updated/address.hpp"
 
 //  the handlers are linked using C linkage, making it easier to call from assembly.
 

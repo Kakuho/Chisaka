@@ -1,4 +1,5 @@
 #include "interrupt_handlers.hpp"
+#include "memory/updated/address.hpp"
 
 extern "C"{
 
@@ -33,7 +34,7 @@ void contextSwitchISR(void* stackaddr){
   std::uint64_t* prsi = reinterpret_cast<std::uint64_t*>(saddr - 6);
   std::uint64_t* prflags = reinterpret_cast<std::uint64_t*>(saddr - 7);
   kout << "AN INTERRUPT HAS OCCURED" << '\n'
-       << "stackaddr = " << reinterpret_cast<memory::vaddr64_t>(saddr) << '\n'
+       << "stackaddr = " << reinterpret_cast<Mem::kvirtaddr_t>(saddr) << '\n'
        << "rax = " << *prax << '\n'
        << "rbx = " << *prbx << '\n'
        << "rcx = " << *prcx << '\n'

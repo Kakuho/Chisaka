@@ -1,4 +1,4 @@
-#include "memory/pages.hpp"
+#include "pages.hpp"
 #include "cpu/utilites.hpp"
 
 namespace memory{

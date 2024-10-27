@@ -5,7 +5,7 @@
 #include <array>
 
 #include "serial/kostream.hpp"
-#include "memory/pmm/buddy.hpp"
+#include "buddy.hpp"
 
 extern "C" void set_paging_table(std::size_t address);
 

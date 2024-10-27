@@ -3,6 +3,7 @@
 namespace memory{
   using namespace limine; // all requests are made using limine::requests
                           
+  /*
   void printMemoryMap(){
     // prints in the format:
     // paddr \t vaddr \t length \t type
@@ -20,7 +21,9 @@ namespace memory{
            << length << '\t' << type << '\n';
     }
   }
+  */
 
+  /*
   void probeMemory(std::size_t index){
     // probe a single entry, entries[index]
     if(requests::memorymap_request.response->entries[index] == nullptr){
@@ -50,7 +53,9 @@ namespace memory{
     }
     kout << "DONE!";
   }
+  */
 
+  /*
   std::uint64_t calculateAvailableMemory(){
     if(requests::memorymap_request.response == nullptr){
       kout << "MEM FAIL\n";
@@ -67,7 +72,9 @@ namespace memory{
     }
     return available_memory;
   }
+  */
 
+  /*
   void printPageFrames(){
     std::uint64_t mem_entries_t = requests::memorymap_request.response->entry_count;
     limine_memmap_entry** entries = requests::memorymap_request.response->entries;
@@ -83,11 +90,15 @@ namespace memory{
       }
     }
   }
+  */
 
+  /*
   vaddr64_t getKernelVirtualAddress(){
     return requests::kernel_addr_req.response->virtual_base;
   }
+  */
 
+  /*
   void upperLimitProbe(){
     // procedure to probe the upper limit of usable ram
     std::uint64_t mem_entries_t = requests::memorymap_request.response->entry_count;
@@ -103,7 +114,9 @@ namespace memory{
            << " :: *pch = " << *pch << '\n';
     }
   }
+  */
 
+/*
   void lowerLimitProbe(){
     // procedure to probe the lower limit of usable ram
     limine_memmap_entry* entry = requests::memorymap_request.response->entries[0];
@@ -118,7 +131,9 @@ namespace memory{
            << " :: *pch = " << *pch << '\n';
     }
   }
+*/
 
+  /*
   vaddr64_t FormLinearAddress(std::uint16_t pm4le_i, std::uint16_t pdpte_i, 
       std::uint16_t pde_i, std::uint16_t pt_i, std::uint16_t offset){
     vaddr64_t vaddr = 0;
@@ -141,7 +156,9 @@ namespace memory{
     vaddr |= (offset & 0xFFF);
     return vaddr;
   }
+  */
 
+  /*
   void ExtractPagingIndices(vaddr64_t vaddr){
     // a reverse of the FormLinearAddress
     std::uint16_t pageoffset = (vaddr & 0xFFF);
@@ -156,6 +173,7 @@ namespace memory{
          << "page directory pointer index :: " << pdpte_i << '\n'
          << "pm4l index :: " << pm4le_i << '\n';
   }
+  */
 
   /* DO NOT USE*/
   [[noreturn]] void corruptMemory(){

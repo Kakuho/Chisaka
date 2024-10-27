@@ -1,5 +1,6 @@
-// this file contains replacement functions for the usual allocation and 
+// this file contains global replacement functions for the usual allocation and 
 // deallocation functions.
+
 #include <cstdint>
 
 #include "serial/kostream.hpp"

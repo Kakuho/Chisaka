@@ -7,9 +7,9 @@
 #include "serial/kostream.hpp"
 #include "cpu/utilites.hpp"
 #include "cpu/features/features.hpp"
-#include "memory.hpp"
-#include "memory/pmm/buddy.hpp"
-#include "pstructs.hpp"
+#include "memory/memory.hpp"
+#include "buddy.hpp"
+#include "memory/pstructs.hpp"
 #include "limine/limine.h"
 #include "limine/requests.hpp"
 

@@ -1,4 +1,5 @@
 #include "features.hpp"
+#include "memory/updated/address.hpp"
 
 void x8664::features::probePhysicalWidth(){
   //cpuid normally references 32 bit registers eax, ebx ect.
@@ -53,11 +54,11 @@ void x8664::features::probeLapic(){
   }
 }
 
-memory::paddr64_t x8664::features::getPML4(){
+Mem::physaddr_t x8664::features::getPML4(){
   // the physical address of the pml4 table is located in bits 54:12 of cr3
   std::uint64_t cr3 = readcr3();
   std::uint64_t mask = (0xFFFFFFF << 12);
-  memory::paddr64_t addr = (cr3 & mask) >> 12;
+  Mem::physaddr_t addr = (cr3 & mask) >> 12;
   return addr;
 } 
 

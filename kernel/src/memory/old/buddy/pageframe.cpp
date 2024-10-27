@@ -1,5 +1,5 @@
-#include "memory/pageframe.hpp"
-#include "memory/pmm/buddy.hpp"
+#include "pageframe.hpp"
+#include "buddy.hpp"
 
 namespace memory{
 

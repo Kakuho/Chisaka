@@ -3,7 +3,7 @@
 // code to probe for cpu features
 #include <cstdint>
 #include <cpuid.h>
-#include "memory/memory.hpp"
+#include "memory/updated/address.hpp"
 #include "serial/kostream.hpp"
 
 extern "C" std::uint64_t readcr0();
@@ -28,7 +28,7 @@ namespace x8664::features{
 
   // intel vol3a.4.5 and vol3a.4.5.4
 
-  memory::paddr64_t getPML4();
+  Mem::physaddr_t getPML4();
 
   // functions just to read control registers
 
