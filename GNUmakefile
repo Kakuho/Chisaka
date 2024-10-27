@@ -1,7 +1,7 @@
 # Nuke built-in rules and variables.
 override MAKEFLAGS += -rR
 
-override IMAGE_NAME := template
+override IMAGE_NAME := chisaka
 
 # Convenience macro to reliably declare user overridable variables.
 define DEFAULT_VAR =
@@ -33,10 +33,27 @@ all-hdd: $(IMAGE_NAME).hdd
 
 .PHONY: run
 run: $(IMAGE_NAME).iso
-	qemu-system-x86_64 -M q35 -m 2G -cdrom $(IMAGE_NAME).iso -boot d 
+	qemu-system-x86_64 -M q35 -m 8G  -no-reboot -cdrom $(IMAGE_NAME).iso -boot d
 
-run32: $(IMAGE_NAME).iso
-	qemu-system-i386 -M q35 -m 2G -cdrom $(IMAGE_NAME).iso -boot d 
+.PHONY: run-io
+run-io: $(IMAGE_NAME).iso
+	clear && qemu-system-x86_64 -M q35 -m 8G -cdrom $(IMAGE_NAME).iso -serial stdio -boot d
+
+.PHONY: run-io-monitor
+run-io-monitor: $(IMAGE_NAME).iso
+	clear && qemu-system-x86_64 -M q35 -m 8G -cdrom $(IMAGE_NAME).iso -monitor stdio -boot d
+
+.PHONY: run-int
+run-int: $(IMAGE_NAME).iso
+	qemu-system-x86_64 -M q35 -m 8G -no-reboot -cdrom $(IMAGE_NAME).iso -boot d -d int -M smm=off
+
+.PHONY: run-debug
+run-debug: $(IMAGE_NAME).iso
+	qemu-system-x86_64 -M q35 -m 8G -cdrom $(IMAGE_NAME).iso -boot d -serial stdio -d int -M smm=off
+
+.PHONY: run-gdb
+run-gdb: $(IMAGE_NAME).iso
+	qemu-system-x86_64 -s -S -M q35 -m 8G -cdrom $(IMAGE_NAME).iso -boot d & gdb -ex "target remote localhost:1234" -ex "symbol-file ./kernel/bin/kernel"
 
 .PHONY: run-uefi
 run-uefi: ovmf $(IMAGE_NAME).iso
@@ -44,7 +61,7 @@ run-uefi: ovmf $(IMAGE_NAME).iso
 
 .PHONY: run-hdd
 run-hdd: $(IMAGE_NAME).hdd
-	qemu-system-x86_64 -M q35 -m 2G -hda $(IMAGE_NAME).hdd
+	qemu-system-x86_64 -M q35 -m 8G -hda $(IMAGE_NAME).hdd
 
 .PHONY: run-hdd-uefi
 run-hdd-uefi: ovmf $(IMAGE_NAME).hdd

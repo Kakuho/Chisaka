@@ -1,3 +1,5 @@
+/* https://ftp.gnu.org/old-gnu/Manuals/ld-2.9.1/html_chapter/ld_3.html */
+
 /* Tell the linker that we want an x86_64 ELF64 output file */
 OUTPUT_FORMAT(elf64-x86-64)
 OUTPUT_ARCH(i386:x86-64)
@@ -30,6 +32,8 @@ SECTIONS
     /* Move to the next memory page for .rodata */
     . += CONSTANT(MAXPAGESIZE);
 
+    /* SECOND PAGE */
+    /* contains global variables data */
     .rodata : {
         *(.rodata .rodata.*)
     } :rodata
@@ -45,6 +49,7 @@ SECTIONS
     /* Move to the next memory page for .data */
     . += CONSTANT(MAXPAGESIZE);
 
+    /* THIRD PAGE */
     .data : {
         *(.data .data.*)
     } :data

@@ -1,30 +1,40 @@
 #ifndef MEMORY_HPP
 #define MEMORY_HPP
 #include <cstdint>
-#include <limine.h>
-#include <limine_services.hpp>
-#include <kostream.hpp>
+#include <cstdlib>
 
-namespace req{
-extern volatile limine_hhdm_request hhdm_request;
-extern volatile limine_memmap_request memorymap_request;
-extern volatile limine_kernel_address_request kernel_addr_req;
-}
+#include "serial/kostream.hpp"
+#include "limine/limine.h"
+#include "limine/requests.hpp"
 
-namespace mem{
-  // a bunch of miscellenaeous memory
+namespace limine::requests{
+  extern volatile limine_hhdm_request hhdm_request;
+  extern volatile limine_memmap_request memorymap_request;
+  extern volatile limine_kernel_address_request kernel_addr_req;
+} // namespace limine::requests
+
+namespace memory{
+  // a bunch of miscellenaeous memory functions
   using paddr64_t = std::uint64_t;
   using vaddr64_t = std::uint64_t;
 
   inline paddr64_t vaddrToPaddr(vaddr64_t vaddr){
-    return vaddr - req::hhdm_request.response->offset;
+    return vaddr - limine::requests::hhdm_request.response->offset;
   }
 
   inline vaddr64_t paddrToVaddr(paddr64_t paddr){
-    return paddr + req::hhdm_request.response->offset;
+    return paddr + limine::requests::hhdm_request.response->offset;
   }
 
   void printMemoryMap();
+
+  vaddr64_t getKernelVirtualAddress();
+
+  inline void printKernelAddress(){
+    vaddr64_t kerneladdr = getKernelVirtualAddress();
+    kout << "kernel vaddr::" << kerneladdr << ":: kernel paddr :: " 
+         << vaddrToPaddr(kerneladdr) << '\n';
+  }
 
   void probeMemory(std::size_t index);
 
@@ -32,16 +42,24 @@ namespace mem{
 
   void printPageFrames();
 
-  vaddr64_t getKernelVirtualAddress();
-
   void upperLimitProbe();
 
   void lowerLimitProbe();
 
+  vaddr64_t FormLinearAddress(
+      std::uint16_t pm4le_i, 
+      std::uint16_t pdpte_i, 
+      std::uint16_t pde_i, 
+      std::uint16_t pt_i, 
+      std::uint16_t offset
+  );
+
+  void ExtractPagingIndices(vaddr64_t vaddr);
+
   /* DO NOT USE */
-  void corruptMemory();
+  [[noreturn]] void corruptMemory();
   /* DO NOT USE */
 
-} // namespace mem
+} // namespace memory
 
 #endif

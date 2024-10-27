@@ -30,11 +30,12 @@ override DEFAULT_LD := ld
 $(eval $(call DEFAULT_VAR,LD,$(DEFAULT_LD)))
 
 # User controllable C++ flags.
-override DEFAULT_CXXFLAGS := -g -O2 -pipe
+override DEFAULT_CXXFLAGS := -g -O0 -pipe -Wall -Wextra -Wpointer-arith -Wcast-align -Wswitch-enum -DDEBUG_KASSERTS
 $(eval $(call DEFAULT_VAR,CXXFLAGS,$(DEFAULT_CXXFLAGS)))
 
 # User controllable C flags.
-override DEFAULT_CFLAGS := -g -O2 -pipe
+override DEFAULT_CFLAGS := -g -O0 -pipe
+#override DEFAULT_CFLAGS := -g 
 $(eval $(call DEFAULT_VAR,CFLAGS,$(DEFAULT_CFLAGS)))
 
 # User controllable C/C++ preprocessor flags. We set none by default.
@@ -51,6 +52,8 @@ $(eval $(call DEFAULT_VAR,LDFLAGS,$(DEFAULT_LDFLAGS)))
 
 # Internal flags shared by both C and C++ compilers.
 override SHARED_FLAGS := \
+		-g \
+		-O0 \
     -Wall \
     -Wextra \
     -ffreestanding \
@@ -59,6 +62,7 @@ override SHARED_FLAGS := \
 		-nostdlib \
     -fno-lto \
     -fPIE \
+		-fPIC \
     -m64 \
     -march=x86-64 \
     -mno-80387 \
@@ -92,11 +96,19 @@ override LDFLAGS += \
     -m elf_x86_64 \
     -nostdlib \
     -static \
-    -pie \
     --no-dynamic-linker \
     -z text \
     -z max-page-size=0x1000 \
     -T linker.ld
+
+#override LDFLAGS += \
+    #-m elf_x86_64 \
+    #-nostdlib \
+    #-static \
+    #--no-dynamic-linker \
+    #-z text \
+    #-z max-page-size=0x1000 \
+    #-T linker.ld
 
 # Internal nasm flags that should not be changed by the user.
 override NASMFLAGS += \
@@ -116,7 +128,7 @@ override HEADER_DEPS := $(addprefix obj/,$(CXXFILES:.cpp=.cpp.d) $(CFILES:.c=.c.
 .PHONY: all
 all: bin/$(KERNEL)
 
-src/limine.h:
+src/limine/limine.h:
 	curl -Lo $@ https://github.com/limine-bootloader/limine/raw/trunk/limine.h
 
 # Link rules for the final kernel executable.
@@ -128,12 +140,12 @@ bin/$(KERNEL): GNUmakefile linker.ld $(OBJ)
 -include $(HEADER_DEPS)
 
 # Compilation rules for *.cpp files.
-obj/%.cpp.o: src/%.cpp GNUmakefile src/limine.h
+obj/%.cpp.o: src/%.cpp GNUmakefile src/limine/limine.h
 	mkdir -p "$$(dirname $@)"
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 # Compilation rules for *.c files.
-obj/%.c.o: src/%.c GNUmakefile src/limine.h
+obj/%.c.o: src/%.c GNUmakefile src/limine/limine.h
 	mkdir -p "$$(dirname $@)"
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
@@ -154,4 +166,4 @@ clean:
 
 .PHONY: distclean
 distclean: clean
-	rm -f src/limine.h
+	rm -f src/limine/limine.h
