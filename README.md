@@ -12,7 +12,7 @@ There is an explicit dependency on my header only library ```Primrose```.
 The compiler assumes there is a symbol link to ```Primrose``` in ```kernel/src```, so if you would like to try out the kernel follow these steps:
 
 * cd into ```kernel/src```
-* add a symbol link to ```Primrose/include``` 
+* add a symbol link from ```kernel/src/primrose/``` to ```Primrose/include``` 
 
 You should now be able to compile the kernel and run the image.
 
