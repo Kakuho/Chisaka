@@ -10,7 +10,7 @@
 #include <cassert>
 
 #include "attributes.hpp"
-#include "memory/memory.hpp"
+#include "memory/old/memory.hpp"
 #include "include/kassert.hpp"
 #include "serial/kostream.hpp"
 

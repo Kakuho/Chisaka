@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-#include "memory.hpp"
+#include "memory/old/memory.hpp"
 #include "cpu/features/features.hpp"
 //#include "cpu/util.hpp"
 #include "serial/kostream.hpp"
