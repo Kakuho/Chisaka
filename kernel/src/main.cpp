@@ -2,7 +2,7 @@
 
 #include "limine/requests.hpp"
 #include "cpu/utilites.hpp"
-#include "grains/cpu/interrupts/interrupt_manager.hpp"
+#include "grains/cpu/features/cpuid0.hpp"
 
 // Extern declarations for global constructor array.
 
@@ -34,5 +34,5 @@ extern "C" void _start() {
   //  Runtime tests for now
   // ------------------------------------------------------ //
 
-  Grains::CPU::InterruptManager_InvokeInterrupt1();
+  Grains::CPU::CpuId0_Test();
 }
