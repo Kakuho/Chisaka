@@ -1,3 +1,5 @@
 .cache/
 chisaka.iso
 limine/
+*.txt
+/Tasks/
