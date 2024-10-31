@@ -20,16 +20,19 @@ physaddr_t KVirtToPhysAddr(kvirtaddr_t vaddr){
 //  Kernel's virtual base address
 //-------------------------------------------------------------
 
-kvirtaddr_t KVirtBase(){
+kvirtaddr_t KernelVirtBase(){
   using namespace limine;
   return requests::kernel_addr_req.response->virtual_base;
 }
 
-void PrintKVirtBase(){
-  kvirtaddr_t kbase = KVirtBase();
-  kout << "kernel vaddr::" << kbase << ":: kernel paddr :: "
-       << KVirtToPhysAddr(kbase) << '\n';
+kvirtaddr_t KernelPhysBase(){
+  using namespace limine;
+  return requests::kernel_addr_req.response->physical_base;
 }
+
+//-------------------------------------------------------------
+//  Useful Queries
+//-------------------------------------------------------------
 
 physaddr_t TopUseableAddress(){
   // procedure to get the top limit of usable ram

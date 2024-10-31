@@ -1,10 +1,10 @@
 #include "pages.hpp"
-#include "cpu/utilites.hpp"
+#include "x86_64/utilites.hpp"
 
 namespace memory{
   constexpr std::size_t availablePages = 0x1fc000;
   paddr64_t startOfRam = 0;
-  std::array<page, availablePages> frameMap;
+  std::array<page, 1> frameMap;
   std::size_t nextFrame;
 
   void InitialisePageFrames(){

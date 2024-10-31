@@ -1,13 +1,13 @@
 #include <cstdint>
 
-namespace memory{
+namespace Mem::Phys{
 
   // template concept for the underlying page frame allocator implementation
+  // allows for static polymorphism
   template <typename T>
     concept PmmImplementation = requires(T pmm, std::size_t pages, void* addr){
-      pmm.alloc();
-      pmm.alloc(pages);
-      pmm.free(addr);
+      pmm.AllocatePage();
+      pmm.FreePage(addr);
     };
   
   // this class serves as just an interface to the physical page frame manager.

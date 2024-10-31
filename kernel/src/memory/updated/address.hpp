@@ -4,8 +4,8 @@
 // memory address related types and functionalities
 
 #include <cstdint>
+
 #include <concepts>
-#include <type_traits>
 
 #include "limine/requests.hpp"
 
@@ -29,24 +29,15 @@ namespace Mem{
   //  Kernel's virtual base address
   //-------------------------------------------------------------
 
-  kvirtaddr_t KVirtBase();
-  void PrintKVirtBase();
+  kvirtaddr_t KernelVirtBase();
+  physaddr_t KernelPhysBase();
+
+  //-------------------------------------------------------------
+  //  Useful Queries
+  //-------------------------------------------------------------
   
   physaddr_t TopUseableAddress();
   physaddr_t BottomUseableAddress();
-
-  //-------------------------------------------------------------
-  //  Alignment Functions
-  //-------------------------------------------------------------
-
-  template<typename T>
-  concept IsAddressType = (std::same_as<T, physaddr_t> || std::same_as<T, kvirtaddr_t>);
-
-  template<typename T, std::size_t AlignAddress>
-    requires IsAddressType<T>
-  constexpr T Align(T addr){
-    return (addr % AlignAddress) == addr ? addr : (addr % AlignAddress) + AlignAddress;
-  }
 
   //-------------------------------------------------------------
   //  Paging Address Related

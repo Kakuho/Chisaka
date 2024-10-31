@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-#include "cpu/utilites.hpp"
+#include "x86_64/utilites.hpp"
 #include "serial/kostream.hpp"
 
 // hacky way to obtain the file path and the line number of code

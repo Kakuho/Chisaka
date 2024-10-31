@@ -25,7 +25,7 @@ void PrintMemoryMap(){
 
 std::size_t TotalUseableMemory(){
   using namespace limine;
-  kassert(requests::memorymap_request.response == nullptr && "MEM FAIL\n");
+  kassert(requests::memorymap_request.response != nullptr && "MEM FAIL\n");
   std::uint64_t available_memory = 0;
   std::uint64_t mem_entries_t = requests::memorymap_request.response->entry_count;
   limine_memmap_entry** entries = requests::memorymap_request.response->entries;

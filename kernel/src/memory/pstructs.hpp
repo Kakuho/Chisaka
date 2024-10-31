@@ -7,8 +7,7 @@
 #include <cstdint>
 
 #include "memory/old/memory.hpp"
-#include "cpu/features/features.hpp"
-//#include "cpu/util.hpp"
+#include "x86_64/features/features.hpp"
 #include "serial/kostream.hpp"
 
 extern "C" std::uint64_t load_paging_table();

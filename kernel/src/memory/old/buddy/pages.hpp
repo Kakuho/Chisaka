@@ -5,8 +5,8 @@
 #include <array>
 
 #include "serial/kostream.hpp"
-#include "cpu/utilites.hpp"
-#include "cpu/features/features.hpp"
+#include "x86_64/utilites.hpp"
+#include "x86_64/features/features.hpp"
 #include "memory/old/memory.hpp"
 #include "buddy.hpp"
 #include "memory/pstructs.hpp"

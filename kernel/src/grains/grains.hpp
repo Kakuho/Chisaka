@@ -8,7 +8,7 @@
 #include <cstdint>
 
 #include "serial/kostream.hpp"
-#include "cpu/utilites.hpp"
+#include "x86_64/utilites.hpp"
 #include "misc/ascii.hpp"
 
 #define START_GRAIN(grainDescription)            \

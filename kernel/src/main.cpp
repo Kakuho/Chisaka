@@ -1,8 +1,8 @@
 #include <cstdint>
 
 #include "limine/requests.hpp"
-#include "cpu/utilites.hpp"
-#include "grains/cpu/features/cpuid0.hpp"
+#include "x86_64/utilites.hpp"
+#include "grains/memory/kernel_bases.hpp"
 
 // Extern declarations for global constructor array.
 
@@ -34,5 +34,6 @@ extern "C" void _start() {
   //  Runtime tests for now
   // ------------------------------------------------------ //
 
-  Grains::CPU::CpuId0_Test();
+  Grains::Mem::PrintKernelBases();
+
 }

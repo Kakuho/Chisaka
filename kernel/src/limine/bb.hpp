@@ -3,7 +3,7 @@
 #include <cstdint>
 #include "requests.hpp"
 #include "memory/memory.hpp"
-#include "cpu/util.hpp"
+#include "x86_64/util.hpp"
 
 
 namespace limine{
