@@ -35,10 +35,22 @@ namespace Mem{
 
   template<typename T, std::size_t AlignAddress>
     requires IsAddressType<T>
+  constexpr T AlignUp(T addr){
+    T aligned = addr % AlignAddress;
+    if(addr > aligned){
+      return aligned + AlignAddress;
+    }
+    else{
+      return aligned;
+    }
+  }
+
+  template<typename T, std::size_t AlignAddress>
+    requires IsAddressType<T>
   constexpr T NearestAlign(T addr){
     T aligned = addr % AlignAddress;
     if(aligned > AlignAddress/2){
-      return aligned += AlignAddress;
+      return aligned + AlignAddress;
     }
     else{
       return aligned;

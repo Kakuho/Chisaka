@@ -17,6 +17,12 @@ void PrintMemoryMap();
 
 std::size_t TotalUseableMemory();
 
+template <std::size_t PageSize>
+std::size_t TotalUseablePageFrames(){
+  std::size_t totalBytes = TotalUseableMemory();
+  return (((totalBytes / PageSize) / 8) / 4096);
+}
+
 //-------------------------------------------------------------
 //  Probers:
 //    these functions are more like run time examples

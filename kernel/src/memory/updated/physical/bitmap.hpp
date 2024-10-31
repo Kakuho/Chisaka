@@ -6,28 +6,43 @@
 #include <cstdint>
 
 #include "bump.hpp"
+#include "./../address.hpp"
+#include "./../features.hpp"
+#include "limine/limine.h"
 #include "limine/requests.hpp"
+#include "string.h"
 
 namespace Mem::Phys{
-
-struct BitmapHandle{
-  using AddrType = void*;
-  AddrType bitmap;
-  AddrType regions;
-};
 
 class Bitmap{
   using ByteType = char;
   using AddrType = void*;
 
-  struct Regions{
+  struct Region{
     std::uint64_t startAddr;
     std::uint64_t endAddr;
     std::uint32_t startIndex;
     std::uint32_t endIndex;
+
+    bool ContainsAddr(std::uint64_t paddr) const noexcept{
+      return (startAddr <= paddr) && (paddr <= endAddr);
+    }
+
+    bool ContainsAddr(void* paddr) const noexcept{
+      return ContainsAddr(reinterpret_cast<std::uint64_t>(paddr));
+    }
+
+    bool ContainsIndex(std::uint32_t index) const noexcept{
+      return (startAddr <= index) && (index <= endIndex);
+    }
   };
 
-  static_assert(sizeof(Regions) == 24);
+  struct BitmapHandle{
+    char* bitmap = nullptr;
+    Region* regions = nullptr;
+  };
+
+  static_assert(sizeof(Region) == 24);
 
   public:
     // ------------------------------------------------------ //
@@ -37,10 +52,21 @@ class Bitmap{
     explicit Bitmap() noexcept;
 
   private:
-    void InitialiseBitmap(AddrType bitmapBase);
-    void InitialiseRegions(AddrType regionBase);
+    std::uint8_t RegionSizeRequired() const noexcept;
+    void InitialiseRegions() noexcept;
+
+    std::uint8_t PageFrameSizeRequired() const noexcept;
+    void InitialiseBitmap() noexcept;
 
   public:
+    // ------------------------------------------------------ //
+    //  Mapping between Physical To Index
+    // ------------------------------------------------------ //
+
+
+    std::size_t IndexFrom(AddrType paddr);
+    AddrType AddressFrom(std::size_t index);
+
     // ------------------------------------------------------ //
     //  Allocation and Deallocation
     // ------------------------------------------------------ //
@@ -50,6 +76,7 @@ class Bitmap{
 
   private:
     BitmapHandle m_handle;
+    mutable std::size_t m_totalRegionSize;
 };
 
 }
