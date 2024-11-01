@@ -3,11 +3,26 @@
 
 namespace Mem::Phys{
 
+using ByteType = char;
+using AddrType = void*;
+
 // ------------------------------------------------------ //
 //  Lifetime and initial setup
 // ------------------------------------------------------ //
 
-Bitmap::Bitmap() noexcept{
+Bitmap::Bitmap() noexcept:
+  m_handle{
+    nullptr, 
+    nullptr
+  },
+  m_maxIndex{
+    PageFrameSizeRequired() * 0x1000u
+  },
+  m_lastIndex{0},
+  m_totalRegionSize{
+    RegionSizeRequired()
+  }
+{
   // I want to place the bookkeeping data in the largest available memory,
   // so I dont have to worry about running out of page frames
   auto [base, length] = LongestBaseLength();
@@ -26,14 +41,13 @@ Bitmap::Bitmap() noexcept{
   std::size_t offset = (useablePages/8) + 1;
   memset(reinterpret_cast<void*>(base), 0, base + offset);
   m_handle.regions = reinterpret_cast<Region*>(base + offset);
-
   // TODO: Initialise the Bitmap and the Region Arrays
 }
 
 std::uint8_t Bitmap::RegionSizeRequired() const noexcept{
   // returns the total size required in bytes for the region array
   using namespace limine::requests;
-  if(m_totalRegionSize == 0){
+  if(m_totalRegionSize != 0){
     return m_totalRegionSize;
   }
   std::uint8_t count = 0;
@@ -83,7 +97,7 @@ void Bitmap::InitialiseBitmap() noexcept{
 //  Mapping between Physical To Index
 // ------------------------------------------------------ //
 
-std::size_t Bitmap::IndexFrom(AddrType paddr){
+std::size_t Bitmap::IndexFrom(AddrType paddr) const noexcept{
   // 100 is a invalid return value
   for(std::size_t i = 0; i < m_totalRegionSize; i++){
     if(m_handle.regions[i].ContainsAddr(paddr)){
@@ -93,10 +107,10 @@ std::size_t Bitmap::IndexFrom(AddrType paddr){
       return m_handle.regions[i].startIndex + relativeIndex;
     }
   }
-  return 100;
+  return m_maxIndex;
 }
 
-void* Bitmap::AddressFrom(std::size_t index){
+AddrType Bitmap::AddressFrom(std::size_t index) const noexcept{
   for(std::size_t i = 0; i < m_totalRegionSize; i++){
     if(m_handle.regions[i].ContainsIndex(index)){
       std::uint8_t relativeIndex = index - m_handle.regions[i].startIndex;
@@ -108,6 +122,59 @@ void* Bitmap::AddressFrom(std::size_t index){
     }
   }
   return nullptr;
+}
+
+// ------------------------------------------------------ //
+//  PMM Interface
+// ------------------------------------------------------ //
+
+// Helpers for page alloc and page free
+
+void Bitmap::SetIndex(std::size_t index) noexcept{
+  // input:   individual page index
+  // effect:  sets the bitmap page index to 1
+  std::size_t pageIndex = index / 8;
+  std::uint8_t relativeIndex = index % 8;
+  m_handle.bitmap[pageIndex] |= (1 << relativeIndex);
+}
+
+void Bitmap::ClearIndex(std::size_t index) noexcept{
+  std::size_t pageIndex = index / 8;
+  std::uint8_t relativeIndex = index % 8;
+  m_handle.bitmap[pageIndex] &= ~(1 << relativeIndex);
+}
+
+std::uint8_t Bitmap::GetFreeIndex(std::uint8_t byte) const noexcept{
+  std::uint8_t index = 0;
+  std::uint8_t mask = ~(1 << index);
+  while((byte & mask) != 0){
+    index++;
+    mask = ~(1 << index);
+  }
+  return index;
+}
+
+// the actual interface themselves
+
+AddrType Bitmap::AllocPage() noexcept{
+  // returns a nullptr on invalid calls
+  if(m_useableIndicies != 0){
+    std::size_t byteIndex = m_lastIndex;
+    bool isFree = static_cast<std::uint8_t>(m_handle.bitmap[byteIndex]) != 0xFF;
+    while(!isFree){
+      byteIndex = (byteIndex + 1) % m_maxIndex;
+    }
+    std::uint8_t freeIndex = GetFreeIndex(m_handle.bitmap[byteIndex]);
+    SetIndex(freeIndex);
+    return AddressFrom(freeIndex);
+  }
+  else{
+    return nullptr;
+  }
+}
+
+void Bitmap::FreePage(AddrType paddr) noexcept{
+  ClearIndex(IndexFrom(paddr));
 }
 
 } // namespace Mem::Phys

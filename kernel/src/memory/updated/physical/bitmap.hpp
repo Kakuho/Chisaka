@@ -2,6 +2,11 @@
 #define MEMORY_PHYS_BITMAP_HPP
 
 // Bitmap Page Frame Allocator
+//
+// Throughout the code I use the term pageIndex to refer to an indiviual 
+// pageframe's index and byteIndex to refer to the unit of pageframes
+//
+// Thus, in this model, a single byteIndex refers to 8 pageIndicies
 
 #include <cstdint>
 
@@ -18,31 +23,36 @@ class Bitmap{
   using ByteType = char;
   using AddrType = void*;
 
-  struct Region{
-    std::uint64_t startAddr;
-    std::uint64_t endAddr;
-    std::uint32_t startIndex;
-    std::uint32_t endIndex;
+  private:
+    // Private Data Structures useful for implementing the Bitmap allocator
+    struct Region{
+      std::uint64_t startAddr;
+      std::uint64_t endAddr;
+      std::uint32_t startIndex;
+      std::uint32_t endIndex;
 
-    bool ContainsAddr(std::uint64_t paddr) const noexcept{
-      return (startAddr <= paddr) && (paddr <= endAddr);
-    }
+      [[nodiscard]] constexpr bool 
+      ContainsAddr(std::uint64_t paddr) const noexcept{
+        return (startAddr <= paddr) && (paddr <= endAddr);
+      }
 
-    bool ContainsAddr(void* paddr) const noexcept{
-      return ContainsAddr(reinterpret_cast<std::uint64_t>(paddr));
-    }
+      [[nodiscard]] constexpr bool 
+      ContainsAddr(void* paddr) const noexcept{
+        return ContainsAddr(reinterpret_cast<std::uint64_t>(paddr));
+      }
 
-    bool ContainsIndex(std::uint32_t index) const noexcept{
-      return (startAddr <= index) && (index <= endIndex);
-    }
-  };
+      [[nodiscard]] constexpr bool 
+      ContainsIndex(std::uint32_t index) const noexcept{
+        return (startAddr <= index) && (index <= endIndex);
+      }
+    };
 
-  struct BitmapHandle{
-    char* bitmap = nullptr;
-    Region* regions = nullptr;
-  };
+    static_assert(sizeof(Region) == 24);
 
-  static_assert(sizeof(Region) == 24);
+    struct BitmapHandle{
+      char* bitmap = nullptr;
+      Region* regions = nullptr;
+    };
 
   public:
     // ------------------------------------------------------ //
@@ -50,32 +60,44 @@ class Bitmap{
     // ------------------------------------------------------ //
 
     explicit Bitmap() noexcept;
+    ~Bitmap() = default;
 
   private:
-    std::uint8_t RegionSizeRequired() const noexcept;
+    // helpful functions for setting up the bitmap
+    [[nodiscard]] std::uint8_t RegionSizeRequired() const noexcept;
     void InitialiseRegions() noexcept;
 
-    std::uint8_t PageFrameSizeRequired() const noexcept;
+    [[nodiscard]] std::uint8_t PageFrameSizeRequired() const noexcept;
     void InitialiseBitmap() noexcept;
 
   public:
     // ------------------------------------------------------ //
     //  Mapping between Physical To Index
+    //    (Indexes are the individual page frame index)
     // ------------------------------------------------------ //
 
-
-    std::size_t IndexFrom(AddrType paddr);
-    AddrType AddressFrom(std::size_t index);
+    [[nodiscard]] std::size_t IndexFrom(AddrType paddr) const noexcept;
+    [[nodiscard]] AddrType AddressFrom(std::size_t index) const noexcept;
 
     // ------------------------------------------------------ //
-    //  Allocation and Deallocation
+    //  PMM Interface
     // ------------------------------------------------------ //
 
-    AddrType AllocatePage();
-    void FreePage();
+    [[nodiscard]] AddrType AllocPage() noexcept;
+    void FreePage(AddrType paddr) noexcept;
+
+  private:
+    // helpers for the pmm interface
+    void ClearIndex(std::size_t index) noexcept;
+    void SetIndex(std::size_t index) noexcept;
+    std::uint8_t GetFreeIndex(std::uint8_t byte) const noexcept;
+
 
   private:
     BitmapHandle m_handle;
+    const std::size_t m_maxIndex;           //  max pageframe index
+    std::size_t m_lastIndex;                //  the last used byte index
+    mutable std::size_t m_useableIndicies;  //  total byte indicies which are free
     mutable std::size_t m_totalRegionSize;
 };
 
