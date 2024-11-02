@@ -22,6 +22,8 @@ class StackDescriptor{
     explicit StackDescriptor() noexcept = default;
     explicit StackDescriptor(PBaseLimit&& args) noexcept;
 
+    [[nodiscard]] paddr_t& LastAddr() { return m_lastAddr; }
+
   private:
     paddr_t m_base;
     paddr_t m_lastAddr;

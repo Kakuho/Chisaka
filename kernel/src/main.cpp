@@ -2,7 +2,8 @@
 
 #include "limine/requests.hpp"
 #include "x86_64/utilites.hpp"
-#include "grains/memory/kernel_bases.hpp"
+//#include "grains/memory/kernel_bases.hpp"
+#include "grains/memory/stack/stack_switch.hpp"
 
 // Extern declarations for global constructor array.
 
@@ -34,6 +35,7 @@ extern "C" void _start() {
   //  Runtime tests for now
   // ------------------------------------------------------ //
 
-  Grains::Mem::PrintKernelBases();
+  //Grains::Mem::PrintKernelBases();
+  Grains::Mem::StackSwitching();
 
 }
