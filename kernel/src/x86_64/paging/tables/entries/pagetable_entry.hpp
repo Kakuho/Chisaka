@@ -44,16 +44,36 @@ class PageTableEntry{
   using VirtAddr_t = std::uint64_t;
   public:
     //-------------------------------------------------------------
-    //  Initialisation
+    //  Lifetime
     //-------------------------------------------------------------
 
-    constexpr explicit PageTableEntry(VirtAddr_t address, std::uint8_t flags) 
+    constexpr explicit PageTableEntry() 
       noexcept
+    {
+      m_buffer = 0;
+    }
+
+    constexpr explicit PageTableEntry(
+        VirtAddr_t address, 
+        std::uint8_t flags
+    ) noexcept
     {
       InitialiseBuffer(address, flags);
     }
 
+    constexpr const PageTableEntry& operator=(std::uint64_t src){
+      m_buffer = src;
+      return *this;
+    }
+
+    constexpr ~PageTableEntry() = default;
+
+    //-------------------------------------------------------------
+    //  Operator Overloads
+    //-------------------------------------------------------------
+
     constexpr operator std::uint64_t() noexcept{ return m_buffer;}
+    constexpr operator std::uint64_t() const noexcept{ return m_buffer;}
 
     //-------------------------------------------------------------
     //  Attribute Queries
@@ -67,6 +87,7 @@ class PageTableEntry{
 
     [[nodiscard]] constexpr bool IsUserAccessible() const noexcept 
     { return m_buffer & Paging::US; }
+    //-------------------------------------------------------------
 
     [[nodiscard]] constexpr bool IsPwt() const noexcept 
     { return m_buffer & Paging::PWT;}
