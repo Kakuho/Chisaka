@@ -7,7 +7,7 @@
 #include "primrose/static_array.hpp"
 #include "include/kassert.hpp"
 
-extern "C" void switch_stack(std::uint64_t rsp);
+extern "C" void switch_stack(std::uint64_t rsp, std::uint64_t code);
 extern "C" std::uint64_t read_rsp();
 
 namespace Mem{
