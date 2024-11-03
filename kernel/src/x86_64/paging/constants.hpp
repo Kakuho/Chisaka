@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-namespace X8664{
+namespace X8664::Paging{
   static inline constexpr std::uint16_t PAGING_ENTRIES = 512;
 }
 

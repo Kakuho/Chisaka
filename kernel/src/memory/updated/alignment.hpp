@@ -28,9 +28,8 @@ namespace Mem{
   template<typename T, std::size_t AlignAddress>
     requires IsAddressType<T>
   constexpr T Align(T addr){
-    return  (addr % AlignAddress) == addr ? 
-            addr : 
-            (addr % AlignAddress) + AlignAddress;
+    return  (addr % AlignAddress) == addr ? addr : 
+            addr - (addr % AlignAddress);
   }
 
   template<typename T, std::size_t AlignAddress>
