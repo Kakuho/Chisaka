@@ -41,13 +41,24 @@ class CommonEntry{
     //  Initialisation
     //-------------------------------------------------------------
 
-    constexpr explicit CommonEntry(VirtAddr_t address, std::uint8_t flags) 
-      noexcept
+    constexpr explicit CommonEntry(): m_buffer{0}{}
+
+    constexpr explicit CommonEntry(
+        VirtAddr_t address, 
+        std::uint8_t flags
+    ) noexcept
     {
       InitialiseBuffer(address, flags);
     }
 
+    constexpr const CommonEntry& operator=( std::uint64_t src)
+    {
+      m_buffer = src;
+      return *this;
+    }
+
     constexpr operator std::uint64_t() noexcept{ return m_buffer;}
+    constexpr operator std::uint64_t() const noexcept{ return m_buffer;}
 
     //-------------------------------------------------------------
     //  Attribute Queries
