@@ -9,7 +9,7 @@
 #include "x86_64/features/features.hpp"
 #include "memory/old/memory.hpp"
 #include "buddy.hpp"
-#include "memory/pstructs.hpp"
+#include "memory/old/pstructs.hpp"
 #include "limine/limine.h"
 #include "limine/requests.hpp"
 

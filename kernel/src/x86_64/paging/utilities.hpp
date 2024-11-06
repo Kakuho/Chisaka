@@ -4,7 +4,7 @@
 // functionalities regarding the paging table for x86_64 processors
 
 #include "../registers/control_registers.hpp"
-#include "memory/updated/address.hpp"
+#include "memory/address.hpp"
 
 namespace X8664::Paging{
 

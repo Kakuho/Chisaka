@@ -3,7 +3,8 @@
 #include "limine/requests.hpp"
 #include "x86_64/utilites.hpp"
 //#include "grains/memory/kernel_bases.hpp"
-#include "grains/memory/stack/stack_switch.hpp"
+//#include "grains/memory/memorymap.hpp"
+#include "grains/memory/physical/bump.hpp"
 
 // Extern declarations for global constructor array.
 
@@ -36,6 +37,5 @@ extern "C" void _start() {
   // ------------------------------------------------------ //
 
   //Grains::Mem::PrintKernelBases();
-  Grains::Mem::StackSwitching();
-
+  Grains::Mem::BumpAllocator();
 }

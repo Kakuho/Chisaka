@@ -21,7 +21,7 @@ namespace Mem::Phys{
 class Bump{
   public:
 
-    using AddrType = physaddr_t;
+    using AddrType = kvirtaddr_t;
 
   public:
     // ------------------------------------------------------ //
@@ -29,6 +29,7 @@ class Bump{
     // ------------------------------------------------------ //
 
     explicit Bump(AddrType start, AddrType end) noexcept;
+    explicit Bump(void* start, void* end) noexcept;
     ~Bump() = default;  
     
     // ------------------------------------------------------ //

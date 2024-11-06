@@ -4,7 +4,6 @@
 // memory address related types and functionalities
 
 #include <cstdint>
-
 #include <concepts>
 
 #include "limine/requests.hpp"
@@ -18,12 +17,33 @@ namespace Mem{
   using physaddr_t = std::uint64_t;
   using kvirtaddr_t = std::uint64_t;
 
+  template<typename T>
+  concept IsAddressType = (
+                            std::same_as<T, physaddr_t> || 
+                            std::same_as<T, kvirtaddr_t>
+                          );
+
+  template<typename T>
+  concept NotIntegralAddressType = ( !IsAddressType<T> );
+
   //-------------------------------------------------------------
-  //  Conversions between the physical and virtual addresses
+  //  Conversions between address types
   //-------------------------------------------------------------
 
   kvirtaddr_t PhysToKVirtAddr(physaddr_t paddr);
   physaddr_t KVirtToPhysAddr(kvirtaddr_t vaddr);
+
+  template<typename T>
+    requires IsAddressType<T>
+  constexpr void* PVAddrToPtr(T addr){
+    return reinterpret_cast<void*>(addr);
+  }
+
+  template<typename T>
+    requires IsAddressType<T>
+  constexpr T PtrToAddr(void* ptr){
+    return reinterpret_cast<T>(ptr);
+  }
 
   //-------------------------------------------------------------
   //  Kernel's virtual base address

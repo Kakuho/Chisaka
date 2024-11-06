@@ -30,7 +30,7 @@ Bitmap::Bitmap() noexcept:
   std::size_t useablePages = TotalUseablePageFrames<0x1000>();
   std::size_t totalBytes = PageFrameSizeRequired() + RegionSizeRequired();
   physaddr_t upperBound = AlignUp<std::size_t, 0x1000>(base + totalBytes);
-  Bump bootstrapper{base, upperBound};
+  //Bump bootstrapper{base, upperBound};
   // setting the handler's base pointers
   m_handle.bitmap = reinterpret_cast<char*>(base);
   //  the offset, if tightly packed, should be 

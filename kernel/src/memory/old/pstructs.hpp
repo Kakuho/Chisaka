@@ -14,7 +14,7 @@ extern "C" std::uint64_t load_paging_table();
 
 namespace memory::paging{
 
-  constexpr std::uint16_t structureBytes = 4096;  // intel 4.2
+  //constexpr std::uint16_t structureBytes = 4096;  // intel 4.2
   constexpr std::uint16_t structureSize = 512;    // intel 4.2
   
   // All paging entries have the same structure, so this struct acts as an 

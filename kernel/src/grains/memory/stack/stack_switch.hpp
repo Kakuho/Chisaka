@@ -1,5 +1,5 @@
-#include "memory/updated/stack/stack_manager.hpp"
-#include "memory/updated/stack/stack_descriptor.hpp"
+#include "memory/stack/stack_manager.hpp"
+#include "memory/stack/stack_descriptor.hpp"
 #include "grains/grains.hpp"
 #include "include/kassert.hpp"
 #include "serial/kostream.hpp"

@@ -5,25 +5,13 @@
 
 #include <cstdint>
 #include <concepts>
+#include "address.hpp"
 
 namespace Mem{
-
-  // Sensible type declarations
-  //  kvirtaddr_t is the kernel's virtual address
-  //  (different processes may have different virtual address mappings)
-
-  using physaddr_t = std::uint64_t;
-  using kvirtaddr_t = std::uint64_t;
 
   // ------------------------------------------------------ //
   //  Aligning Functions
   // ------------------------------------------------------ //
-
-  template<typename T>
-  concept IsAddressType = (
-                            std::same_as<T, physaddr_t> || 
-                            std::same_as<T, kvirtaddr_t>
-                          );
 
   template<typename T, std::size_t AlignAddress>
     requires IsAddressType<T>
@@ -46,13 +34,26 @@ namespace Mem{
 
   template<typename T, std::size_t AlignAddress>
     requires IsAddressType<T>
-  constexpr T NearestAlign(T addr){
+  constexpr auto NearestAlign(T addr){
     T aligned = addr % AlignAddress;
+    if(aligned == 0){
+      return addr;
+    }
     if(aligned > AlignAddress/2){
       return aligned + AlignAddress;
     }
     else{
       return aligned;
+    }
+  }
+
+  template<typename T, std::size_t AlignAddress>
+    requires NotIntegralAddressType<T>
+  constexpr auto NearestAlign(T addr){
+    kvirtaddr_t aligned = reinterpret_cast<kvirtaddr_t>(addr) % 
+                          AlignAddress;
+    if(aligned == 0){
+      return addr;
     }
   }
 

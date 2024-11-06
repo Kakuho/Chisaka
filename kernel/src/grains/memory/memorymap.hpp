@@ -1,5 +1,5 @@
 #include "serial/kostream.hpp"
-#include "memory/updated/features.hpp"
+#include "memory/features.hpp"
 #include "grains/grains.hpp"
 #include "include/kassert.hpp"
 

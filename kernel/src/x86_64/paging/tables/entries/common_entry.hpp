@@ -36,6 +36,7 @@ static inline constexpr std::uint8_t A    = EntryModifier::Accessed;
 
 class CommonEntry{
   using VirtAddr_t = std::uint64_t;
+  static inline constexpr std::uint64_t ADDRESS_MASK = (0xFFF'FFFF << 12);
   public:
     //-------------------------------------------------------------
     //  Initialisation
@@ -63,6 +64,9 @@ class CommonEntry{
     //-------------------------------------------------------------
     //  Attribute Queries
     //-------------------------------------------------------------
+
+    [[nodiscard]] constexpr std::uint64_t BaseAddress() const noexcept 
+    { return m_buffer & ADDRESS_MASK;  }
 
     [[nodiscard]] constexpr bool IsPresent() const noexcept 
     { return m_buffer & Paging::P;  }
