@@ -19,30 +19,89 @@ Bitmap::Bitmap() noexcept:
     PageFrameSizeRequired() * 0x1000u
   },
   m_lastIndex{0},
-  m_totalRegionSize{
-    RegionSizeRequired()
-  }
+  m_totalRegionSize{0}
 {
-  // I want to place the bookkeeping data in the largest available memory,
+  // I want to place the bookkeeping data in the largest 
+  // available memory,
   // so I dont have to worry about running out of page frames
   auto [base, length] = LongestBaseLength();
+#if DEBUG
+  kout << "base :: " << base << '\n';
+  kout << "length :: " << length << '\n';
+#endif
   // I use the bump allocator just for initialising the bitmap
   std::size_t useablePages = TotalUseablePageFrames<0x1000>();
-  std::size_t totalBytes = PageFrameSizeRequired() + RegionSizeRequired();
-  physaddr_t upperBound = AlignUp<std::size_t, 0x1000>(base + totalBytes);
-  //Bump bootstrapper{base, upperBound};
+#if DEBUG
+  kout << "useable Pages :: " << useablePages << '\n';
+#endif
+  std::size_t totalBytes = PageFrameSizeRequired() + 
+  RegionSizeRequired();
+#if DEBUG
+  kout << "totalBytes :: " << totalBytes << '\n';
+#endif
   // setting the handler's base pointers
   m_handle.bitmap = reinterpret_cast<char*>(base);
   //  the offset, if tightly packed, should be 
   //  Ceiling(useablePages/8)
   //
-  //  However I changed it to useablePages/8 + 1, which although pads it slightly, 
-  //  makes the math easier to implement
+  //  However I changed it to useablePages/8 + 1, which although pads 
+  //  it slightly, makes the math easier to implement
   std::size_t offset = (useablePages/8) + 1;
-  memset(reinterpret_cast<void*>(base), 0, base + offset);
-  m_handle.regions = reinterpret_cast<Region*>(base + offset);
-  // TODO: Initialise the Bitmap and the Region Arrays
+#if DEBUG
+  kout << "offset :: " << offset << '\n';
+#endif
+  InitialiseBitmap(reinterpret_cast<void*>(base), offset);
+  InitialiseRegions(reinterpret_cast<Region*>(base + offset));
+  Epilogue();
 }
+
+void Bitmap::InitialiseRegions(Region* regionBase) noexcept{
+  // Regions represents continous areas of useable available memory
+  using namespace limine::requests;
+  // make space for the region bitmap
+  memset(reinterpret_cast<void*>(regionBase), 0, RegionSizeRequired());
+  std::uint32_t pageIndex = 0;    
+  std::size_t regionIndex = 0;  // index into the region array
+  limine_memmap_response* response = memorymap_request.response;
+  for(std::size_t i = 0; i < response->entry_count; i++){
+    auto memEntry = response->entries[i];
+    if(memEntry->type == LIMINE_MEMMAP_USABLE){
+      std::uint32_t relativeIndex = memEntry->length / 0x1000;
+      regionBase[regionIndex++] = Region
+        {
+          .startAddr = memEntry->base,
+          .endAddr = memEntry->base + memEntry->length,
+          .startIndex = pageIndex,
+          .endIndex = pageIndex + relativeIndex
+        };
+      pageIndex += relativeIndex;
+    }
+  }
+  m_handle.regions = regionBase;
+  m_handle.end = 
+    reinterpret_cast<void*>(
+    reinterpret_cast<std::uint64_t>(regionBase + RegionSizeRequired())
+    );
+}
+
+void Bitmap::InitialiseBitmap(void* base, std::size_t length) noexcept{
+  // Regions represents continous areas of useable available memory
+  memset(reinterpret_cast<void*>(base), 0, length);
+  m_handle.bitmap = reinterpret_cast<char*>(base);
+}
+
+void Bitmap::Epilogue() noexcept{
+  // finishes set up, by setting the used bitmap entries
+  physaddr_t start = reinterpret_cast<physaddr_t>(m_handle.bitmap);
+  while(start < reinterpret_cast<physaddr_t>(m_handle.end)){
+    SetIndex(IndexFrom(reinterpret_cast<void*>(start)));
+    start += 0x1000;
+  }
+}
+
+// ------------------------------------------------------ //
+//  Determining number of Bytes required
+// ------------------------------------------------------ //
 
 std::uint8_t Bitmap::RegionSizeRequired() const noexcept{
   // returns the total size required in bytes for the region array
@@ -58,39 +117,13 @@ std::uint8_t Bitmap::RegionSizeRequired() const noexcept{
       count++;
     }
   }
-  m_totalRegionSize = count;
-  return sizeof(Region) * m_totalRegionSize;
-}
-
-void Bitmap::InitialiseRegions() noexcept{
-  // Regions represents continous areas of useable available memory
-  using namespace limine::requests;
-  std::uint32_t pageIndex = 0;    
-  std::size_t regionIndex = 0;  // index into the region array
-  limine_memmap_response* response = memorymap_request.response;
-  for(std::size_t i = 0; i < response->entry_count; i++){
-    auto memEntry = response->entries[i];
-    if(memEntry->type == LIMINE_MEMMAP_USABLE){
-      std::uint32_t relativeIndex = memEntry->length / 0x1000;
-      m_handle.regions[regionIndex++] = Region
-        {
-          .startAddr = memEntry->base,
-          .endAddr = memEntry->base + memEntry->length,
-          .startIndex = pageIndex,
-          .endIndex = pageIndex + relativeIndex
-        };
-      pageIndex += relativeIndex;
-    }
-  }
+  m_totalRegionSize = count * sizeof(Region);
+  return m_totalRegionSize;
 }
 
 std::uint8_t Bitmap::PageFrameSizeRequired() const noexcept{
   // returns the total size required in bytes for page frame statuses 
   return (TotalUseableMemory() / 4096) / 8;
-}
-
-void Bitmap::InitialiseBitmap() noexcept{
-  // Regions represents continous areas of useable available memory
 }
 
 // ------------------------------------------------------ //

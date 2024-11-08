@@ -18,9 +18,11 @@ void PrintMemoryMap();
 std::size_t TotalUseableMemory();
 
 template <std::size_t PageSize>
-std::size_t TotalUseablePageFrames(){
+[[nodiscard]] constexpr std::size_t TotalUseablePageFrames(){
+  // there is an extra 1 for padding / to ensure the division does 
+  // not lose the fractional part.
   std::size_t totalBytes = TotalUseableMemory();
-  return (((totalBytes / PageSize) / 8) / 4096);
+  return (((totalBytes / PageSize) / 8) / 4096) + 1;
 }
 
 //-------------------------------------------------------------

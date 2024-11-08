@@ -1,6 +1,8 @@
 #ifndef MEMORY_PHYS_BITMAP_HPP
 #define MEMORY_PHYS_BITMAP_HPP
 
+#define DEBUG 1
+
 // Bitmap Page Frame Allocator
 //
 // Throughout the code I use the term pageIndex to refer to an indiviual 
@@ -52,6 +54,7 @@ class Bitmap{
     struct BitmapHandle{
       char* bitmap = nullptr;
       Region* regions = nullptr;
+      void* end = nullptr;
     };
 
   public:
@@ -63,12 +66,9 @@ class Bitmap{
     ~Bitmap() = default;
 
   private:
-    // helpful functions for setting up the bitmap
-    [[nodiscard]] std::uint8_t RegionSizeRequired() const noexcept;
-    void InitialiseRegions() noexcept;
-
-    [[nodiscard]] std::uint8_t PageFrameSizeRequired() const noexcept;
-    void InitialiseBitmap() noexcept;
+    void InitialiseBitmap(void* base, std::size_t length) noexcept;
+    void InitialiseRegions(Region* base) noexcept;
+    void Epilogue() noexcept;
 
   public:
     // ------------------------------------------------------ //
@@ -86,19 +86,30 @@ class Bitmap{
     [[nodiscard]] AddrType AllocPage() noexcept;
     void FreePage(AddrType paddr) noexcept;
 
+    // ------------------------------------------------------ //
+    //  Checking how much space the bitmap requires
+    // ------------------------------------------------------ //
+
+    [[nodiscard]] std::uint8_t RegionSizeRequired() const noexcept;
+    [[nodiscard]] std::uint8_t PageFrameSizeRequired() const noexcept;
+
+    [[nodiscard]] constexpr std::size_t TotalPageFrames() const noexcept{
+      return m_maxIndex + 1;
+    }
+
   private:
     // helpers for the pmm interface
     void ClearIndex(std::size_t index) noexcept;
     void SetIndex(std::size_t index) noexcept;
     std::uint8_t GetFreeIndex(std::uint8_t byte) const noexcept;
 
-
   private:
     BitmapHandle m_handle;
     const std::size_t m_maxIndex;           //  max pageframe index
     std::size_t m_lastIndex;                //  the last used byte index
-    mutable std::size_t m_useableIndicies;  //  total byte indicies which are free
-    mutable std::size_t m_totalRegionSize;
+    mutable std::size_t m_useableIndicies;  //  total byte indicies 
+                                            //  which are free
+    mutable std::size_t m_totalRegionSize{0};
 };
 
 }

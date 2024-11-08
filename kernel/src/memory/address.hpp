@@ -64,6 +64,7 @@ namespace Mem{
     std::size_t length;
   };
 
+  // in physical
   BaseLength LongestBaseLength();
 
   //-------------------------------------------------------------

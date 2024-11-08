@@ -2,9 +2,7 @@
 
 #include "limine/requests.hpp"
 #include "x86_64/utilites.hpp"
-//#include "grains/memory/kernel_bases.hpp"
-//#include "grains/memory/memorymap.hpp"
-#include "grains/memory/physical/bump.hpp"
+#include "grains/memory/physical/bitmap.hpp"
 
 // Extern declarations for global constructor array.
 
@@ -37,5 +35,5 @@ extern "C" void _start() {
   // ------------------------------------------------------ //
 
   //Grains::Mem::PrintKernelBases();
-  Grains::Mem::BumpAllocator();
+  Grains::Mem::BitmapAllocatorTests();
 }
