@@ -21,8 +21,7 @@ template <std::size_t PageSize>
 [[nodiscard]] constexpr std::size_t TotalUseablePageFrames(){
   // there is an extra 1 for padding / to ensure the division does 
   // not lose the fractional part.
-  std::size_t totalBytes = TotalUseableMemory();
-  return (((totalBytes / PageSize) / 8) / 4096) + 1;
+  return TotalUseableMemory() / PageSize;
 }
 
 //-------------------------------------------------------------

@@ -90,8 +90,8 @@ class Bitmap{
     //  Checking how much space the bitmap requires
     // ------------------------------------------------------ //
 
-    [[nodiscard]] std::uint8_t RegionSizeRequired() const noexcept;
-    [[nodiscard]] std::uint8_t PageFrameSizeRequired() const noexcept;
+    [[nodiscard]] std::size_t RegionSizeNBytes() const noexcept;
+    [[nodiscard]] std::size_t PageFrameSizeNBytes() const noexcept;
 
     [[nodiscard]] constexpr std::size_t TotalPageFrames() const noexcept{
       return m_maxIndex + 1;

@@ -16,7 +16,7 @@ Bitmap::Bitmap() noexcept:
     nullptr
   },
   m_maxIndex{
-    PageFrameSizeRequired() * 0x1000u
+    PageFrameSizeNBytes() - 1u
   },
   m_lastIndex{0},
   m_totalRegionSize{0}
@@ -34,9 +34,11 @@ Bitmap::Bitmap() noexcept:
 #if DEBUG
   kout << "useable Pages :: " << useablePages << '\n';
 #endif
-  std::size_t totalBytes = PageFrameSizeRequired() + 
-  RegionSizeRequired();
+  std::size_t totalBytes = PageFrameSizeNBytes() + 
+  RegionSizeNBytes();
 #if DEBUG
+  kout << "Page Frame Bitmap Bytes :: " << PageFrameSizeNBytes() << '\n';
+  kout << "Region Array Bytes :: " << RegionSizeNBytes() << '\n';
   kout << "totalBytes :: " << totalBytes << '\n';
 #endif
   // setting the handler's base pointers
@@ -59,7 +61,7 @@ void Bitmap::InitialiseRegions(Region* regionBase) noexcept{
   // Regions represents continous areas of useable available memory
   using namespace limine::requests;
   // make space for the region bitmap
-  memset(reinterpret_cast<void*>(regionBase), 0, RegionSizeRequired());
+  memset(reinterpret_cast<void*>(regionBase), 0, RegionSizeNBytes());
   std::uint32_t pageIndex = 0;    
   std::size_t regionIndex = 0;  // index into the region array
   limine_memmap_response* response = memorymap_request.response;
@@ -80,7 +82,7 @@ void Bitmap::InitialiseRegions(Region* regionBase) noexcept{
   m_handle.regions = regionBase;
   m_handle.end = 
     reinterpret_cast<void*>(
-    reinterpret_cast<std::uint64_t>(regionBase + RegionSizeRequired())
+    reinterpret_cast<std::uint64_t>(regionBase + RegionSizeNBytes())
     );
 }
 
@@ -103,7 +105,7 @@ void Bitmap::Epilogue() noexcept{
 //  Determining number of Bytes required
 // ------------------------------------------------------ //
 
-std::uint8_t Bitmap::RegionSizeRequired() const noexcept{
+std::size_t Bitmap::RegionSizeNBytes() const noexcept{
   // returns the total size required in bytes for the region array
   using namespace limine::requests;
   if(m_totalRegionSize != 0){
@@ -121,9 +123,10 @@ std::uint8_t Bitmap::RegionSizeRequired() const noexcept{
   return m_totalRegionSize;
 }
 
-std::uint8_t Bitmap::PageFrameSizeRequired() const noexcept{
+std::size_t Bitmap::PageFrameSizeNBytes() const noexcept{
   // returns the total size required in bytes for page frame statuses 
-  return (TotalUseableMemory() / 4096) / 8;
+  // each page frame is a single bit
+  return TotalUseablePageFrames<0x1000>() / 8;
 }
 
 // ------------------------------------------------------ //

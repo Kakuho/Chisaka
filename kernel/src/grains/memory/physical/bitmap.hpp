@@ -13,10 +13,7 @@ namespace Grains::Mem{
       {
         ::Mem::PrintMemoryMap();
         ::Mem::Phys::Bitmap alloc{};
-        kout << "region size required :: " << alloc.RegionSizeRequired() << '\n';
-        kout << "page size required :: " << alloc.PageFrameSizeRequired() << '\n';
-        //REQUIRE_EQUAL(::Mem::TotalUseablePageFrames<0x1000>(), alloc.TotalPageFrames());
-        REQUIRE_EQUAL(false, true);
+        REQUIRE_EQUAL(::Mem::TotalUseablePageFrames<0x1000>(), alloc.TotalPageFrames());
       }
     );
   }
