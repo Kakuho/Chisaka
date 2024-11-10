@@ -76,7 +76,7 @@ void MemoryMapDescriptor::InitialiseUseableData() noexcept{
 //-------------------------------------------------------------
   
 [[nodiscard]] physaddr_t 
-MemoryMapDescriptor::TopUseableAddress() const noexcept{
+MemoryMapDescriptor::HighestUseableAddress() const noexcept{
   using enum MemoryMapEntry::Type;
   physaddr_t top = 0;
   for(std::uint64_t i = 0; i < m_entries.Size(); i++){
@@ -84,7 +84,7 @@ MemoryMapDescriptor::TopUseableAddress() const noexcept{
       continue;
     }
     else{
-      top = m_entries[i-1].base + m_entries[i-1].length;
+      top = m_entries[i-1].base + m_entries[i-1].length - 1;
       break;
     }
   }
@@ -109,6 +109,19 @@ MemoryMapDescriptor::LongestUseableBase() const noexcept{
     }
   }
   return m_entries[longest].base;
+}
+
+[[nodiscard]] std::size_t 
+MemoryMapDescriptor::UseableEntries() const noexcept{
+  using enum MemoryMapEntry::Type;
+  std::size_t count = 0;
+  for(std::uint64_t i = 0; i < m_entries.Size(); i++){
+    // now perform the comparison
+    if(m_entries[i].type == Useable){
+      count++;
+    }
+  }
+  return count;
 }
 
 //-------------------------------------------------------------

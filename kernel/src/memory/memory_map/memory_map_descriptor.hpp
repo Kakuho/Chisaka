@@ -22,7 +22,7 @@ namespace Mem{
 
 class MemoryMapDescriptor{
 
-static constexpr std::size_t MAX_ENTRIES = 15;
+static constexpr std::size_t MAX_ENTRIES = 20;
 
 public:
   //-------------------------------------------------------------
@@ -45,11 +45,18 @@ public:
     return m_totalUseableBytes / PageSize;
   }
 
-  [[nodiscard]] physaddr_t TopUseableAddress() const noexcept;
+  [[nodiscard]] physaddr_t HighestUseableAddress() const noexcept;
   [[nodiscard]] physaddr_t LowestUseableAddress() const noexcept;
   [[nodiscard]] physaddr_t LongestUseableBase() const noexcept;
+  [[nodiscard]] std::size_t UseableEntries() const noexcept;
 
   [[nodiscard]] constexpr std::size_t Entries() const noexcept{ return MAX_ENTRIES;};
+
+  [[nodiscard]] constexpr MemoryMapEntry& 
+  Entry(std::size_t index) noexcept{ return m_entries[index];};
+
+  [[nodiscard]] constexpr const MemoryMapEntry& 
+  Entry(std::size_t index) const noexcept{ return m_entries[index];};
 
   //-------------------------------------------------------------
   //  Printing Functionalities

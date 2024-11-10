@@ -28,7 +28,9 @@ class Bitmap{
   using ByteType = char;
   using AddrType = void*;
 
-  // Private Data Structures useful for implementing the Bitmap allocator
+  // Regions represents continuous areas of useable available memory
+  //  addresses are valid within [startAddr, endAddr]
+  //  indexes maps to the bitmap indexes, within [startIndex, endIndex]
   struct Region{
     std::uint64_t startAddr;
     std::uint64_t endAddr;
@@ -47,20 +49,21 @@ class Bitmap{
 
     [[nodiscard]] constexpr bool 
     ContainsIndex(std::uint32_t index) const noexcept{
-      return (startAddr <= index) && (index <= endIndex);
+      return (startIndex <= index) && (index <= endIndex);
     }
 
     friend kostream& operator<<(kostream& kost, const Region& region){
-      kout << "( " << region.startAddr << ", "
-           << region.endAddr   << " ) :: "
-           << "( " << region.startIndex << ", "
-           << region.endIndex  << " )\n";
+      kout << "[ " << region.startAddr << ", "
+           << region.endAddr   << " ] :: "
+           << "[ " << region.startIndex << ", "
+           << region.endIndex  << " ]\n";
       return kost;
     }
   };
 
   static_assert(sizeof(Region) == 24);
 
+  // Handle from the stack to the bitmap data
   struct BitmapHandle{
     char* bitmap = nullptr;
     Region* regions = nullptr;
@@ -78,7 +81,13 @@ class Bitmap{
 
   private:
     void InitialiseBitmap(void* base, std::size_t length) noexcept;
+    void InitialiseBitmapMemmap(void* base, std::size_t length, 
+          const MemoryMapDescriptor& map) noexcept;
+
     void InitialiseRegions(Region* base) noexcept;
+    void InitialiseRegionsMemmap(Region* base, 
+        const MemoryMapDescriptor& map) noexcept;
+
     void Epilogue() noexcept;
 
   public:
@@ -102,10 +111,15 @@ class Bitmap{
     // ------------------------------------------------------ //
 
     [[nodiscard]] std::size_t RegionSizeNBytes() const noexcept;
+    [[nodiscard]] std::size_t 
+    RegionSizeNBytes(const MemoryMapDescriptor& map) const noexcept;
+
     [[nodiscard]] std::size_t PageFrameSizeNBytes() const noexcept;
+    [[nodiscard]] std::size_t 
+    PageFrameSizeNBytes(const MemoryMapDescriptor& map) const noexcept;
 
     [[nodiscard]] constexpr std::size_t TotalPageFrames() const noexcept{
-      return m_maxIndex;
+      return m_maxIndex*8;
     }
 
     // ------------------------------------------------------ //
@@ -113,9 +127,11 @@ class Bitmap{
     // ------------------------------------------------------ //
 
     void PrintRegions() const noexcept;
-
+    void PrintRegions(const MemoryMapDescriptor& map) const noexcept;
+    void PrintBitmap() const noexcept;
 
   private:
+
     // helpers for the pmm interface
     void ClearIndex(std::size_t index) noexcept;
     void SetIndex(std::size_t index) noexcept;

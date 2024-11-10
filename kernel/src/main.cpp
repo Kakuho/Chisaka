@@ -2,7 +2,7 @@
 
 #include "limine/requests.hpp"
 #include "x86_64/utilites.hpp"
-#include "grains/memory/physical/bitmap/regions.hpp"
+#include "grains/memory/physical/bitmap/conversions.hpp"
 
 // Extern declarations for global constructor array.
 
@@ -35,5 +35,5 @@ extern "C" void _start() {
   // ------------------------------------------------------ //
 
   //Grains::Mem::PrintKernelBases();
-  Grains::Mem::BitmapRegionTests();
+  Grains::Mem::Bitmap_Conversion_Tests();
 }
