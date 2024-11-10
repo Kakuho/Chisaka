@@ -15,6 +15,8 @@
 #include "bump.hpp"
 #include "./../address.hpp"
 #include "./../features.hpp"
+#include "./../memory_map/memory_map_descriptor.hpp"
+
 #include "limine/limine.h"
 #include "limine/requests.hpp"
 #include "serial/kostream.hpp"
@@ -26,45 +28,44 @@ class Bitmap{
   using ByteType = char;
   using AddrType = void*;
 
-  private:
-    // Private Data Structures useful for implementing the Bitmap allocator
-    struct Region{
-      std::uint64_t startAddr;
-      std::uint64_t endAddr;
-      std::uint32_t startIndex;
-      std::uint32_t endIndex;
+  // Private Data Structures useful for implementing the Bitmap allocator
+  struct Region{
+    std::uint64_t startAddr;
+    std::uint64_t endAddr;
+    std::uint32_t startIndex;
+    std::uint32_t endIndex;
 
-      [[nodiscard]] constexpr bool 
-      ContainsAddr(std::uint64_t paddr) const noexcept{
-        return (startAddr <= paddr) && (paddr <= endAddr);
-      }
+    [[nodiscard]] constexpr bool 
+    ContainsAddr(std::uint64_t paddr) const noexcept{
+      return (startAddr <= paddr) && (paddr <= endAddr);
+    }
 
-      [[nodiscard]] constexpr bool 
-      ContainsAddr(void* paddr) const noexcept{
-        return ContainsAddr(reinterpret_cast<std::uint64_t>(paddr));
-      }
+    [[nodiscard]] constexpr bool 
+    ContainsAddr(void* paddr) const noexcept{
+      return ContainsAddr(reinterpret_cast<std::uint64_t>(paddr));
+    }
 
-      [[nodiscard]] constexpr bool 
-      ContainsIndex(std::uint32_t index) const noexcept{
-        return (startAddr <= index) && (index <= endIndex);
-      }
+    [[nodiscard]] constexpr bool 
+    ContainsIndex(std::uint32_t index) const noexcept{
+      return (startAddr <= index) && (index <= endIndex);
+    }
 
-      friend kostream& operator<<(kostream& kost, const Region& region){
-        kout << "( " << region.startAddr << ", "
-             << region.endAddr   << " ) :: "
-             << "( " << region.startIndex << ", "
-             << region.endIndex  << " )\n";
-        return kost;
-      }
-    };
+    friend kostream& operator<<(kostream& kost, const Region& region){
+      kout << "( " << region.startAddr << ", "
+           << region.endAddr   << " ) :: "
+           << "( " << region.startIndex << ", "
+           << region.endIndex  << " )\n";
+      return kost;
+    }
+  };
 
-    static_assert(sizeof(Region) == 24);
+  static_assert(sizeof(Region) == 24);
 
-    struct BitmapHandle{
-      char* bitmap = nullptr;
-      Region* regions = nullptr;
-      void* end = nullptr;
-    };
+  struct BitmapHandle{
+    char* bitmap = nullptr;
+    Region* regions = nullptr;
+    void* end = nullptr;
+  };
 
   public:
     // ------------------------------------------------------ //
@@ -72,6 +73,7 @@ class Bitmap{
     // ------------------------------------------------------ //
 
     explicit Bitmap() noexcept;
+    explicit Bitmap(const MemoryMapDescriptor& map) noexcept;
     ~Bitmap() = default;
 
   private:
