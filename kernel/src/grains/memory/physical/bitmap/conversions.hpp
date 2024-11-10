@@ -7,13 +7,13 @@
 
 namespace Grains::Mem{
 
-  inline void BitmapAllocatorTests(){
+  inline void BitmapRegionTests(){
     // PLEASE CHECK REGISTERS!
-    GRAIN("Bitmap Allocation Tests",
+    GRAIN("Checking the Region array of the bitmp",
       {
         ::Mem::PrintMemoryMap();
         ::Mem::Phys::Bitmap alloc{};
-        REQUIRE_EQUAL(::Mem::TotalUseablePageFrames<0x1000>(), alloc.TotalPageFrames());
+        alloc.PrintRegions();
       }
     );
   }

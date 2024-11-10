@@ -17,6 +17,7 @@
 #include "./../features.hpp"
 #include "limine/limine.h"
 #include "limine/requests.hpp"
+#include "serial/kostream.hpp"
 #include "string.h"
 
 namespace Mem::Phys{
@@ -46,6 +47,14 @@ class Bitmap{
       [[nodiscard]] constexpr bool 
       ContainsIndex(std::uint32_t index) const noexcept{
         return (startAddr <= index) && (index <= endIndex);
+      }
+
+      friend kostream& operator<<(kostream& kost, const Region& region){
+        kout << "( " << region.startAddr << ", "
+             << region.endAddr   << " ) :: "
+             << "( " << region.startIndex << ", "
+             << region.endIndex  << " )\n";
+        return kost;
       }
     };
 
@@ -94,8 +103,15 @@ class Bitmap{
     [[nodiscard]] std::size_t PageFrameSizeNBytes() const noexcept;
 
     [[nodiscard]] constexpr std::size_t TotalPageFrames() const noexcept{
-      return m_maxIndex + 1;
+      return m_maxIndex;
     }
+
+    // ------------------------------------------------------ //
+    //  Printing
+    // ------------------------------------------------------ //
+
+    void PrintRegions() const noexcept;
+
 
   private:
     // helpers for the pmm interface
@@ -109,7 +125,8 @@ class Bitmap{
     std::size_t m_lastIndex;                //  the last used byte index
     mutable std::size_t m_useableIndicies;  //  total byte indicies 
                                             //  which are free
-    mutable std::size_t m_totalRegionSize{0};
+    mutable std::size_t m_totalPageBytes{0};
+    mutable std::size_t m_totalRegionBytes{0};
 };
 
 }

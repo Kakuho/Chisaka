@@ -15,11 +15,10 @@ Bitmap::Bitmap() noexcept:
     nullptr, 
     nullptr
   },
-  m_maxIndex{
-    PageFrameSizeNBytes() - 1u
-  },
+  m_maxIndex{(TotalUseablePageFrames<0x1000>()/8)},
   m_lastIndex{0},
-  m_totalRegionSize{0}
+  m_totalPageBytes{0},
+  m_totalRegionBytes{0}
 {
   // I want to place the bookkeeping data in the largest 
   // available memory,
@@ -54,7 +53,6 @@ Bitmap::Bitmap() noexcept:
 #endif
   InitialiseBitmap(reinterpret_cast<void*>(base), offset);
   InitialiseRegions(reinterpret_cast<Region*>(base + offset));
-  Epilogue();
 }
 
 void Bitmap::InitialiseRegions(Region* regionBase) noexcept{
@@ -76,29 +74,28 @@ void Bitmap::InitialiseRegions(Region* regionBase) noexcept{
           .startIndex = pageIndex,
           .endIndex = pageIndex + relativeIndex
         };
-      pageIndex += relativeIndex;
+      pageIndex += relativeIndex + 1;
     }
   }
   m_handle.regions = regionBase;
   m_handle.end = 
     reinterpret_cast<void*>(
-    reinterpret_cast<std::uint64_t>(regionBase + RegionSizeNBytes())
+      reinterpret_cast<std::uint64_t>(m_handle.regions) + 
+      RegionSizeNBytes()
     );
+  #if DEBUG
+    kout << "RegionBase :: " << reinterpret_cast<std::uint64_t>
+            (m_handle.regions) << '\n'
+         << "offset :: " << RegionSizeNBytes() << '\n'
+         << "end :: " << reinterpret_cast<std::uint64_t>(m_handle.end)
+         << '\n';
+  #endif
 }
 
 void Bitmap::InitialiseBitmap(void* base, std::size_t length) noexcept{
   // Regions represents continous areas of useable available memory
   memset(reinterpret_cast<void*>(base), 0, length);
   m_handle.bitmap = reinterpret_cast<char*>(base);
-}
-
-void Bitmap::Epilogue() noexcept{
-  // finishes set up, by setting the used bitmap entries
-  physaddr_t start = reinterpret_cast<physaddr_t>(m_handle.bitmap);
-  while(start < reinterpret_cast<physaddr_t>(m_handle.end)){
-    SetIndex(IndexFrom(reinterpret_cast<void*>(start)));
-    start += 0x1000;
-  }
 }
 
 // ------------------------------------------------------ //
@@ -108,8 +105,8 @@ void Bitmap::Epilogue() noexcept{
 std::size_t Bitmap::RegionSizeNBytes() const noexcept{
   // returns the total size required in bytes for the region array
   using namespace limine::requests;
-  if(m_totalRegionSize != 0){
-    return m_totalRegionSize;
+  if(m_totalRegionBytes != 0){
+    return m_totalRegionBytes;
   }
   std::uint8_t count = 0;
   limine_memmap_response* response = memorymap_request.response;
@@ -119,14 +116,37 @@ std::size_t Bitmap::RegionSizeNBytes() const noexcept{
       count++;
     }
   }
-  m_totalRegionSize = count * sizeof(Region);
-  return m_totalRegionSize;
+  m_totalRegionBytes = count * sizeof(Region);
+  return m_totalRegionBytes;
 }
 
 std::size_t Bitmap::PageFrameSizeNBytes() const noexcept{
   // returns the total size required in bytes for page frame statuses 
   // each page frame is a single bit
-  return TotalUseablePageFrames<0x1000>() / 8;
+  if(m_totalPageBytes != 0){
+    return m_totalPageBytes;
+  }
+  m_totalPageBytes = TotalUseablePageFrames<0x1000>() / 8;
+  return m_totalPageBytes;
+}
+
+// ------------------------------------------------------ //
+//  Printing
+// ------------------------------------------------------ //
+
+void Bitmap::PrintRegions() const noexcept{
+  Region* regionIter = reinterpret_cast<Region*>(m_handle.regions);
+#if DEBUG
+  kout 
+      << "regionIter: " << reinterpret_cast<std::uint64_t>(regionIter) 
+      << '\n'
+      << "end: " << reinterpret_cast<std::uint64_t>(m_handle.end) 
+      <<'\n';
+#endif
+  while(regionIter < m_handle.end){ 
+    kout << *regionIter;
+    regionIter++;
+  }
 }
 
 // ------------------------------------------------------ //
@@ -135,7 +155,7 @@ std::size_t Bitmap::PageFrameSizeNBytes() const noexcept{
 
 std::size_t Bitmap::IndexFrom(AddrType paddr) const noexcept{
   // 100 is a invalid return value
-  for(std::size_t i = 0; i < m_totalRegionSize; i++){
+  for(std::size_t i = 0; i < m_totalRegionBytes; i++){
     if(m_handle.regions[i].ContainsAddr(paddr)){
 
       std::uint8_t relativeIndex = 
@@ -147,7 +167,7 @@ std::size_t Bitmap::IndexFrom(AddrType paddr) const noexcept{
 }
 
 AddrType Bitmap::AddressFrom(std::size_t index) const noexcept{
-  for(std::size_t i = 0; i < m_totalRegionSize; i++){
+  for(std::size_t i = 0; i < m_totalRegionBytes; i++){
     if(m_handle.regions[i].ContainsIndex(index)){
       std::uint8_t relativeIndex = index - m_handle.regions[i].startIndex;
       return 
