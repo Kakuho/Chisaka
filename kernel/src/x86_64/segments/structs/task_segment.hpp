@@ -15,7 +15,7 @@
 #include <cstdint>
 
 #include "primrose/static_array.hpp"
-#include "include/kassert.hpp"
+#include "lib/kassert.hpp"
 
 namespace X8664{
 

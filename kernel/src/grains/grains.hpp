@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "x86_64/utilites.hpp"
 #include "misc/ascii.hpp"
 

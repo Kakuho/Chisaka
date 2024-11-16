@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <cassert>
 
-#include "include/kassert.hpp"
+#include "lib/kassert.hpp"
 #include "attributes.hpp"
 #include "./../constants.hpp"
 

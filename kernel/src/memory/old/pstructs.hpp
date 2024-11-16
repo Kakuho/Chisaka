@@ -8,7 +8,7 @@
 
 #include "memory/old/memory.hpp"
 #include "x86_64/features/features.hpp"
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 extern "C" std::uint64_t load_paging_table();
 

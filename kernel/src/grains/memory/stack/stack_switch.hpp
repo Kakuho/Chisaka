@@ -1,8 +1,8 @@
 #include "memory/stack/stack_manager.hpp"
 #include "memory/stack/stack_descriptor.hpp"
 #include "grains/grains.hpp"
-#include "include/kassert.hpp"
-#include "serial/kostream.hpp"
+#include "lib/kassert.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "x86_64/utilites.hpp"
 
 extern "C" void* stack_switch_read_memory();

@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <array>
 
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "x86_64/utilites.hpp"
 #include "x86_64/features/features.hpp"
 #include "memory/old/memory.hpp"

@@ -1,7 +1,7 @@
 #ifndef ATAIO_HPP
 #define ATAIO_HPP
 
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 extern "C" void outb(int port, char val);
 extern "C" std::uint8_t inb(int port);

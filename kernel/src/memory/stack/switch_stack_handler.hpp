@@ -5,7 +5,7 @@
 //    first decodes the entry code, and then it performs the 
 //    required function call
 
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 extern "C" void SwitchStackHandler(void* topofstack);
 

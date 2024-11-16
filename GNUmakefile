@@ -33,7 +33,7 @@ all-hdd: $(IMAGE_NAME).hdd
 
 .PHONY: run
 run: $(IMAGE_NAME).iso
-	qemu-system-x86_64 -M q35 -m 8G  -no-reboot -cdrom $(IMAGE_NAME).iso -boot d
+	qemu-system-x86_64 -M q35 -m 8G  -no-reboot -cdrom $(IMAGE_NAME).iso -hda disk.img --boot d 
 
 .PHONY: run-small
 run-small: $(IMAGE_NAME).iso

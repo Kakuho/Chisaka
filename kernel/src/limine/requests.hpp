@@ -2,7 +2,7 @@
 #define SERVICES_HPP
 
 #include "limine.h"
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 namespace limine{
 

@@ -7,7 +7,7 @@
 // Reference: Intel vol3 CPUID
 
 #include "cpuid.hpp"
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "primrose/static_array.hpp"
 
 namespace X8664::Features{

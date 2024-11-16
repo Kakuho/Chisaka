@@ -5,8 +5,8 @@
 
 #include <cstdint>
 
-#include "serial/kostream.hpp"
-#include "include/kassert.hpp"
+#include "drivers/serial/kostream.hpp"
+#include "lib/kassert.hpp"
 #include "memory/address.hpp"
 
 //  the handlers are linked using C linkage, making it easier to call from assembly.

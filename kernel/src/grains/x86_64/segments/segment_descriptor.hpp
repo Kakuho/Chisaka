@@ -3,9 +3,9 @@
 #include "x86_64/segments/segment_manager.hpp"
 #include "x86_64/segments/structs/segment_descriptor.hpp"
 #include "x86_64/segments/structs/task_descriptor.hpp"
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "grains/grains.hpp"
-#include "include/kassert.hpp"
+#include "lib/kassert.hpp"
 
 namespace Grains::CPU{
 

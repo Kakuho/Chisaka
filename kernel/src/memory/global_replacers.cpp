@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "x86_64/utilites.hpp"
 
 // I won't be using exceptions to build this os

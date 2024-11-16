@@ -8,8 +8,8 @@
 
 #include "segment_descriptor.hpp"
 #include "attributes.hpp"
-#include "include/kassert.hpp"
-#include "serial/kostream.hpp"
+#include "lib/kassert.hpp"
+#include "drivers/serial/kostream.hpp"
 
 namespace X8664{
 

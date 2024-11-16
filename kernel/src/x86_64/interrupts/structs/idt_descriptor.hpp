@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <cassert>
 
-#include "include/kassert.hpp"
+#include "lib/kassert.hpp"
 #include "idt_table.hpp"
 
 extern "C" void load_idtr(void* address);

@@ -2,9 +2,9 @@
 
 #include "x86_64/segments/structs/gdt_descriptor.hpp"
 #include "x86_64/segments/structs/attributes.hpp"
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "grains/grains.hpp"
-#include "include/kassert.hpp"
+#include "lib/kassert.hpp"
 
 namespace Grains::CPU{
 

@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "limine/limine.h"
 #include "limine/requests.hpp"
 

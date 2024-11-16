@@ -1,6 +1,6 @@
 #ifndef ASCII_HPP
 #define ASCII_HPP
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 inline const char* rarity = R"(
                 %%#####%%%%%%%

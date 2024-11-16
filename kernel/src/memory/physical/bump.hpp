@@ -14,7 +14,7 @@
 
 #include "./../address.hpp"
 #include "./../alignment.hpp"
-#include "include/kassert.hpp"
+#include "lib/kassert.hpp"
 
 namespace Mem::Phys{
 

@@ -19,8 +19,8 @@
 
 #include "limine/limine.h"
 #include "limine/requests.hpp"
-#include "serial/kostream.hpp"
-#include "string.h"
+#include "drivers/serial/kostream.hpp"
+#include "lib/string.h"
 
 namespace Mem::Phys{
 

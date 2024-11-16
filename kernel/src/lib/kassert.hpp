@@ -9,7 +9,7 @@
 #include <cstdint>
 
 #include "x86_64/utilites.hpp"
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 // hacky way to obtain the file path and the line number of code
 // for any file

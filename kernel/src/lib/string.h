@@ -2,7 +2,7 @@
 #define STRING_H
 
 #include <cstdint>
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 // GCC and Clang reserve the right to generate calls to the following
 // 4 functions even if they are not directly called.

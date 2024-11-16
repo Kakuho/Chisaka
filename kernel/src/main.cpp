@@ -2,7 +2,8 @@
 
 #include "limine/requests.hpp"
 #include "x86_64/utilites.hpp"
-#include "grains/memory/physical/bitmap/conversions.hpp"
+//#include "grains/memory/physical/bitmap/conversions.hpp"
+#include "grains/drivers/pci_enumeration.hpp"
 
 // Extern declarations for global constructor array.
 
@@ -35,5 +36,5 @@ extern "C" void _start() {
   // ------------------------------------------------------ //
 
   //Grains::Mem::PrintKernelBases();
-  Grains::Mem::Bitmap_Conversion_Tests();
+  Grains::Drivers::EnumeratePCI();
 }

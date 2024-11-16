@@ -7,8 +7,8 @@
 #include <cstdint>
 
 #include "address.hpp"
-#include "include/kassert.hpp"
-#include "serial/kostream.hpp"
+#include "lib/kassert.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "limine/requests.hpp"
 
 namespace Mem{

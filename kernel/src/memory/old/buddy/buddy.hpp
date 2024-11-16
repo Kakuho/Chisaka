@@ -12,7 +12,7 @@
 
 #include "limine/requests.hpp"
 #include "memory/old/memory.hpp"
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 namespace memory::pmm::buddy{
 

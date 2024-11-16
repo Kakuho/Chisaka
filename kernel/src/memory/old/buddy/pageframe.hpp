@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <array>
 
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "buddy.hpp"
 
 extern "C" void set_paging_table(std::size_t address);

@@ -14,9 +14,9 @@
 #include "./../address.hpp"
 
 #include "primrose/static_array.hpp"
-#include "include/kassert.hpp"
+#include "lib/kassert.hpp"
 #include "limine/requests.hpp"
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 namespace Mem{
 

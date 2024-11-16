@@ -2,9 +2,9 @@
 // Runtime test to test the correctness of the segment descriptor
 
 #include "x86_64/segments/segment_manager.hpp"
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 #include "grains/grains.hpp"
-#include "include/kassert.hpp"
+#include "lib/kassert.hpp"
 
 namespace Grains::CPU{
 

@@ -1,17 +1,27 @@
+#ifndef DRIVERS_PCI_HPP
+#define DRIVERS_PCI_HPP
+
 #include <cstdint>
 
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 extern "C" void outl(std::uint32_t address, std::uint32_t data);
 extern "C" std::uint32_t inl(std::uint32_t address);
 
-namespace io::pci{
-  using ioaddr32_t = std::uint32_t;
-  constexpr ioaddr32_t CONFIG_ADDR = 0xCF8;
-  constexpr ioaddr32_t CONFIG_DATA = 0xCFC;
+namespace Drivers::Pci{
 
-  inline ioaddr32_t FormConfigAddress(bool enable, std::uint8_t busn, 
-      std::uint8_t devn, std::uint8_t funcn, std::uint8_t regOffset){
+  using ioaddr32_t = std::uint32_t;
+  inline static constexpr ioaddr32_t CONFIG_ADDR = 0xCF8;
+  inline static constexpr ioaddr32_t CONFIG_DATA = 0xCFC;
+
+  inline ioaddr32_t FormConfigAddress(
+      bool enable, 
+      std::uint8_t busn, 
+      std::uint8_t devn, 
+      std::uint8_t funcn, 
+      std::uint8_t regOffset
+    )
+  {
     std::uint32_t bus  = busn;
     std::uint32_t dev = devn;
     std::uint32_t func = funcn;
@@ -42,14 +52,15 @@ namespace io::pci{
         std::uint32_t ids = inl(CONFIG_DATA);
         if((ids & 0xFFFF) == 0xFFFF)
           continue;
+        kout << intmode::hex;
         kout << "Bus :: " << bus << " :: dev :: " << dev 
              << " :: Vendorid :: " << (ids & 0xFFFF) 
              << " :: Deviceid :: " << ((ids & (0xFFFF << 16)) >> 16) << '\n'
              << "Underlying :: " << ids << '\n'
              << "---" << '\n';
       }
-
     }
   }
-
 }
+
+#endif

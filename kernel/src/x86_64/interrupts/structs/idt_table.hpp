@@ -9,7 +9,7 @@
 
 #include "primrose/static_array.hpp"
 
-#include "include/kassert.hpp"
+#include "lib/kassert.hpp"
 #include "x86_64/utilites.hpp"
 #include "gate_descriptor.hpp"
 

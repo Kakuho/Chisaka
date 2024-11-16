@@ -1,7 +1,7 @@
 #include "memory/pageframe.hpp"
 #include "memory/pmm/buddy.hpp"
 #include "helpers.hpp"
-#include "serial/kostream.hpp"
+#include "drivers/serial/kostream.hpp"
 
 namespace integ{
   inline void TestPhysicalMemoryDescriptor(){
