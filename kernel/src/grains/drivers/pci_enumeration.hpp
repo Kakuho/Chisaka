@@ -8,7 +8,9 @@ namespace Grains::Drivers{
   inline void EnumeratePCI(){
     GRAIN("enumerates the pci bus",
       {
+        kout << "we trying to enumerate" << '\n';
         ::Drivers::Pci::EnumeratePCI();
+        ::Drivers::Pci::CheckSataICH9();
       }
     );
   }

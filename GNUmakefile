@@ -55,6 +55,13 @@ run-int: $(IMAGE_NAME).iso
 run-debug: $(IMAGE_NAME).iso
 	qemu-system-x86_64 -M q35 -m 8G -cdrom $(IMAGE_NAME).iso -boot d -serial stdio -d int -M smm=off
 
+.PHONY: run-disk
+run-disk: $(IMAGE_NAME).iso
+	qemu-system-x86_64 -M q35 -m 8G  -no-reboot \
+										 -drive if=ide,file=$(IMAGE_NAME).iso,media=cdrom,bus=2,unit=0\
+										 -drive if=ide,file=disk.img,media=disk,bus=3,unit=0 \
+										 --boot d 
+
 .PHONY: run-gdb
 run-gdb: $(IMAGE_NAME).iso
 	qemu-system-x86_64 -s -S -M q35 -m 8G -cdrom $(IMAGE_NAME).iso -boot d & gdb -ex "target remote localhost:1234" -ex "symbol-file ./kernel/bin/kernel"
@@ -65,7 +72,15 @@ run-uefi: ovmf $(IMAGE_NAME).iso
 
 .PHONY: run-hdd
 run-hdd: $(IMAGE_NAME).hdd
-	qemu-system-x86_64 -M q35 -m 8G -hda $(IMAGE_NAME).hdd
+	qemu-system-x86_64 -nodefaults 	\
+										 -display gtk \
+										 -vga cirrus\
+										 -chardev vc,id=serial\
+										 -chardev vc,id=monitor\
+										 -serial chardev:serial\
+										 -mon chardev=monitor\
+										 -M pc-q35-6.1 -m 7G \
+										 -drive if=ide,file=$(IMAGE_NAME).hdd,format=raw,media=disk,bus=0,unit=0 \
 
 .PHONY: run-hdd-uefi
 run-hdd-uefi: ovmf $(IMAGE_NAME).hdd

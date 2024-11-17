@@ -5,6 +5,13 @@ outb:
   outb %al , %dx
   ret
 
+.globl outw
+outw: 
+  movl %edi, %edx
+  movl %esi, %eax
+  outw %ax, %dx
+  ret
+
 .globl outl
 outl: 
   movl %edi, %edx

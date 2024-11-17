@@ -2,6 +2,8 @@
 chisaka.iso
 limine/
 *.txt
+*.hdd
+
 
 Tasks
 kernel/src/primrose

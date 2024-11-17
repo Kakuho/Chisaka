@@ -6,6 +6,7 @@
 #include "drivers/serial/kostream.hpp"
 
 extern "C" void outl(std::uint32_t address, std::uint32_t data);
+extern "C" void outw(std::uint32_t address, std::uint32_t data);
 extern "C" std::uint32_t inl(std::uint32_t address);
 
 namespace Drivers::Pci{
@@ -60,6 +61,36 @@ namespace Drivers::Pci{
              << "---" << '\n';
       }
     }
+  }
+
+  inline void CheckSataICH9(){
+    ioaddr32_t address = FormConfigAddress(1, 0, 31, 2, 0);
+    outl(CONFIG_ADDR, address);
+    std::uint32_t ids = inl(CONFIG_DATA);
+    kout << ids << '\n';
+    if((ids & 0xFFFF) == 0xFFFF)
+      return;
+    kout << intmode::hex;
+    kout << "Bus :: " << 1 << " :: dev :: " << 31
+         << " :: Vendorid :: " << (ids & 0xFFFF) 
+         << " :: Deviceid :: " << ((ids & (0xFFFF << 16)) >> 16) << '\n'
+         << "Underlying :: " << ids << '\n'
+         << "---" << '\n';
+
+    // checking what type it is
+
+    ioaddr32_t classAddr = FormConfigAddress(1, 0, 31, 2, 0x0a);
+    outl(CONFIG_ADDR, classAddr);
+    std::uint16_t classes = inl(CONFIG_DATA);
+    if((classes & 0xFFFF) == 0xFFFF)
+      return;
+
+    kout << intmode::hex
+         << classAddr << '\n'
+         << classes << '\n'
+         << "Subclass :: " << (classes & 0xFF) << '\n'
+         << "Main Class :: " << ((classes >> 8) & 0xFF )
+         << '\n';
   }
 }
 
