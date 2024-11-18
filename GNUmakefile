@@ -58,8 +58,8 @@ run-debug: $(IMAGE_NAME).iso
 .PHONY: run-disk
 run-disk: $(IMAGE_NAME).iso
 	qemu-system-x86_64 -M q35 -m 8G  -no-reboot \
-										 -drive if=ide,file=$(IMAGE_NAME).iso,media=cdrom,bus=2,unit=0\
-										 -drive if=ide,file=disk.img,media=disk,bus=3,unit=0 \
+										 -drive if=ide,file=$(IMAGE_NAME).iso,media=disk,format=raw,bus=2,unit=0\
+										 -drive if=ide,file=disk.img,media=disk,format=raw,bus=3,unit=0 \
 										 --boot d 
 
 .PHONY: run-gdb

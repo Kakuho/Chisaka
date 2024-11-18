@@ -48,23 +48,35 @@ namespace Drivers::Pci{
     // brute force method of enumerating available devices on the PCI
     for(std::uint32_t bus = 0; bus < 256; bus++){
       for(std::uint32_t dev = 0; dev < 32; dev++){
-        ioaddr32_t address = FormConfigAddress(1, bus, dev, 0, 0);
-        outl(CONFIG_ADDR, address);
-        std::uint32_t ids = inl(CONFIG_DATA);
-        if((ids & 0xFFFF) == 0xFFFF)
-          continue;
-        kout << intmode::hex;
-        kout << "Bus :: " << bus << " :: dev :: " << dev 
-             << " :: Vendorid :: " << (ids & 0xFFFF) 
-             << " :: Deviceid :: " << ((ids & (0xFFFF << 16)) >> 16) << '\n'
-             << "Underlying :: " << ids << '\n'
-             << "---" << '\n';
+        for(std::uint8_t func = 0; func < 10; func++){
+          ioaddr32_t address = FormConfigAddress(1, bus, dev, func, 0);
+          outl(CONFIG_ADDR, address);
+          std::uint32_t ids = inl(CONFIG_DATA);
+          if((ids & 0xFFFF) == 0xFFFF)
+            continue;
+          kout << intmode::hex;
+          kout << "Bus :: " << bus << " :: dev :: " << dev 
+               << " :: Vendorid :: " << (ids & 0xFFFF) 
+               << " :: Deviceid :: " << ((ids & (0xFFFF << 16)) >> 16) << '\n'
+               << "Underlying :: " << ids << '\n';
+          ioaddr32_t classAddr = FormConfigAddress(1, bus, dev, func, 0x08);
+          outl(CONFIG_ADDR, classAddr);
+          std::uint32_t classes = inl(CONFIG_DATA);
+          if(classes == 0xFFFF)
+            continue;
+          kout << intmode::hex
+               << classAddr << '\n'
+               << classes << '\n'
+               << "Subclass :: " << ((classes >> 16) & 0xFF) << '\n'
+               << "Main Class :: " << ((classes >> 24) & 0xFF ) << '\n';
+          kout << "----\n";
+        }
       }
     }
   }
 
   inline void CheckSataICH9(){
-    ioaddr32_t address = FormConfigAddress(1, 0, 31, 2, 0);
+    ioaddr32_t address = FormConfigAddress(0, 0, 31, 2, 0);
     outl(CONFIG_ADDR, address);
     std::uint32_t ids = inl(CONFIG_DATA);
     kout << ids << '\n';
@@ -79,18 +91,18 @@ namespace Drivers::Pci{
 
     // checking what type it is
 
-    ioaddr32_t classAddr = FormConfigAddress(1, 0, 31, 2, 0x0a);
+    ioaddr32_t classAddr = FormConfigAddress(0, 0, 31, 2, 0x0a);
     outl(CONFIG_ADDR, classAddr);
     std::uint16_t classes = inl(CONFIG_DATA);
     if((classes & 0xFFFF) == 0xFFFF)
       return;
-
     kout << intmode::hex
          << classAddr << '\n'
          << classes << '\n'
          << "Subclass :: " << (classes & 0xFF) << '\n'
          << "Main Class :: " << ((classes >> 8) & 0xFF )
          << '\n';
+
   }
 }
 
