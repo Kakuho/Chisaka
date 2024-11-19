@@ -10,7 +10,7 @@ namespace Grains::Drivers{
       {
         kout << "we trying to enumerate" << '\n';
         ::Drivers::Pci::EnumeratePCI();
-        //::Drivers::Pci::CheckSataICH9();
+        ::Drivers::Pci::PrintEnumeratePCI();
       }
     );
   }

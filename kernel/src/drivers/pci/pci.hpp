@@ -3,6 +3,7 @@
 
 #include <cstdint>
 
+#include "identification.hpp"
 #include "drivers/serial/kostream.hpp"
 
 extern "C" void outl(std::uint32_t address, std::uint32_t data);
@@ -70,6 +71,35 @@ namespace Drivers::Pci{
                << "Subclass :: " << ((classes >> 16) & 0xFF) << '\n'
                << "Main Class :: " << ((classes >> 24) & 0xFF ) << '\n';
           kout << "----\n";
+        }
+      }
+    }
+  }
+
+  inline void PrintEnumeratePCI(){
+    // Prettier PCI Enumeration
+    // brute force method of enumerating available devices on the PCI
+    for(std::uint32_t bus = 0; bus < 256; bus++){
+      for(std::uint32_t dev = 0; dev < 32; dev++){
+        for(std::uint8_t func = 0; func < 10; func++){
+          ioaddr32_t address = FormConfigAddress(1, bus, dev, func, 0);
+          outl(CONFIG_ADDR, address);
+          std::uint32_t ids = inl(CONFIG_DATA);
+          if((ids & 0xFFFF) == 0xFFFF){
+            continue;
+          }
+          kout << intmode::hex;
+          kout << "[" << bus << ":" <<  dev << ":" << func << "] - Probe Success\n";
+          PrintIdentifier(ids);
+          kout << '\n';
+          ioaddr32_t classAddr = FormConfigAddress(1, bus, dev, func, 0x08);
+          outl(CONFIG_ADDR, classAddr);
+          std::uint32_t classes = inl(CONFIG_DATA);
+          if(classes == 0xFFFF){
+            continue;
+          }
+          PrintClass(classes);
+          kout << "\n\n";
         }
       }
     }
