@@ -34,6 +34,13 @@ namespace Drivers::Pci{
     }
   }
 
+  inline void PrintInterruptInfo(std::uint32_t value){
+    std::uint8_t interruptLine = value & 0xFF;
+    std::uint16_t interruptPin = (value >> 8) & 0xFF;
+    kout << "Interrupt Line:: " <<  interruptLine << "\nInterrupt Pin:: " << interruptPin << '\n';
+  }
+
+
   inline void PrintClass(std::uint32_t value){
     std::uint8_t baseClass = value >> 24;
     std::uint8_t subClass = (value >> 16) & 0xFF;

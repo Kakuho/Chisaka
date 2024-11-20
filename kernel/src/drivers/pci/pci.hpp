@@ -82,9 +82,11 @@ namespace Drivers::Pci{
     for(std::uint32_t bus = 0; bus < 256; bus++){
       for(std::uint32_t dev = 0; dev < 32; dev++){
         for(std::uint8_t func = 0; func < 10; func++){
+          //-------------------------------------------------------------
           ioaddr32_t address = FormConfigAddress(1, bus, dev, func, 0);
           outl(CONFIG_ADDR, address);
           std::uint32_t ids = inl(CONFIG_DATA);
+          // Check to see if Vendor is valid
           if((ids & 0xFFFF) == 0xFFFF){
             continue;
           }
@@ -92,13 +94,17 @@ namespace Drivers::Pci{
           kout << "[" << bus << ":" <<  dev << ":" << func << "] - Probe Success\n";
           PrintIdentifier(ids);
           kout << '\n';
+          //-------------------------------------------------------------
           ioaddr32_t classAddr = FormConfigAddress(1, bus, dev, func, 0x08);
           outl(CONFIG_ADDR, classAddr);
           std::uint32_t classes = inl(CONFIG_DATA);
-          if(classes == 0xFFFF){
-            continue;
-          }
           PrintClass(classes);
+          kout << '\n';
+          //-------------------------------------------------------------
+          ioaddr32_t interruptAddr = FormConfigAddress(1, bus, dev, func, 0x3c);
+          outl(CONFIG_ADDR, interruptAddr);
+          std::uint32_t interruptInfo = inl(CONFIG_DATA);
+          PrintInterruptInfo(interruptInfo);
           kout << "\n\n";
         }
       }
