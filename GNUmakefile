@@ -31,40 +31,63 @@ all: $(IMAGE_NAME).iso
 .PHONY: all-hdd
 all-hdd: $(IMAGE_NAME).hdd
 
+# compile and run the image
+
 .PHONY: run
 run: $(IMAGE_NAME).iso
-	qemu-system-x86_64 -M q35 -m 8G  -no-reboot -cdrom $(IMAGE_NAME).iso -hda disk.img --boot d 
+	qemu-system-x86_64 -cpu IvyBridge -M q35 -m 8G -no-reboot \
+										 -cdrom $(IMAGE_NAME).iso -hda disk.img \
+										 -boot d 
 
-.PHONY: run-small
-run-small: $(IMAGE_NAME).iso
-	qemu-system-x86_64 -M q35 -m 4G  -no-reboot -cdrom $(IMAGE_NAME).iso -boot d
+#	compile and run qemu, treating host terminal as serial out
 
 .PHONY: run-io
 run-io: $(IMAGE_NAME).iso
-	clear && qemu-system-x86_64 -M q35 -m 8G -cdrom $(IMAGE_NAME).iso -serial stdio -boot d
+	clear &&\
+	qemu-system-x86_64 -cpu IvyBridge -M q35 -m 8G  \
+										 -serial stdio \
+										 -cdrom $(IMAGE_NAME).iso -hda disk.img \
+										 -boot d
+
+#	compile and run qemu, treating host terminal as output for the qemu monitor
 
 .PHONY: run-io-monitor
 run-io-monitor: $(IMAGE_NAME).iso
-	clear && qemu-system-x86_64 -M q35 -m 8G -cdrom $(IMAGE_NAME).iso -monitor stdio -boot d
+	qemu-system-x86_64 -cpu IvyBridge -M q35 -m 8G \
+										 -monitor stdio \
+										 -cdrom $(IMAGE_NAME).iso -hda disk.img \
+										 -boot d
+
+#	compile and run qemu, and print out interrupts to host terminal
 
 .PHONY: run-int
 run-int: $(IMAGE_NAME).iso
-	qemu-system-x86_64 -M q35 -m 8G -no-reboot -cdrom $(IMAGE_NAME).iso -boot d -d int -M smm=off
+	clear &&\
+	qemu-system-x86_64 -cpu IvyBridge -M q35 -m 8G -no-reboot \
+										 -d int -M smm=off \
+									   -cdrom $(IMAGE_NAME).iso -hda disk.img \
+										 -boot d 
 
-.PHONY: run-debug
-run-debug: $(IMAGE_NAME).iso
-	qemu-system-x86_64 -M q35 -m 8G -cdrom $(IMAGE_NAME).iso -boot d -serial stdio -d int -M smm=off
+#	test routine for disk storage only
 
 .PHONY: run-disk
 run-disk: $(IMAGE_NAME).iso
-	qemu-system-x86_64 -M q35 -m 8G  -no-reboot \
-										 -drive if=ide,file=$(IMAGE_NAME).iso,media=disk,format=raw,bus=2,unit=0\
-										 -drive if=ide,file=disk.img,media=disk,format=raw,bus=3,unit=0 \
-										 --boot d 
+	qemu-system-x86_64 \
+		-cpu IvyBridge -M q35 -m 8G -no-reboot \
+		-drive if=ide,file=$(IMAGE_NAME).iso,media=disk,format=raw,bus=2,unit=0 \
+		-drive if=ide,file=disk.img,media=disk,format=raw,bus=3,unit=0 \
+		-boot d 
+
+# compile and run under gdb debugger
 
 .PHONY: run-gdb
 run-gdb: $(IMAGE_NAME).iso
-	qemu-system-x86_64 -s -S -M q35 -m 8G -cdrom $(IMAGE_NAME).iso -boot d & gdb -ex "target remote localhost:1234" -ex "symbol-file ./kernel/bin/kernel"
+	qemu-system-x86_64 \
+		-cpu IvyBridge -M q35 -m 8G -no-reboot\
+		-s -S \
+		-cdrom $(IMAGE_NAME).iso -hda disk.img \
+		-boot d & \
+	gdb -ex "target remote localhost:1234" -ex "symbol-file ./kernel/bin/kernel"
 
 .PHONY: run-uefi
 run-uefi: ovmf $(IMAGE_NAME).iso
@@ -79,7 +102,7 @@ run-hdd: $(IMAGE_NAME).hdd
 										 -chardev vc,id=monitor\
 										 -serial chardev:serial\
 										 -mon chardev=monitor\
-										 -M pc-q35-6.1 -m 7G \
+										 -M pc-q35-6.1 -m 8G \
 										 -drive if=ide,file=$(IMAGE_NAME).hdd,format=raw,media=disk,bus=0,unit=0 \
 
 .PHONY: run-hdd-uefi
