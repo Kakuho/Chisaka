@@ -29,22 +29,27 @@ class PicController{
   static constexpr inline std::uint8_t SLAVE_BASE_PORT = 0xa0;
 
   public:
+    PicController(std::uint16_t vectorOffset);
     PicController(std::uint16_t masterOffset, std::uint16_t slaveOffset);
+
     void FlushICWs();
     void Disable();
 
+    [[nodiscard]] constexpr 
+    std::uint8_t IrqToVector(std::uint8_t irq) const noexcept;
+
     //-------------------------------------------------------------
+    // Register Reading R/W
+    //-------------------------------------------------------------
+
     // Masking
-    //-------------------------------------------------------------
 
     [[nodiscard]] std::uint16_t Masksbm() const noexcept;
     void ClearMasks() noexcept;
     void MaskIrq(std::uint8_t irq) noexcept;
     void SetIrq(std::uint8_t irq) noexcept;
 
-    //-------------------------------------------------------------
-    // Register Reading
-    //-------------------------------------------------------------
+    // Other Registers
 
     [[nodiscard]] std::uint16_t GetIrr() noexcept;
     [[nodiscard]] std::uint16_t GetIsr() noexcept;

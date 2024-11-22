@@ -2,6 +2,15 @@
 
 namespace X8664::Interrupt{
 
+PicController::PicController(std::uint16_t vectorOffset)
+  : m_masterOffset{vectorOffset}, 
+    m_slaveOffset{vectorOffset+8}
+{
+  // linear offsets
+  Initialise();
+  ClearMasks();
+}
+
 PicController::PicController(
     std::uint16_t masterOffset, 
     std::uint16_t slaveOffset
@@ -9,6 +18,7 @@ PicController::PicController(
     : m_masterOffset{masterOffset},
       m_slaveOffset{slaveOffset}
 {
+  // non linear offsets
   Initialise();
   ClearMasks();
 }
@@ -53,9 +63,22 @@ void PicController::Disable(){
   outb(MASTER_BASE_PORT+1, 0xFF);
 }
 
+[[nodiscard]] constexpr std::uint8_t 
+PicController::IrqToVector(std::uint8_t irq) const noexcept{
+  kassert(irq < 16);
+  if(irq < 8){
+    return m_masterOffset + irq;
+  }
+  else{
+    return m_slaveOffset + (irq - 8);
+  }
+}
+
 //-------------------------------------------------------------
+// Register Reading R/W
+//-------------------------------------------------------------
+
 //  Masking
-//-------------------------------------------------------------
 
 [[nodiscard]] std::uint16_t 
 PicController::Masksbm() const noexcept{
@@ -98,9 +121,7 @@ void PicController::SetIrq(std::uint8_t irq) noexcept{
   }
 }
 
-//-------------------------------------------------------------
-// Register Reading
-//-------------------------------------------------------------
+// Other Registers
 
 [[nodiscard]] std::uint16_t 
 PicController::GetIrr() noexcept{
