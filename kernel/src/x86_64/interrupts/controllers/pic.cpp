@@ -10,6 +10,7 @@ PicController::PicController(
       m_slaveOffset{slaveOffset}
 {
   Initialise();
+  ClearMasks();
 }
 
 void PicController::FlushICWs(){
@@ -46,10 +47,75 @@ void PicController::Initialise(){
   FlushICWs();
 }
 
+void PicController::Disable(){
+  // essentially, masks all the IRQs
+  outb(MASTER_BASE_PORT+1, 0xFF);
+  outb(MASTER_BASE_PORT+1, 0xFF);
+}
+
 //-------------------------------------------------------------
 //  Masking
 //-------------------------------------------------------------
 
+[[nodiscard]] std::uint16_t 
+PicController::Masksbm() const noexcept{
+  // returns 16 bit packed bit mask
+  std::uint8_t masterbm = inb(MASTER_BASE_PORT+1);
+  std::uint8_t slavebm = inb(SLAVE_BASE_PORT+1);
+  return (masterbm << 8) | slavebm;
+}
 
+void PicController::ClearMasks() noexcept{
+    outb(MASTER_BASE_PORT+1, 0);
+    outb(SLAVE_BASE_PORT+1, 0);
+}
+    
+void PicController::MaskIrq(std::uint8_t irq) noexcept{
+  kassert(irq < 15);
+  if(irq < 8){
+    std::uint8_t masks = inb(MASTER_BASE_PORT+1);
+    masks |= 1 << irq;
+    outb(MASTER_BASE_PORT+1, masks);
+  } 
+  else{
+    std::uint8_t masks = inb(SLAVE_BASE_PORT+1);
+    masks |= 1 << (irq - 8);
+    outb(SLAVE_BASE_PORT+1, masks);
+  }
+}
+
+void PicController::SetIrq(std::uint8_t irq) noexcept{
+  kassert(irq < 15);
+  if(irq < 8){
+    std::uint8_t masks = inb(MASTER_BASE_PORT+1);
+    masks &= ~(1 << irq);
+    outb(MASTER_BASE_PORT+1, masks);
+  } 
+  else{
+    std::uint8_t masks = inb(SLAVE_BASE_PORT+1);
+    masks &= ~(1 << (irq - 8));
+    outb(SLAVE_BASE_PORT+1, masks);
+  }
+}
+
+//-------------------------------------------------------------
+// Register Reading
+//-------------------------------------------------------------
+
+[[nodiscard]] std::uint16_t 
+PicController::GetIrr() noexcept{
+  static constexpr std::uint8_t OCW3_IRR = 0x0a;
+  outb(MASTER_BASE_PORT, OCW3_IRR);
+  outb(SLAVE_BASE_PORT, OCW3_IRR);
+  return(inb(SLAVE_BASE_PORT+1) << 8) | inb(MASTER_BASE_PORT+1);
+}
+
+[[nodiscard]] std::uint16_t 
+PicController::GetIsr() noexcept{
+  static constexpr std::uint8_t OCW3_ISR = 0x0b;
+  outb(MASTER_BASE_PORT, OCW3_ISR);
+  outb(SLAVE_BASE_PORT, OCW3_ISR);
+  return(inb(SLAVE_BASE_PORT+1) << 8) | inb(MASTER_BASE_PORT+1);
+}
 
 }

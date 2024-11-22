@@ -9,6 +9,11 @@
 
 #include "lib/kassert.hpp"
 
+extern "C" {
+  std::uint8_t inb(std::uint64_t port_addr);
+  void outb(int port_addr, char val);
+}
+
 namespace X8664::Interrupt{
 
 class PicController{
@@ -26,18 +31,23 @@ class PicController{
   public:
     PicController(std::uint16_t masterOffset, std::uint16_t slaveOffset);
     void FlushICWs();
-  
+    void Disable();
+
     //-------------------------------------------------------------
     // Masking
     //-------------------------------------------------------------
 
-    [[nodiscard]] std::uint16_t Masksbm(std::uint8_t index);
+    [[nodiscard]] std::uint16_t Masksbm() const noexcept;
+    void ClearMasks() noexcept;
+    void MaskIrq(std::uint8_t irq) noexcept;
+    void SetIrq(std::uint8_t irq) noexcept;
 
-    void MaskMaster(std::uint8_t index);
-    void UnmaskMaster(std::uint8_t index);
+    //-------------------------------------------------------------
+    // Register Reading
+    //-------------------------------------------------------------
 
-    void MaskSlave(std::uint8_t index);
-    void UnmaskSlave(std::uint8_t index);
+    [[nodiscard]] std::uint16_t GetIrr() noexcept;
+    [[nodiscard]] std::uint16_t GetIsr() noexcept;
 
   private:
     void Initialise();
