@@ -1,62 +1,134 @@
+#ifndef MEMORY_HEAP_SLAB_HPP
+#define MEMORY_HEAP_SLAB_HPP
+
 #include <cstdint>
+#include <new>
+
+#include "./../../physical/freelist.hpp"
+#include "descriptors.hpp"
 
 namespace Mem::Heap::Slab{
 
-struct SlabDescriptor{
-  // information regarding a slab
-  // A slab requires:
-  //    A free list of object part of its page
-  //    A doubly linked list to other slabs part of its cache
-  //    A Colouring Area
-  void* nextObject;
-  void* pageBase;
-};
-
-enum class CacheType: std::uint8_t{
-  CacheDescriptor,
-  SlabDescriptor,
-  AddressSpaceDescriptor
-};
-
-struct CacheDescriptor{
-  CacheType type;
-  CacheDescriptor* nextCache;
-  void Grow(); // used to increase # of slabs for this cache
-};
-
 class SlabAllocator{ 
+
+  struct CacheHandler{
+    CacheDescriptor* pcache = nullptr;
+  };
+
   public:
+    //-------------------------------------------------------------
+    //  Initialisation
+    //-------------------------------------------------------------
+    explicit SlabAllocator();
 
-    void* ConstructCache(CacheType type);
+    void Initialise(){
+      // first create the cache of caches
+      void* cachePage = m_pageAllocator.AllocatePage();
+      CacheDescriptor* cacheCache = new(cachePage) 
+        CacheDescriptor{CacheType::CacheDescriptor};
+      // a cache of slabs is also required 
+      CacheDescriptor* slabCache = new(cachePage) 
+        CacheDescriptor{CacheType::SlabDescriptor};
+      // now create initial slabs for that cache
+      void* slabPage = m_pageAllocator.AllocatePage();
+      SlabDescriptor* slab = reinterpret_cast<SlabDescriptor*>(cachePage);
 
-    template<typename T>
-    T* Allocate()
-    {
-      // General allocation routine
+      m_cacheCache.pcache = reinterpret_cast<CacheDescriptor*>
+        (m_pageAllocator.AllocatePage());
+      m_slabCache.pcache = reinterpret_cast<CacheDescriptor*>
+        (m_pageAllocator.AllocatePage());
     }
 
-    void Free(CacheDescriptor* pcache, void* pobject);
+  private:
+    template<typename T>
+    CacheDescriptor* ConstructCache();
+
+    template<typename T>
+    void InitialiseKernelCache();
+
+    void InitialiseGeneralCaches();
+
+  public:
+    //-------------------------------------------------------------
+    // Heap Allocation Interface
+    //-------------------------------------------------------------
+
+    template<typename T>
+    T* Allocate();
+
+    template<typename T>
+    void Free(CacheDescriptor* pcache, T* pobject);
 
   private:
-    CacheDescriptor cacheOfCache;
-    CacheDescriptor slabCache;
-    CacheDescriptor addressCache;
-    CacheDescriptor generalCache;
+    Mem::Phys::FreeList& m_pageAllocator;
+
+    // Kernel Objects
+    CacheHandler m_cacheCache;
+    CacheHandler m_slabCache;
+    CacheHandler m_addressCache;
+
+    // General Heap Cache ... object sizes starts at 32 (2^5) and 
+    // increases in powers of 2 up to (2^16)
+    CacheHandler m_generalCache[11];
 };
 
-// Template Specialised Allocation for Kernel Object Types
+//-------------------------------------------------------------
+// Specialised Cache Construction for Kernel Object Types
+//-------------------------------------------------------------
+
+template<>
+CacheDescriptor* SlabAllocator::ConstructCache<CacheDescriptor>(){
+
+}
+
+//-------------------------------------------------------------
+// Specialised Allocation for Kernel Object Types
+//-------------------------------------------------------------
+
+// Procedure for allocating within a slab:
+//    i) first check of the Cache has a free slab
+//    ii) if it does then allocate within it
 
 template<>
 inline CacheDescriptor* SlabAllocator::Allocate<CacheDescriptor>()
 {
-  // do something to the cacheCache here
+  if(m_cacheCache.pcache == nullptr){
+    m_cacheCache.pcache = ConstructCache<CacheDescriptor>();
+  }
   return nullptr;
 }
 
-void DoSomething(){
-  SlabAllocator slaballoc;
-  CacheDescriptor* pcache = slaballoc.Allocate<CacheDescriptor>();
 
+template<>
+inline SlabDescriptor* SlabAllocator::Allocate<SlabDescriptor>()
+{
+  if(m_slabCache.pcache == nullptr){
+
+  }
+  return nullptr;
+}
+
+// Template Specialisations for returning memory back to the caches 
+// "free"
+
+template<>
+inline void SlabAllocator::Free<CacheDescriptor>(
+    CacheDescriptor* pcache, 
+    CacheDescriptor* pobject
+  )
+{
+  // do something to cacheCaches
+}
+
+template<>
+inline void SlabAllocator::Free<SlabDescriptor>(
+    CacheDescriptor* pcache, 
+    SlabDescriptor* pobject
+  )
+{
+  // do something to cacheCaches
 }
 
 }
+
+#endif

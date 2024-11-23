@@ -5,7 +5,7 @@ namespace Mem::Phys{
   // template concept for the underlying page frame allocator implementation
   // allows for static polymorphism
   template <typename T>
-    concept PmmImplementation = requires(T pmm, std::size_t pages, void* addr){
+    concept PmmImpl = requires(T pmm, std::size_t pages, void* addr){
       pmm.AllocatePage();
       pmm.FreePage(addr);
     };
@@ -14,7 +14,7 @@ namespace Mem::Phys{
   // this is because I want to be able to configure the pmm with different allocation 
   // mechanisms
   template<typename T>
-    requires PmmImplementation<T>
+    requires PmmImpl<T>
   class Pmm{
     public:
 
