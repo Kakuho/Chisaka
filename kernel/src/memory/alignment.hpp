@@ -5,9 +5,15 @@
 
 #include <cstdint>
 #include <concepts>
+#include <type_traits>
+
 #include "address.hpp"
 
+
 namespace Mem{
+
+  template<typename T>
+  concept IsPointerType = std::is_pointer_v<T>;
 
   // ------------------------------------------------------ //
   //  Aligning Functions
@@ -16,6 +22,14 @@ namespace Mem{
   template<typename T, std::size_t AlignAddress>
     requires IsAddressType<T>
   constexpr T Align(T addr){
+    return  (addr % AlignAddress) == addr ? addr : 
+            addr - (addr % AlignAddress);
+  }
+  
+  template<typename T, std::size_t AlignAddress>
+    requires IsPointerType<T>
+  constexpr std::uint64_t Align(T ptr){
+    std::uint64_t addr = reinterpret_cast<std::uint64_t>(ptr);
     return  (addr % AlignAddress) == addr ? addr : 
             addr - (addr % AlignAddress);
   }

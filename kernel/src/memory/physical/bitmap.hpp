@@ -76,6 +76,7 @@ class Bitmap{
     // ------------------------------------------------------ //
 
     explicit Bitmap() noexcept;
+
     explicit Bitmap(const MemoryMapDescriptor& map) noexcept;
     ~Bitmap() = default;
 
