@@ -28,16 +28,24 @@ static_assert(sizeof(ObjectDescriptor<void>) == 24);
 
 //-------------------------------------------------------------
 
+// The slab descriptors has:
+//  * A free list of object descriptors
+//  * A doubly linked list to other slabs of the same type
 template<typename T>
 class SlabDescriptor{
+  using FreeListHead = ObjectDescriptor<T>*;
   public:
     explicit SlabDescriptor(void* pageBase);
+  private:
     void InitialiseObjects();
+    void InitialiseAsFreeObjectSlab();
+    void InitialiseAsCacheDescriptorSlab();
+    void InitialiseAsSlabDescriptorSlab();
 
   private:
     void* pageBase;
     void* parentCache;
-    ObjectDescriptor<T>* m_objectList;
+    FreeListHead m_objectList;
     // doubly linked list of slabs
     SlabDescriptor<T>* next;
     SlabDescriptor<T>* prev;
