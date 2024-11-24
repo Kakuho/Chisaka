@@ -1,13 +1,21 @@
 #ifndef MEMORY_HEAP_SLAB_CACHE_DESCRIPTOR_HPP
 #define MEMORY_HEAP_SLAB_CACHE_DESCRIPTOR_HPP
 
-// Cache Descriptors and related functionalities
+//  Cache Descriptors and related functionalities
+//
+//
+//  Each Cache Desriptor has the head of a doubly linked list of its slab 
+//  descriptors
 
 #include <cassert>
 
 #include "slab_descriptor.hpp"
+#include "./../../physical/freelist.hpp"
 
 namespace Mem::Heap::Slab::T{
+
+template<typename T>
+class SlabDescriptor;
 
 template<typename T>
 class CacheDescriptor{
@@ -25,6 +33,9 @@ class CacheDescriptor{
     SlabDescriptor<T>* AllocateSlab();
     void FreeSlab(SlabDescriptor<T>* pslab);
     void DestroySlabs();  // iteratively delete all slabs
+
+    SlabDescriptor<T>* PartialListHead(){ return partialSlabs;}
+    SlabDescriptor<T>* FullListHead(){ return fullSlabs;}
     
     //-------------------------------------------------------------
     // Object Management
@@ -38,6 +49,7 @@ class CacheDescriptor{
     SlabDescriptor<T>* partialSlabs;
     SlabDescriptor<T>* fullSlabs;
     SlabDescriptor<T>* freeSlabs;
+    //Mem::Phys::FreeList& m_pmmAllocator;
     // used for quick querying
     std::size_t objectsPerSlab;
     std::size_t freeObjects;    
@@ -59,10 +71,12 @@ template<typename T>
 SlabDescriptor<T>* CacheDescriptor<T>::AllocateSlab(){
   //  Procedure:
   //    * obtain a page frame
+  //void* base = m_pmmAllocator.AllocatePage();
   //    * allocate a slab descriptor on the cache of slab descriptors 
   //    * initialise the slab
   //    * Initialise the objects of the slab
-  //    * add the slab to the list of free slabs
+  //    * add the slab to the list of free slabs 
+
 }
 
 template<typename T>

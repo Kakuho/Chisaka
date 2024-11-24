@@ -4,15 +4,17 @@
 #include <cstdint>
 #include <new>
 
+#include "cache_descriptor.hpp"
+#include "slab_descriptor.hpp"
 #include "./../../physical/freelist.hpp"
-#include "descriptors.hpp"
 
-namespace Mem::Heap::Slab{
+namespace Mem::Heap::Slab::T{
 
 class SlabAllocator{ 
 
+  template<typename T>
   struct CacheHandler{
-    CacheDescriptor* pcache = nullptr;
+    CacheDescriptor<T>* pcache = nullptr;
   };
 
   public:
@@ -21,27 +23,11 @@ class SlabAllocator{
     //-------------------------------------------------------------
     explicit SlabAllocator();
 
-    void Initialise(){
-      // first create the cache of caches
-      void* cachePage = m_pageAllocator.AllocatePage();
-      CacheDescriptor* cacheCache = new(cachePage) 
-        CacheDescriptor{CacheType::CacheDescriptor};
-      // a cache of slabs is also required 
-      CacheDescriptor* slabCache = new(cachePage) 
-        CacheDescriptor{CacheType::SlabDescriptor};
-      // now create initial slabs for that cache
-      void* slabPage = m_pageAllocator.AllocatePage();
-      SlabDescriptor* slab = reinterpret_cast<SlabDescriptor*>(cachePage);
-
-      m_cacheCache.pcache = reinterpret_cast<CacheDescriptor*>
-        (m_pageAllocator.AllocatePage());
-      m_slabCache.pcache = reinterpret_cast<CacheDescriptor*>
-        (m_pageAllocator.AllocatePage());
-    }
+    void Initialise();
 
   private:
     template<typename T>
-    CacheDescriptor* ConstructCache();
+    CacheDescriptor<T>* ConstructCache();
 
     template<typename T>
     void InitialiseKernelCache();
@@ -57,7 +43,7 @@ class SlabAllocator{
     T* Allocate();
 
     template<typename T>
-    void Free(CacheDescriptor* pcache, T* pobject);
+    void Free(CacheDescriptor<T>* pcache, T* pobject);
 
   private:
     Mem::Phys::FreeList& m_pageAllocator;
@@ -66,6 +52,8 @@ class SlabAllocator{
     CacheHandler m_cacheCache;
     CacheHandler m_slabCache;
     CacheHandler m_addressCache;
+    CacheHandler<int> m_intCache;
+
 
     // General Heap Cache ... object sizes starts at 32 (2^5) and 
     // increases in powers of 2 up to (2^16)

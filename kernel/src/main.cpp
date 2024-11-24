@@ -2,7 +2,8 @@
 
 #include "limine/requests.hpp"
 #include "x86_64/utilites.hpp"
-#include "grains/x86_64/interrupts/controller/pic.hpp"
+#include "grains/memory/heap/slab_descriptors.hpp"
+
 
 // Extern declarations for global constructor array.
 
@@ -35,5 +36,5 @@ extern "C" void _start() {
   // ------------------------------------------------------ //
 
   //Grains::Mem::PrintKernelBases();
-  Grains::CPU::PIC_DefaultCtor();
+  Grains::Mem::SlabDescriptorInstantiation();
 }

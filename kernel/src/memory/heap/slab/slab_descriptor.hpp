@@ -5,14 +5,15 @@
 //    * A free list of object descriptors
 //    * A doubly linked list to other slabs of the same type
 //
-//  This class is specifcally for small kernel objects
-//
 //  Requirements:
-//    
 //    * Slabs must initialise all of their objects before usage
-//    * On deallocation, Slabs must Destruct their Object, and then deallocation can occur
+//    * On deallocation, Slabs must Destruct their Object, and then 
+//      deallocation can occur
 
 #include <cstdint>
+#include <new>
+
+#include "cache_descriptor.hpp"
 
 namespace Mem::Heap::Slab::T{
 
@@ -23,7 +24,7 @@ class SlabDescriptor{
   // Each page frame a slab refers to is divided into cells
   struct Cell{
     T object;
-    T* pnext;
+    Cell* pnext;
   };
 
   // this is stored at the end of a large slab
@@ -41,17 +42,28 @@ class SlabDescriptor{
     explicit SlabDescriptor(void* pageBase);
     ~SlabDescriptor();
 
-    T* ObjectAddress(std::size_t index);
+    //-------------------------------------------------------------
+    //  Object Management
+    //-------------------------------------------------------------
   
+    T* ObjectAddress(std::size_t index);
+    T* Allocate();
+    void Free(T* pobject);
+
   private:
+    // Helpers for lifetime
     void InitialiseSmall();
     void InitialiseLarge();
     void ResetSmall();
     void ResetLarge();
 
+    // Helpers for object management
+    T* AllocateSmall();
+    T* AllocateLarge();
+
   private:
     void* m_pageBase;
-    void* m_cache;
+    CacheDescriptor<T>* m_cache;
     SlabInfo* m_slabInfo;
     std::size_t m_allocated;
     std::size_t m_totalObjects;
@@ -101,7 +113,7 @@ void SlabDescriptor<T>::InitialiseSmall(){
   }
   // populate known slab descriptor information
   m_totalObjects = count;
-  m_nextFree = m_pageBase;
+  m_nextFree = reinterpret_cast<T*>(m_pageBase);
 }
 
 template<typename T>
@@ -130,14 +142,46 @@ SlabDescriptor<T>::~SlabDescriptor(){
 
 template<typename T>
 void SlabDescriptor<T>::ResetSmall(){
-  Cell* index = m_pageBase;
-  index.~Cell();
+  Cell* index = reinterpret_cast<Cell*>(m_pageBase);
+  index->~Cell();
   while(reinterpret_cast<std::uint64_t>(index) < 
       reinterpret_cast<std::uint64_t>(m_pageBase) + 0x1000){
     index++;
-    index.~Cell();
+    index->~Cell();
   }
 }
+
+//-------------------------------------------------------------
+//  Object Management
+//-------------------------------------------------------------
+
+template<typename T>
+T* SlabDescriptor<T>::Allocate(){
+  // just a frontend for cache descriptors
+  return sizeof(T) < 0x1000 ? AllocateSmall() : AllocateLarge();
+}
+
+template<typename T>
+T* SlabDescriptor<T>::AllocateSmall(){
+  if(m_allocated == m_totalObjects){
+    return nullptr;
+  }
+  Cell* alloc = reinterpret_cast<Cell*>(m_nextFree);
+  if(alloc->pnext != nullptr){
+    m_nextFree = reinterpret_cast<T*>(alloc->pnext);
+    m_allocated++;
+    SlabDescriptor* head = m_cache->PartialListHead();
+  }
+  else{
+    SlabDescriptor* head = m_cache->FullListHead();
+  }
+}
+
+void DoSomething(){
+  SlabDescriptor<int> yes{reinterpret_cast<void*>(0x1000)};
+  yes.Allocate();
+}
+
 
 }
 
