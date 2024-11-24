@@ -3,39 +3,35 @@
 
 // Cache Descriptors and related functionalities
 
-#include "slab_descriptor.hpp"
 #include <cassert>
+
+#include "slab_descriptor.hpp"
 
 namespace Mem::Heap::Slab::T{
 
 template<typename T>
 class CacheDescriptor{
   public:
-    CacheDescriptor();
-
     //-------------------------------------------------------------
-    // Functionalities
+    //  Lifetime
     //-------------------------------------------------------------
 
-    // Increasing a Slab requires:
-    //  i)    Page Frames to be allocated
-    //  ii)   Initialising the slab
-    //  iii)  Initialisaing the objects of that slab
-    //  iv)   adding the slab descriptor to the list of free slabs
-    SlabDescriptor<T>* IncreaseSlab(std::size_t n); 
+    explicit CacheDescriptor();
 
-    // Releasing a slab requires:
-    //  i)    calling the destructor on all slabs
-    //  ii)   releasing the page frame back to the page frame 
-    //        allocator
-    void DeallocateSlab(SlabDescriptor<T>* pslab);
+    //-------------------------------------------------------------
+    // Slab Management
+    //-------------------------------------------------------------
 
-    // iteratively deleting all slabs of the 
-    void DestroySlabs();
+    SlabDescriptor<T>* AllocateSlab();
+    void FreeSlab(SlabDescriptor<T>* pslab);
+    void DestroySlabs();  // iteratively delete all slabs
     
-    // Allocate/Deallocate within a Cache
+    //-------------------------------------------------------------
+    // Object Management
+    //-------------------------------------------------------------
+
     void Alloc();
-    void Free(void* pobject);
+    void Free(T* pobject);
 
   private:
     // lists of slabs
@@ -43,10 +39,40 @@ class CacheDescriptor{
     SlabDescriptor<T>* fullSlabs;
     SlabDescriptor<T>* freeSlabs;
     // used for quick querying
-    std::size_t objectSize;
     std::size_t objectsPerSlab;
     std::size_t freeObjects;    
 };
+
+//-------------------------------------------------------------
+//  Lifetime
+//-------------------------------------------------------------
+
+template<typename T>
+CacheDescriptor<T>::CacheDescriptor(){
+}
+
+//-------------------------------------------------------------
+// Slab Management 
+//-------------------------------------------------------------
+
+template<typename T>
+SlabDescriptor<T>* CacheDescriptor<T>::AllocateSlab(){
+  //  Procedure:
+  //    * obtain a page frame
+  //    * allocate a slab descriptor on the cache of slab descriptors 
+  //    * initialise the slab
+  //    * Initialise the objects of the slab
+  //    * add the slab to the list of free slabs
+}
+
+template<typename T>
+void CacheDescriptor<T>::FreeSlab(SlabDescriptor<T>* pslab){
+  //  Procedure:
+  //    * Call Destructor on the objects of the Slab
+  //    * Release the page frame back to the page frame allocator
+  //    * Destruct the slab descriptor on the cache of slab descriptors
+  //    * Remove the slab descriptor from the correct slab list
+}
 
 }
 
