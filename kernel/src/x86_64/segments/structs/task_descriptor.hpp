@@ -13,7 +13,7 @@
 
 namespace X8664{
 
-struct __attribute__((packed)) TaskDescriptor{
+struct [[gnu::packed]] TaskDescriptor{
   public:
     //---------------------------------------------------------------//
     // Lifetime

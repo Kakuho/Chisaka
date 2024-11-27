@@ -13,7 +13,7 @@
 
 namespace X8664{
 
-struct __attribute__((packed)) GdtTable{
+struct [[gnu::packed]] GdtTable{
   public:
     //---------------------------------------------------------------//
     //  Lifetime

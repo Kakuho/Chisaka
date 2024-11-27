@@ -19,7 +19,7 @@
 
 namespace X8664{
 
-struct __attribute__((packed)) TaskSegment{
+struct [[gnu::packed]] TaskSegment{
   using RspTableType = Prim::StaticArray<std::uint64_t, 3>;
   using IstTableType = Prim::StaticArray<std::uint64_t, 7>;
 

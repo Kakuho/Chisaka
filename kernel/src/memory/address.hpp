@@ -14,7 +14,10 @@ namespace Mem{
   //  kvirtaddr_t is the kernel's virtual address
   //  (different processes may have different virtual address mappings)
 
-  using physaddr_t = std::uint64_t;
+  using physaddr64_t = std::uint64_t;
+  using physaddr32_t = std::uint32_t;
+  using physaddr_t = std::uint64_t;     // catch all
+
   using kvirtaddr_t = std::uint64_t;
 
   template<typename T>

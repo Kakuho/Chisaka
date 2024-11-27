@@ -15,7 +15,7 @@ extern "C" void load_idtr(void* address);
 
 namespace X8664{
 
-class __attribute__((packed)) IdtDescriptor{
+class [[gnu::packed]] IdtDescriptor{
   public:
     //---------------------------------------------------------------//
     //  Lifetime

@@ -18,7 +18,7 @@ extern "C" void load_gdtr(void* address);
 namespace X8664{
 
 
-struct __attribute__((packed)) GdtDescriptor{
+struct [[gnu::packed]] GdtDescriptor{
   public:
     //---------------------------------------------------------------//
     //  Lifetime

@@ -16,7 +16,7 @@
 
 namespace X8664{
 
-struct __attribute__((packed)) SegmentDescriptor{
+struct [[gnu::packed]] SegmentDescriptor{
   friend class TaskDescriptor;
   public:
     //---------------------------------------------------------------//
