@@ -1,0 +1,5 @@
+
+
+namespace Firmware::Acpi{
+
+}

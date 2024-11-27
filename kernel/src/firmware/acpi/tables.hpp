@@ -1,9 +1,15 @@
 #ifndef FIRMWARE_ACPI_TABLES_HPP
 #define FIRMWARE_ACPI_TABLES_HPP
 
-// ACPI Table Definitions
+//  ACPI Table Definitions
+//
+//  Contains:
+//  * RSDP
+//  * RSDT
+//  * XSDT
+//  * MADT
 // 
-// These structures are given the packed attribute if required
+//  These structures are given the packed attribute if required
 
 #include <cstdint>
 #include <cassert>
@@ -64,7 +70,6 @@ namespace Firmware::Acpi{
       TableHeader header;
       Mem::physaddr64_t* tablePointers;
   };
-
 }
 
 #endif
