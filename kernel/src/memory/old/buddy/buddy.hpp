@@ -10,7 +10,7 @@
 
 #include <cstdint>
 
-#include "limine/requests.hpp"
+#include "firmware/limine/requests.hpp"
 #include "memory/old/memory.hpp"
 #include "drivers/serial/kostream.hpp"
 

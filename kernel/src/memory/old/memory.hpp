@@ -4,8 +4,8 @@
 #include <cstdlib>
 
 #include "drivers/serial/kostream.hpp"
-#include "limine/limine.h"
-#include "limine/requests.hpp"
+#include "firmware/limine/limine.h"
+#include "firmware/limine/requests.hpp"
 
 namespace limine::requests{
   extern volatile limine_hhdm_request hhdm_request;

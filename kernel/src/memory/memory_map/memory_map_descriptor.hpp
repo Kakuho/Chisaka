@@ -15,7 +15,7 @@
 
 #include "primrose/static_array.hpp"
 #include "lib/kassert.hpp"
-#include "limine/requests.hpp"
+#include "firmware/limine/requests.hpp"
 #include "drivers/serial/kostream.hpp"
 
 namespace Mem{

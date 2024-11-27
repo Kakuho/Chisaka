@@ -10,8 +10,8 @@
 #include "memory/old/memory.hpp"
 #include "buddy.hpp"
 #include "memory/old/pstructs.hpp"
-#include "limine/limine.h"
-#include "limine/requests.hpp"
+#include "firmware/limine/limine.h"
+#include "firmware/limine/requests.hpp"
 
 extern "C" void set_paging_table(std::size_t address);
 

@@ -1,5 +1,4 @@
 #include "requests.hpp"
-#include "limine.h"
 
 namespace limine::requests{
 
@@ -32,6 +31,5 @@ volatile limine_dtb_request dtb_request{
   .revision = 0,
   .response = nullptr
 };
-
 
 } // namespace limine::requests

@@ -1,5 +1,5 @@
-#ifndef SERVICES_HPP
-#define SERVICES_HPP
+#ifndef FIRMWARE_LIMINE_REQUESTS_HPP
+#define FIRMWARE_LIMINE_REQUESTS_HPP
 
 #include "limine.h"
 #include "drivers/serial/kostream.hpp"
@@ -34,19 +34,19 @@ inline bool dtb_feature_okay(){
 }
 */
 
-  namespace requests{
+namespace requests{
 
-  extern volatile limine_framebuffer_request framebuffer_request;
+extern volatile limine_framebuffer_request framebuffer_request;
 
-  extern volatile limine_memmap_request memorymap_request;
+extern volatile limine_memmap_request memorymap_request;
 
-  extern volatile limine_hhdm_request hhdm_request;
+extern volatile limine_hhdm_request hhdm_request;
 
-  extern volatile limine_kernel_address_request kernel_addr_req;
+extern volatile limine_kernel_address_request kernel_addr_req;
 
-  extern volatile limine_dtb_request dtb_request;
+extern volatile limine_dtb_request dtb_request;
 
-  } // namespace limine::requests
+} // namespace limine::requests
 
 } // namespace limine
 

@@ -13,8 +13,8 @@
 #include "./../memory_map/memory_map_descriptor.hpp"
 #include "lib/kassert.hpp"
 
-#include "limine/limine.h"
-#include "limine/requests.hpp"
+#include "firmware/limine/limine.h"
+#include "firmware/limine/requests.hpp"
 #include "drivers/serial/kostream.hpp"
 #include "lib/string.h"
 
