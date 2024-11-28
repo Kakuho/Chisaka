@@ -32,4 +32,10 @@ volatile limine_dtb_request dtb_request{
   .response = nullptr
 };
 
+volatile limine_rsdp_request rsdp_request{
+  .id = LIMINE_RSDP_REQUEST,
+  .revision = 0,
+  .response = nullptr
+};
+
 } // namespace limine::requests

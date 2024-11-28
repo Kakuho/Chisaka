@@ -46,6 +46,8 @@ extern volatile limine_kernel_address_request kernel_addr_req;
 
 extern volatile limine_dtb_request dtb_request;
 
+extern volatile limine_rsdp_request rsdp_request;
+
 } // namespace limine::requests
 
 } // namespace limine

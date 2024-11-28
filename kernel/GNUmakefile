@@ -140,12 +140,12 @@ bin/$(KERNEL): GNUmakefile linker.ld $(OBJ)
 -include $(HEADER_DEPS)
 
 # Compilation rules for *.cpp files.
-obj/%.cpp.o: src/%.cpp GNUmakefile src/limine/limine.h
+obj/%.cpp.o: src/%.cpp GNUmakefile src/firmware/limine/limine.h
 	mkdir -p "$$(dirname $@)"
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 # Compilation rules for *.c files.
-obj/%.c.o: src/%.c GNUmakefile src/limine/limine.h
+obj/%.c.o: src/%.c GNUmakefile src/firmware/limine/limine.h
 	mkdir -p "$$(dirname $@)"
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
