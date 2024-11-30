@@ -13,13 +13,19 @@
 #include <cstdint>
 #include <new>
 
+#include "lib/kassert.hpp"
+
 #include "cache_descriptor.hpp"
 
 namespace Mem::Heap::Slab::T{
 
 template<typename T>
+class CacheDescriptor;
+
+template<typename T>
 class SlabDescriptor{
   using FreeListHead = T*;
+  friend class CacheDescriptor<T>;
 
   // Each page frame a slab refers to is divided into cells
   struct Cell{
@@ -28,6 +34,7 @@ class SlabDescriptor{
   };
 
   // this is stored at the end of a large slab
+  // it will be a bit involved maintaining the integrity of data
   struct SlabInfo{
     struct kmembuf_ctl{
       T* pobject;
@@ -49,6 +56,13 @@ class SlabDescriptor{
     T* ObjectAddress(std::size_t index);
     T* Allocate();
     void Free(T* pobject);
+
+    //-------------------------------------------------------------
+    //  List Management
+    //-------------------------------------------------------------
+
+    SlabDescriptor* Next() noexcept{return m_next;}
+    SlabDescriptor* Prev() noexcept{return m_prev;}
 
   private:
     // Helpers for lifetime
@@ -88,13 +102,12 @@ SlabDescriptor<T>::SlabDescriptor(void* pageBase)
     m_next{nullptr},
     m_prev{nullptr}
 {
-  if(sizeof(T) < 0x1000){
+  if constexpr (sizeof(T) < 0x1000){
     InitialiseSmall();
   }
   else{
     InitialiseLarge();
   }
-
 }
 
 // Given a page we need to initialise objects within the pages
@@ -102,13 +115,15 @@ SlabDescriptor<T>::SlabDescriptor(void* pageBase)
 
 template<typename T>
 void SlabDescriptor<T>::InitialiseSmall(){
-  // This procedure is called during construction when the type to store is a small type
+  // This procedure is called during construction when the type to 
+  // store is a small type
   std::size_t count = 1;
   Cell* objectIndex = new(reinterpret_cast<Cell*>(m_pageBase)) Cell{};
-  while( reinterpret_cast<std::uint64_t>(objectIndex) < reinterpret_cast<std::uint64_t>(m_pageBase) + 0x1000){
+  while( reinterpret_cast<std::uint64_t>(objectIndex+1) < (reinterpret_cast<std::uint64_t>(m_pageBase) + 0x1000)){
     Cell* objectNext = new(objectIndex+1) Cell{};
     objectIndex->pnext = objectNext;
-    objectIndex++;
+    // update the index
+    objectIndex = objectNext;
     count++;
   }
   // populate known slab descriptor information
@@ -128,27 +143,35 @@ void SlabDescriptor<T>::InitialiseLarge(){
 
 template<typename T>
 SlabDescriptor<T>::~SlabDescriptor(){
-  // first call the destructors
-  if(sizeof(T) < 0x1000){
+  if constexpr(sizeof(T) < 0x1000){
     ResetSmall();
   }
   else{
     ResetLarge();
   }
   // clean the slab list
-  m_next->m_prev = m_prev;
-  m_prev->m_next = m_next;
+  if(m_next){
+    m_next->m_prev = m_prev;
+  }
+  if(m_prev){
+    m_prev->m_next = m_next;
+  }
 }
 
 template<typename T>
 void SlabDescriptor<T>::ResetSmall(){
   Cell* index = reinterpret_cast<Cell*>(m_pageBase);
   index->~Cell();
-  while(reinterpret_cast<std::uint64_t>(index) < 
+  while(reinterpret_cast<std::uint64_t>(index+1) < 
       reinterpret_cast<std::uint64_t>(m_pageBase) + 0x1000){
     index++;
     index->~Cell();
   }
+}
+
+template<typename T>
+void SlabDescriptor<T>::ResetLarge(){
+  kassert(false && "ResetLarge() not implemented");
 }
 
 //-------------------------------------------------------------
@@ -181,7 +204,6 @@ void DoSomething(){
   SlabDescriptor<int> yes{reinterpret_cast<void*>(0x1000)};
   yes.Allocate();
 }
-
 
 }
 

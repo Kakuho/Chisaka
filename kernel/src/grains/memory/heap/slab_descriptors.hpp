@@ -2,7 +2,6 @@
 #include "drivers/serial/kostream.hpp"
 #include "lib/kassert.hpp"
 #include "memory/heap/slab/slab_descriptor.hpp"
-#include "memory/heap/slab/cache_descriptor.hpp"
 
 namespace Grains::Mem{
 
@@ -10,13 +9,10 @@ namespace Grains::Mem{
     // PLEASE CHECK REGISTERS!
     GRAIN("Checking the bytes of the bitmap",
       {
-        /*
-        ::Mem::Heap::Slab::T::SlabDescriptor<int> slabDesc{reinterpret_cast<void*>(0x1000)};
-        slabDesc.Allocate();
-        */
-
-        ::Mem::Heap::Slab::T::CacheDescriptor<int> cacheDesc{};
-        cacheDesc.AllocateSlab();
+        ::Mem::Heap::Slab::T::SlabDescriptor<int> slabDesc{reinterpret_cast<void*>(0x50000)};
+        //slabDesc.Allocate();
+        using bigboii = char[0x1234];
+        ::Mem::Heap::Slab::T::SlabDescriptor<bigboii> bigSlab{reinterpret_cast<void*>(0x51000)};
       }
     );
   }

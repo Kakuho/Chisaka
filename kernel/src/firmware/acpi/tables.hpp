@@ -72,6 +72,7 @@ namespace Firmware::Acpi{
         return header.signature == SIG;
       }
 
+      /*
       [[nodiscard]] const Mem::physaddr32_t* 
       operator[](std::size_t index) const noexcept{
         // indexes the table pointers
@@ -82,6 +83,7 @@ namespace Firmware::Acpi{
           return tablePointers[index];
         }
       }
+      */
 
     public:
       TableHeader header;
