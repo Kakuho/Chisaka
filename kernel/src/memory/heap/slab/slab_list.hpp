@@ -14,9 +14,23 @@ class SlabDescriptor;
 template<typename T>
 class SlabList{
   public:
+    //-------------------------------------------------------------
+    //  Lifetime
+    //-------------------------------------------------------------
+
     SlabList(SlabDescriptor<T>* head) noexcept: m_head{head}{}
 
+    //-------------------------------------------------------------
+    // Member Lookup / Capacity
+    //-------------------------------------------------------------
+
     SlabDescriptor<T>* Head() noexcept { return m_head;}
+    [[nodiscard]] bool IsEmpty() noexcept;
+
+    //-------------------------------------------------------------
+    //  Modififers
+    //-------------------------------------------------------------
+
     void AddBack(SlabDescriptor<T>& src);
     void AddBack(SlabDescriptor<T>&& src);
     void AddFront(SlabDescriptor<T>& src);

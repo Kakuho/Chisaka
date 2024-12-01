@@ -54,7 +54,13 @@ class SlabDescriptor{
     //-------------------------------------------------------------
   
     T* ObjectAddress(std::size_t index);
-    T* Allocate();
+
+    template<typename... Args>
+    T* Allocate(Args&&... args){
+      T* allocd = new(m_nextFree) T{std::forward<Args>(args)...};
+      return allocd;
+    }
+
     void Free(T* pobject);
 
     //-------------------------------------------------------------
@@ -193,10 +199,10 @@ T* SlabDescriptor<T>::AllocateSmall(){
   if(alloc->pnext != nullptr){
     m_nextFree = reinterpret_cast<T*>(alloc->pnext);
     m_allocated++;
-    SlabDescriptor* head = m_cache->PartialListHead();
+    SlabDescriptor* head = m_cache->PartialSlabsHead();
   }
   else{
-    SlabDescriptor* head = m_cache->FullListHead();
+    SlabDescriptor* head = m_cache->FullSlabsHead();
   }
 }
 

@@ -8,6 +8,7 @@
 //  descriptors
 
 #include <cassert>
+#include <utility>
 
 #include "slab_descriptor.hpp"
 #include "slab_list.hpp"
@@ -21,6 +22,10 @@ class SlabDescriptor;
 template<typename T>
 class CacheDescriptor{
   using PageAllocator_t = Mem::Phys::FreeList;
+  using CnEntry_t = SlabDescriptor<T>;
+  using SlabCacheEntry_t = SlabDescriptor<void*>;
+  using SlabCache_t = CacheDescriptor<SlabCacheEntry_t>;
+
   public:
     //-------------------------------------------------------------
     //  Lifetime
@@ -33,25 +38,39 @@ class CacheDescriptor{
     //-------------------------------------------------------------
 
     [[nodiscard]] SlabDescriptor<T>* 
-    AllocateSlab(PageAllocator_t& pageAllocator) noexcept;
+    AllocateSlab(PageAllocator_t& pageAllocator, SlabCache_t& slabCache) noexcept;
+
     void FreeSlab(SlabDescriptor<T>* pslab);
     void DestroySlabs();  // iteratively delete all slabs
 
-    SlabDescriptor<T>* PartialSlabsHead(){ return partialSlabs;}
-    SlabDescriptor<T>* FullSlabsHead(){ return fullSlabs;}
-    SlabDescriptor<T>* EmptySlabsHead(){ return partialSlabs;}
+    SlabDescriptor<T>* PartialSlabsHead(){ return m_partialSlabs.Head();}
+    SlabDescriptor<T>* FullSlabsHead(){ return m_fullSlabs.Head();}
+    SlabDescriptor<T>* EmptySlabsHead(){ return m_partialSlabs.Head();}
     
     //-------------------------------------------------------------
     // Object Management
     //-------------------------------------------------------------
 
-    void Alloc();
-    void Free(T* pobject);
+    template<typename ...Args>
+    T* AllocateObject(Args&&... args){
+      if(!m_partialSlabs.IsEmpty()){
+        m_partialSlabs.Head()->Allocate(std::forward<Args>(args)...);
+      }
+      else if(!m_freeSlabs.IsEmpty()){
+        m_freeSlabs.Head()->Allocate(std::forward<Args>(args)...);
+      }
+      else{
+        AllocateSlab();
+        m_freeSlabs.Head()->Allocate(std::forward<Args>(args)...);
+      }
+    }
+
+    void FreeObject(T* pobject);
 
   private:
-    SlabList<T> partialSlabs;
-    SlabList<T> fullSlabs;
-    SlabList<T> freeSlabs;
+    SlabList<T> m_partialSlabs;
+    SlabList<T> m_fullSlabs;
+    SlabList<T> m_freeSlabs;
     // used for quick querying
     std::size_t objectsPerSlab;
     std::size_t freeObjects;    
@@ -71,16 +90,17 @@ CacheDescriptor<T>::CacheDescriptor(){
 
 template<typename T>
 SlabDescriptor<T>* 
-CacheDescriptor<T>::AllocateSlab(PageAllocator_t& pageAllocator) 
+CacheDescriptor<T>::AllocateSlab(PageAllocator_t& pageAllocator, SlabCache_t& slabCache)
 noexcept{
-  //  Procedure:
-  //    * obtain a page frame
-  //void* base = m_pmmAllocator.AllocatePage();
-  //    * allocate a slab descriptor on the cache of slab descriptors 
-  //    * initialise the slab
-  //    * Initialise the objects of the slab
-  //    * add the slab to the list of free slabs 
   void* base = pageAllocator.AllocatePage();
+  CnEntry_t* slab = slabCache.AllocateObject(base);
+  if constexpr(sizeof(T) < 0x1000){
+    slab->InitialiseSmall();
+  }
+  else{
+    slab->InitialiseLarge();
+  }
+  m_freeSlabs.AddBack(slab);
 }
 
 template<typename T>
@@ -92,6 +112,9 @@ void CacheDescriptor<T>::FreeSlab(SlabDescriptor<T>* pslab){
   //    * Remove the slab descriptor from the correct slab list
 }
 
+//-------------------------------------------------------------
+// Object Management
+//-------------------------------------------------------------
 }
 
 #endif
