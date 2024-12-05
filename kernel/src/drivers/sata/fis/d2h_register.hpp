@@ -11,13 +11,11 @@
 //  contents of the FIS.
 
 #include <cstdint>
+
 #include "fis_types.hpp"
+#include "args.hpp"
 
 namespace Drivers::Sata::Fis::D2HRegister{
-
-struct Initialiser{
-
-};
 
 class Frame{
   static constexpr std::uint8_t TYPE_VALUE = 

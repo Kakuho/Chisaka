@@ -32,9 +32,16 @@ class Frame{
     constexpr Frame() = default;
     constexpr Frame(Initialiser&& src) noexcept;
 
-    [[nodiscard]] constexpr std::uint8_t Type() const noexcept{ return m_type;}
-    [[nodiscard]] constexpr std::uint8_t StatusByte() const noexcept;
-    [[nodiscard]] constexpr std::uint8_t Error() const noexcept{ return m_errorReg;}
+    //-------------------------------------------------------------
+    // Attribute Querying
+    //-------------------------------------------------------------
+
+    [[nodiscard]] constexpr std::uint8_t Type() const noexcept
+    { return m_type;}
+    [[nodiscard]] constexpr std::uint8_t StatusByte() const noexcept
+    { return m_statusByte;}
+    [[nodiscard]] constexpr std::uint8_t Error() const noexcept
+    { return m_errorReg;}
 
     // Status Querying
     [[nodiscard]] constexpr bool BSY() const noexcept;
