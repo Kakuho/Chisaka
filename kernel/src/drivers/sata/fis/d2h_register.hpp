@@ -1,5 +1,5 @@
-#ifndef DRIVERS_SATA_FIS_D2H_REGISTER_FRAME_HPP
-#define DRIVERS_SATA_FIS_D2H_REGISTER_FRAME_HPP
+#ifndef DRIVERS_SATA_FIS_D2H_REGISTER_HPP
+#define DRIVERS_SATA_FIS_D2H_REGISTER_HPP
 
 //  Encapsulates Register - Device to Host FISes
 //
@@ -13,14 +13,18 @@
 #include <cstdint>
 #include "fis_types.hpp"
 
-namespace Drivers::Sata{
+namespace Drivers::Sata::Fis::D2HRegister{
 
-class D2HRegisterFrame{
+struct Initialiser{
+
+};
+
+class Frame{
   static constexpr std::uint8_t TYPE_VALUE = 
     static_cast<std::uint8_t>(FisType::RegisterDeviceToHost);
 
   public:
-    D2HRegisterFrame() = default;
+    Frame() = default;
 
     // ------------------------------------------------------ //
     //  Attribute Querying
@@ -61,57 +65,57 @@ class D2HRegisterFrame{
     [[maybe_unused]] std::uint32_t m_rsv2 = 0;
 };
 
-static_assert(sizeof(D2HRegisterFrame) == 20);
+static_assert(sizeof(Frame) == 20);
 
 // Implementation
 
-[[nodiscard]] constexpr std::uint8_t D2HRegisterFrame::Type() const 
+[[nodiscard]] constexpr std::uint8_t Frame::Type() const 
 noexcept{
   return m_type;
 }
 
 [[nodiscard]] constexpr 
-std::uint8_t D2HRegisterFrame::PortSelector() const noexcept{
+std::uint8_t Frame::PortSelector() const noexcept{
   return m_i_portMultiplier & 0x0F;
 }
 
 [[nodiscard]] constexpr 
-bool D2HRegisterFrame::Interrupt() const noexcept{
+bool Frame::Interrupt() const noexcept{
   return m_i_portMultiplier & 0x40;
 }
 
 [[nodiscard]] constexpr 
-std::uint8_t D2HRegisterFrame::Status() const noexcept{
+std::uint8_t Frame::Status() const noexcept{
   return m_statusReg;
 }
 
 [[nodiscard]] constexpr 
-std::uint8_t D2HRegisterFrame::Error() const noexcept{
+std::uint8_t Frame::Error() const noexcept{
   return m_errorReg;
 }
 
 [[nodiscard]] constexpr 
-std::uint8_t D2HRegisterFrame::Device() const noexcept{
+std::uint8_t Frame::Device() const noexcept{
   return m_deviceReg;
 }
 
 [[nodiscard]] constexpr 
-std::uint16_t D2HRegisterFrame::SectorCount() const noexcept{
+std::uint16_t Frame::SectorCount() const noexcept{
   return m_sectorCountReg;
 }
 
 [[nodiscard]] constexpr 
-std::uint16_t D2HRegisterFrame::LbaLow() const noexcept{
+std::uint16_t Frame::LbaLow() const noexcept{
   return (m_lbaLowReg1 << 8) | m_lbaLowReg0;
 }
 
 [[nodiscard]] constexpr 
-std::uint16_t D2HRegisterFrame::LbaMid() const noexcept{
+std::uint16_t Frame::LbaMid() const noexcept{
   return (m_lbaMidReg1 << 8) | m_lbaMidReg0;
 }
 
 [[nodiscard]] constexpr 
-std::uint16_t D2HRegisterFrame::LbaHigh() const noexcept{
+std::uint16_t Frame::LbaHigh() const noexcept{
   return (m_lbaHighReg1 << 8) | m_lbaHighReg0;
 }
 

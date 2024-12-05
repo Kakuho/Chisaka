@@ -4,7 +4,7 @@
 #include "x86_64/utilites.hpp"
 //#include "grains/memory/memorymap.hpp"
 #include "grains/memory/heap/slab_descriptors.hpp"
-#include "drivers/sata/fis/h2d_register_frame.hpp"
+#include "drivers/sata/fis/h2d_register.hpp"
 
 // Extern declarations for global constructor array.
 

@@ -1,5 +1,5 @@
-#ifndef DRIVERS_SATA_FIS_SET_DEVICE_BITS_FRAME_HPP
-#define DRIVERS_SATA_FIS_SET_DEVICE_BITS_FRAME_HPP
+#ifndef DRIVERS_SATA_FIS_DMA_ACTIVATE_HPP
+#define DRIVERS_SATA_FIS_DMA_ACTIVATE_HPP
 
 //  Encapsulates DMA Activate - Device to Host FISes
 //
@@ -13,25 +13,44 @@
 #include <cstdint>
 #include <cassert>
 
+#include "drivers/sata/fis/args.hpp"
 #include "fis_types.hpp"
 
-namespace Drivers::Sata{
+namespace Drivers::Sata::Fis::DmaActivate{
 
-class DmaActivate{
+struct Initialiser{
+  Args::PortMultiplier portMultiplier;
+};
+
+class Frame{
   static constexpr std::uint8_t TYPE_VALUE = 
     static_cast<std::uint8_t>(FisType::DMAActivate);
 
   public:
-    DmaActivate() = default;
+    constexpr Frame(Initialiser&& src) noexcept;
+
+    [[nodiscard]] constexpr std::uint8_t Type() const noexcept{
+      return m_type;
+    }
+
+    [[nodiscard]] constexpr std::uint8_t PortMultiplier() const noexcept{
+      return m_portMultiplier;
+    }
 
   private:
     // Dword 0
     std::uint8_t m_type = TYPE_VALUE;
     std::uint8_t m_portMultiplier;
-    std::uint16_t m_reserved;
+    [[maybe_unused]] std::uint16_t m_reserved = 0;
 };
 
-static_assert(sizeof(DmaActivate) == 4);
+static_assert(sizeof(Frame) == 4);
+
+constexpr Frame::Frame(Initialiser&& src) noexcept
+  : m_portMultiplier{src.portMultiplier.data}
+{
+
+}
 
 }
 

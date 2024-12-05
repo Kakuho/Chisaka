@@ -1,5 +1,5 @@
-#ifndef DRIVERS_SATA_FIS_H2D_REGISTER_FRAME_HPP
-#define DRIVERS_SATA_FIS_H2D_REGISTER_FRAME_HPP
+#ifndef DRIVERS_SATA_FIS_H2D_REGISTER_HPP
+#define DRIVERS_SATA_FIS_H2D_REGISTER_HPP
 
 //  Encapsulates Register - Host to Device Fises
 //
@@ -19,9 +19,9 @@
 #include "fis_types.hpp"
 #include "args.hpp"
 
-namespace Drivers::Sata{
+namespace Drivers::Sata::Fis::H2DRegister{
 
-struct H2DRegisterInitialiser{
+struct Initialiser{
   Args::C               isC;
   Args::PortMultiplier  portMultiplier;
   Args::Command         command;
@@ -34,12 +34,12 @@ struct H2DRegisterInitialiser{
   Args::Control         control;
 };
 
-class H2DRegisterFrame{
+class Frame{
   static constexpr std::uint8_t TYPE_VALUE = 
     static_cast<std::uint8_t>(FisType::RegisterHostToDevice);
 
   public:
-    constexpr H2DRegisterFrame(H2DRegisterInitialiser&& src) noexcept;
+    constexpr Frame(Initialiser&& src) noexcept;
 
     //-------------------------------------------------------------
     //  Queries
@@ -81,14 +81,14 @@ class H2DRegisterFrame{
     [[maybe_unused]] std::uint32_t m_rsv1 = 0;
 };
 
-static_assert(sizeof(H2DRegisterFrame) == 20);
+static_assert(sizeof(Frame) == 20);
 
 // ------------------------------------------------------ //
 //  Impl
 // ------------------------------------------------------ //
 
 constexpr 
-H2DRegisterFrame::H2DRegisterFrame(H2DRegisterInitialiser&& src)
+Frame::Frame(Initialiser&& src)
   noexcept:
     m_commandReg{src.command.data},
     m_deviceReg{src.device.data},
@@ -108,56 +108,56 @@ H2DRegisterFrame::H2DRegisterFrame(H2DRegisterInitialiser&& src)
 // ------------------------------------------------------ //
 
 [[nodiscard]] constexpr 
-std::uint8_t H2DRegisterFrame::TypeValue() const noexcept{
+std::uint8_t Frame::TypeValue() const noexcept{
   return m_type;
 }
 
-[[nodiscard]] constexpr bool H2DRegisterFrame::IsC() const noexcept{
+[[nodiscard]] constexpr bool Frame::IsC() const noexcept{
   return m_c_portMultiplier & 0x80;
 }
 
 [[nodiscard]] constexpr 
-std::uint8_t H2DRegisterFrame::SelectedPort() const noexcept{
+std::uint8_t Frame::SelectedPort() const noexcept{
   return m_c_portMultiplier & 0x0F;
 }
 
 [[nodiscard]] constexpr
-std::uint8_t H2DRegisterFrame::Command() const noexcept{
+std::uint8_t Frame::Command() const noexcept{
   return m_commandReg;
 }
 
 [[nodiscard]] constexpr
-std::uint16_t H2DRegisterFrame::Features() const noexcept{
+std::uint16_t Frame::Features() const noexcept{
   return (m_featuresReg1 << 8) | m_featuresReg0;
 }
 
 [[nodiscard]] constexpr
-std::uint16_t H2DRegisterFrame::LbaLow() const noexcept{
+std::uint16_t Frame::LbaLow() const noexcept{
   return (m_lbaLowReg1 << 8) | m_lbaLowReg0;
 }
 
 [[nodiscard]] constexpr
-std::uint16_t H2DRegisterFrame::LbaMid() const noexcept{
+std::uint16_t Frame::LbaMid() const noexcept{
   return (m_lbaMidReg1 << 8) | m_lbaMidReg0;
 }
 
 [[nodiscard]] constexpr
-std::uint16_t H2DRegisterFrame::LbaHigh() const noexcept{
+std::uint16_t Frame::LbaHigh() const noexcept{
   return (m_lbaHighReg1 << 8) | m_lbaHighReg0;
 }
 
 [[nodiscard]] constexpr
-std::uint8_t H2DRegisterFrame::Device() const noexcept{
+std::uint8_t Frame::Device() const noexcept{
   return m_deviceReg;
 }
 
 [[nodiscard]] constexpr
-std::uint16_t H2DRegisterFrame::SectorCount() const noexcept{
+std::uint16_t Frame::SectorCount() const noexcept{
   return m_sectorCountReg;
 }
 
 [[nodiscard]] constexpr
-std::uint8_t H2DRegisterFrame::Control() const noexcept{
+std::uint8_t Frame::Control() const noexcept{
   return m_controlReg;
 }
 

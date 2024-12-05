@@ -170,6 +170,17 @@ namespace Drivers::Sata::Args{
     bool data; 
   };
 
+  struct Notification{
+    constexpr explicit Notification() noexcept = default;
+    constexpr explicit Notification(bool src) noexcept: data{src}{}
+
+    [[nodiscard]] constexpr explicit operator bool() const noexcept{
+      return data;
+    }
+
+    bool data; 
+  };
+
   struct Status{
     constexpr explicit Status() noexcept = default;
     constexpr explicit Status(std::uint8_t src) noexcept: data{src}{}
