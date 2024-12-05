@@ -21,7 +21,7 @@
 
 namespace Drivers::Sata{
 
-struct H2DRegisterFrameArgs{
+struct H2DRegisterInitialiser{
   Args::C               isC;
   Args::PortMultiplier  portMultiplier;
   Args::Command         command;
@@ -39,8 +39,7 @@ class H2DRegisterFrame{
     static_cast<std::uint8_t>(FisType::RegisterHostToDevice);
 
   public:
-    H2DRegisterFrame();
-    H2DRegisterFrame(H2DRegisterFrameArgs&& src);
+    constexpr H2DRegisterFrame(H2DRegisterInitialiser&& src) noexcept;
 
     //-------------------------------------------------------------
     //  Queries
@@ -57,20 +56,6 @@ class H2DRegisterFrame{
     [[nodiscard]] constexpr std::uint8_t Device() const noexcept;
     [[nodiscard]] constexpr std::uint16_t SectorCount() const noexcept;
     [[nodiscard]] constexpr std::uint8_t Control() const noexcept;
-
-  private:
-    // used by the constructor to split up ctor arguments
-
-    constexpr void SplitFeatures(std::uint16_t features) noexcept;
-    constexpr void SplitLbaLow(std::uint16_t lbaLow) noexcept;
-    constexpr void SplitLbaMid(std::uint16_t lbaMid) noexcept;
-    constexpr void SplitLbaHigh(std::uint16_t lbaHigh) noexcept;
-
-    constexpr void PackCPortmultiplier(
-      bool c, 
-      std::uint8_t portMultiplier
-    ) 
-    noexcept;
 
   private:
     // Dword 0
@@ -98,6 +83,25 @@ class H2DRegisterFrame{
 
 static_assert(sizeof(H2DRegisterFrame) == 20);
 
+// ------------------------------------------------------ //
+//  Impl
+// ------------------------------------------------------ //
+
+constexpr 
+H2DRegisterFrame::H2DRegisterFrame(H2DRegisterInitialiser&& src)
+  noexcept:
+    m_commandReg{src.command.data},
+    m_deviceReg{src.device.data},
+    m_sectorCountReg{src.sectorCount.data},
+    m_controlReg{src.control.data}
+{
+  m_c_portMultiplier = src.portMultiplier.data | (src.isC.data 
+    ? 0x80 : 0x00);
+  std::tie(m_featuresReg0, m_featuresReg1) = src.features.Split();
+  std::tie(m_lbaLowReg0, m_lbaLowReg1) = src.lbaLow.Split();
+  std::tie(m_lbaMidReg0, m_lbaMidReg1) = src.lbaMid.Split();
+  std::tie(m_lbaHighReg0, m_lbaHighReg1) = src.lbaHigh.Split();
+}
 
 // ------------------------------------------------------ //
 //  Queries
@@ -155,47 +159,6 @@ std::uint16_t H2DRegisterFrame::SectorCount() const noexcept{
 [[nodiscard]] constexpr
 std::uint8_t H2DRegisterFrame::Control() const noexcept{
   return m_controlReg;
-}
-
-// ------------------------------------------------------ //
-//  Private Helper Routines
-// ------------------------------------------------------ //
-
-constexpr void H2DRegisterFrame::SplitFeatures(std::uint16_t features) 
-noexcept{
-  m_featuresReg1 = (features & 0xF0) >> 8;
-  m_featuresReg0 = features & 0x0F;
-}
-
-constexpr void H2DRegisterFrame::SplitLbaLow(std::uint16_t lbaLow) 
-noexcept{
-  m_lbaLowReg1 = (lbaLow & 0xF0) >> 8;
-  m_lbaLowReg0 = lbaLow & 0x0F;
-}
-
-constexpr void H2DRegisterFrame::SplitLbaMid(std::uint16_t lbaMid) 
-noexcept{
-  m_lbaMidReg1 = (lbaMid & 0xF0) >> 8;
-  m_lbaMidReg0 = lbaMid & 0x0F;
-}
-
-constexpr void H2DRegisterFrame::SplitLbaHigh(std::uint16_t lbaHigh) 
-noexcept{
-  m_lbaHighReg1 = (lbaHigh & 0xF0) >> 8;
-  m_lbaHighReg0 = lbaHigh & 0x0F;
-}
-
-constexpr void H2DRegisterFrame::PackCPortmultiplier(
-  bool c, 
-  std::uint8_t portMultiplier
-) 
-noexcept{
-  if(c){
-    m_c_portMultiplier |= 0x80 | (portMultiplier & 0xF);
-  }
-  else{
-    m_c_portMultiplier |= portMultiplier & 0xF;
-  }
 }
 
 }

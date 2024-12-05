@@ -1,7 +1,22 @@
 #ifndef DRIVERS_SATA_FIS_ARGS_HPP
 #define DRIVERS_SATA_FIS_ARGS_HPP
 
-// Type safe classes for SATA FIS constructor arguments
+//  Type safe classes for SATA FIS constructor arguments
+//
+//  Arguments:
+//    * C
+//    * Port Multiplier
+//    * Command
+//    * Features
+//    * LbaLow
+//    * LbaMid
+//    * LbaHigh
+//    * Device
+//    * SectorCount
+//    * Control
+//    * Interrupt
+//    * Status
+//    * Error
 
 #include <cstdint>
 #include <tuple>
@@ -9,6 +24,10 @@
 #include "lib/kassert.hpp"
 
 namespace Drivers::Sata::Args{
+
+  // Common Args
+
+  // Register Host - Device
 
   struct C{
     constexpr explicit C() noexcept = default;
@@ -137,6 +156,42 @@ namespace Drivers::Sata::Args{
     
     std::uint8_t data; 
   };
+
+  // Register Device - Host
+
+  struct Interrupt{
+    constexpr explicit Interrupt() noexcept = default;
+    constexpr explicit Interrupt(bool src) noexcept: data{src}{}
+
+    [[nodiscard]] constexpr explicit operator bool() const noexcept{
+      return data;
+    }
+
+    bool data; 
+  };
+
+  struct Status{
+    constexpr explicit Status() noexcept = default;
+    constexpr explicit Status(std::uint8_t src) noexcept: data{src}{}
+
+    [[nodiscard]] constexpr explicit operator std::uint8_t() const noexcept{
+      return data;
+    }
+
+    std::uint8_t data; 
+  };
+
+  struct Error{
+    constexpr explicit Error() noexcept = default;
+    constexpr explicit Error(std::uint8_t src) noexcept: data{src}{}
+
+    [[nodiscard]] constexpr explicit operator std::uint8_t() const noexcept{
+      return data;
+    }
+
+    std::uint8_t data; 
+  };
+
 }
 
 #endif
