@@ -2,8 +2,11 @@ For now, assume the kernel is always mapped at the top half of the virtual addre
 
 I also assume the system has 8GiB RAM
 
-I will set up two mappings: 
-  
-0x000000000           -> 0x1ffffffff            (Identity mapping of the first 8GiB of physical RAM)
+//-------------------------------------------------------------
 
-0xffffffff80000000    -> 0x1000000017fffffff    (Identity mapping of the first 8GiB of RAM to Kernel hhdm Offset)
+I will set up two mappings: 
+
+0x00000000'00000000 -> 0x00000002'40000000    Identity mapping of the first 9GiB of RAM (9 GiB because some extra memory
+                                              is required after the first 8GiB of present RAM)
+
+0xffff8000'00000000 -> 0xffff8002'40000000    Identity mapping of the first 9GiB of RAM with kernel offset applied

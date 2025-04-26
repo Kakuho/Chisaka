@@ -21,51 +21,49 @@ struct MemoryMapEntry{
   };
 
   static constexpr Type ConvertLimineType(std::uint64_t limineCode) noexcept{
-    using enum Type;
     switch(limineCode){
       case 0:
-        return Useable;
+        return Type::Useable;
       case 1:
-        return Reserved;
+        return Type::Reserved;
       case 2:
-        return AcpiReclaimable;
+        return Type::AcpiReclaimable;
       case 3:
-        return AcpiNVS;
+        return Type::AcpiNVS;
       case 4:
-        return BadMemory;
+        return Type::BadMemory;
       case 5:
-        return BootLoaderReclaimable;
+        return Type::BootLoaderReclaimable;
       case 6:
-        return Kernel;
+        return Type::Kernel;
       case 7:
-        return FrameBuffer;
+        return Type::FrameBuffer;
       default:
-        return Unknown;
+        return Type::Unknown;
     }
   }
 
   static constexpr const char* MemTypeToString(Type type) noexcept{
-    using enum Type;
     switch(type){
-      case Useable:
+      case Type::Useable:
         return "Useable";
-      case Reserved:
+      case Type::Reserved:
         return "Reserved";
-      case AcpiReclaimable:
+      case Type::AcpiReclaimable:
         return "AcpiReclaimable";
-      case AcpiNVS:
+      case Type::AcpiNVS:
         return "AcpiNVS";
-      case BadMemory:
+      case Type::BadMemory:
         return "BadMemory";
-      case BootLoaderReclaimable:
+      case Type::BootLoaderReclaimable:
         return "BootLoaderReclaimable";
-      case Kernel:
+      case Type::Kernel:
         return "Kernel";
-      case FrameBuffer:
+      case Type::FrameBuffer:
         return "FrameBuffer";
-      case Empty:
+      case Type::Empty:
         return "Empty";
-      case Unknown:
+      case Type::Unknown:
         [[fallthrough]];
       default:
         return "Unknown";

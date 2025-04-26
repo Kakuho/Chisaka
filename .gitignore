@@ -1,8 +1,13 @@
 .cache/
+
 chisaka.iso
 limine/
 *.txt
 *.hdd
+*.img
+compile_commands.json
 
 Tasks
 kernel/src/primrose
+
+clangd_gen/build

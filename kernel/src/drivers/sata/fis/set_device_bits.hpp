@@ -7,7 +7,6 @@
 //  which cannot otherwise be obtained, notably parts of the Error 
 //  Register and the Status Register
 
-#include <cmath>
 #include <cstdint>
 #include <cassert>
 
@@ -26,7 +25,7 @@ struct Initialiser{
 
 class Frame{
   static constexpr std::uint8_t TYPE_VALUE = 
-    static_cast<std::uint8_t>(FisType::SetDeviceBits);
+    GetUnderlying(FisType::SetDeviceBits);
 
   public:
     constexpr Frame() = default;
@@ -53,15 +52,23 @@ class Frame{
     constexpr void
     FormPack(Args::Notification, Args::Interrupt, Args::PortMultiplier) noexcept;
 
-  private:
+  public:
+    // Public Open Encapsulation for now... will change it later on
+
     // Dword 0
-    std::uint8_t m_type = TYPE_VALUE;
+    const std::uint8_t m_type = TYPE_VALUE;
     std::uint8_t m_n_i_portMultiplier;
     std::uint8_t m_statusByte;
     std::uint8_t m_errorReg;
+    // Dword 1
+    std::uint32_t m_rsv = 0;
 };
 
-static_assert(sizeof(Frame) == 4);
+static_assert(sizeof(Frame) == 8);
+
+//-------------------------------------------------------------
+//  Impl
+//-------------------------------------------------------------
 
 constexpr Frame::Frame(Initialiser&& src) noexcept
   : m_n_i_portMultiplier{0},

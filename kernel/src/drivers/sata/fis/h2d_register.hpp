@@ -13,6 +13,10 @@
 //
 //    b) Executes a control request supplied in the Device Control 
 //       Register
+//
+//  TODO:
+//    
+//    * Define better abstraction
 
 #include <cstdint>
 
@@ -36,10 +40,11 @@ struct Initialiser{
 
 class Frame{
   static constexpr std::uint8_t TYPE_VALUE = 
-    static_cast<std::uint8_t>(FisType::RegisterHostToDevice);
+    GetUnderlying(FisType::RegisterHostToDevice);
 
   public:
     constexpr Frame(Initialiser&& src) noexcept;
+    constexpr Frame();
 
     //-------------------------------------------------------------
     //  Queries
@@ -57,9 +62,11 @@ class Frame{
     [[nodiscard]] constexpr std::uint16_t SectorCount() const noexcept;
     [[nodiscard]] constexpr std::uint8_t Control() const noexcept;
 
-  private:
+  public:
+    // public for now, will change the interface later on...
+
     // Dword 0
-    std::uint8_t m_type = TYPE_VALUE;
+    const std::uint8_t m_type = TYPE_VALUE;
     std::uint8_t m_c_portMultiplier = 0;
     std::uint8_t m_commandReg;
     std::uint8_t m_featuresReg0;
@@ -86,6 +93,29 @@ static_assert(sizeof(Frame) == 20);
 // ------------------------------------------------------ //
 //  Impl
 // ------------------------------------------------------ //
+
+constexpr Frame::Frame()
+  :
+    // Dword 0
+    m_c_portMultiplier{0},
+    m_commandReg{0},
+    m_featuresReg0{0},
+    // Dword 1
+    m_lbaLowReg0{0},
+    m_lbaMidReg0{0},
+    m_lbaHighReg0{0},
+    m_deviceReg{0},
+    // Dword 2
+    m_lbaLowReg1{0},
+    m_lbaMidReg1{0},
+    m_lbaHighReg1{0},
+    m_featuresReg1{0},
+    // Dword 3
+    m_sectorCountReg{0},
+    m_controlReg{0}
+{
+
+}
 
 constexpr 
 Frame::Frame(Initialiser&& src)

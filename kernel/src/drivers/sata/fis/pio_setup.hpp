@@ -1,28 +1,22 @@
-#ifndef DRIVERS_SATA_FIS_D2H_REGISTER_HPP
-#define DRIVERS_SATA_FIS_D2H_REGISTER_HPP
+#ifndef DRIVERS_SATA_FIS_PIO_SETUP_HPP
+#define DRIVERS_SATA_FIS_PIO_SETUP_HPP
 
-//  Encapsulates Register - Device to Host FISes
+//  Encapsulates PIO Setup FISes (D2H)
 //
-//  These FISes are used by the device to notify the host that a command 
-//  has completed, or to change the shadow block registers of the hba 
-//  otherwise.
-//
-//  Upon reception, the hba's shadow block register are updated with the 
-//  contents of the FIS.
 
 #include <cstdint>
 
 #include "fis_types.hpp"
 #include "args.hpp"
 
-namespace Drivers::Sata::Fis::D2HRegister{
+namespace Drivers::Sata::Fis::PioSetup{
 
 class Frame{
   static constexpr std::uint8_t TYPE_VALUE = 
-    GetUnderlying(FisType::RegisterDeviceToHost);
+    GetUnderlying(FisType::PIOSetup);
 
   public:
-    constexpr Frame() noexcept;
+    Frame() = default;
 
     // ------------------------------------------------------ //
     //  Attribute Querying
@@ -45,7 +39,7 @@ class Frame{
     
     // Dword 0
     const std::uint8_t m_type = TYPE_VALUE;
-    std::uint8_t m_i_portMultiplier;
+    std::uint8_t m_i_d_portMultiplier;
     std::uint8_t m_statusReg;
     std::uint8_t m_errorReg;
     // Dword 1
@@ -60,39 +54,16 @@ class Frame{
     [[maybe_unused]] std::uint8_t m_rsv0 = 0;
     // Dword 3
     std::uint16_t m_sectorCountReg;
-    [[maybe_unused]] std::uint16_t m_rsv1 = 0;
+    [[maybe_unused]] std::uint8_t m_rsv1 = 0;
+    std::uint8_t m_e_status;
     // Dword 4
-    [[maybe_unused]] std::uint32_t m_rsv2 = 0;
+    std::uint16_t m_transferCount;
+    [[maybe_unused]] std::uint16_t m_rsv2 = 0;
 };
 
 static_assert(sizeof(Frame) == 20);
 
-
-
 // Implementation
-
-constexpr Frame::Frame() noexcept
-  :
-    // Dword 0
-    m_i_portMultiplier{0},
-    m_statusReg{0},
-    m_errorReg{0},
-    // Dword 1
-    m_lbaLowReg0{0},
-    m_lbaMidReg0{0},
-    m_lbaHighReg0{0},
-    m_deviceReg{0},
-    // Dword 2
-    m_lbaLowReg1{0},
-    m_lbaMidReg1{0},
-    m_lbaHighReg1{0},
-    // Dword 3
-    m_sectorCountReg{0}
-{
-
-}
-
-//-------------------------------------------------------------
 
 [[nodiscard]] constexpr std::uint8_t Frame::Type() const 
 noexcept{
@@ -101,12 +72,12 @@ noexcept{
 
 [[nodiscard]] constexpr 
 std::uint8_t Frame::PortSelector() const noexcept{
-  return m_i_portMultiplier & 0x0F;
+  return m_i_d_portMultiplier & 0x0F;
 }
 
 [[nodiscard]] constexpr 
 bool Frame::Interrupt() const noexcept{
-  return m_i_portMultiplier & 0x40;
+  return m_i_d_portMultiplier & 0x40;
 }
 
 [[nodiscard]] constexpr 

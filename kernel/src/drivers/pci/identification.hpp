@@ -40,7 +40,6 @@ namespace Drivers::Pci{
     kout << "Interrupt Line:: " <<  interruptLine << "\nInterrupt Pin:: " << interruptPin << '\n';
   }
 
-
   inline void PrintClass(std::uint32_t value){
     std::uint8_t baseClass = value >> 24;
     std::uint8_t subClass = (value >> 16) & 0xFF;

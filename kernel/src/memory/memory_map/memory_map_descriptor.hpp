@@ -21,58 +21,56 @@
 namespace Mem{
 
 class MemoryMapDescriptor{
+  static constexpr std::size_t MAX_ENTRIES = 20;
+  public:
+    //-------------------------------------------------------------
+    //  Lifetime
+    //-------------------------------------------------------------
 
-static constexpr std::size_t MAX_ENTRIES = 20;
+    MemoryMapDescriptor() noexcept;
+    MemoryMapDescriptor(std::initializer_list<MemoryMapEntry> src) noexcept;
 
-public:
-  //-------------------------------------------------------------
-  //  Lifetime
-  //-------------------------------------------------------------
+    //-------------------------------------------------------------
+    //  Queries
+    //-------------------------------------------------------------
 
-  MemoryMapDescriptor() noexcept;
-  MemoryMapDescriptor(std::initializer_list<MemoryMapEntry> src) noexcept;
+    [[nodiscard]] constexpr 
+    std::size_t TotalUseableMemory() const noexcept{ return m_totalUseableBytes;}
 
-  //-------------------------------------------------------------
-  //  Queries
-  //-------------------------------------------------------------
+    template<std::size_t PageSize>
+    [[nodiscard]] constexpr 
+    std::size_t TotalUseablePageFrames() const noexcept{
+      return m_totalUseableBytes / PageSize;
+    }
 
-  [[nodiscard]] constexpr 
-  std::size_t TotalUseableMemory() const noexcept{ return m_totalUseableBytes;}
+    [[nodiscard]] physaddr_t HighestUseableAddress() const noexcept;
+    [[nodiscard]] physaddr_t LowestUseableAddress() const noexcept;
+    [[nodiscard]] physaddr_t LongestUseableBase() const noexcept;
+    [[nodiscard]] std::size_t UseableEntries() const noexcept;
 
-  template<std::size_t PageSize>
-  [[nodiscard]] constexpr 
-  std::size_t TotalUseablePageFrames() const noexcept{
-    return m_totalUseableBytes / PageSize;
-  }
+    [[nodiscard]] constexpr std::size_t Entries() const noexcept{ return MAX_ENTRIES;};
 
-  [[nodiscard]] physaddr_t HighestUseableAddress() const noexcept;
-  [[nodiscard]] physaddr_t LowestUseableAddress() const noexcept;
-  [[nodiscard]] physaddr_t LongestUseableBase() const noexcept;
-  [[nodiscard]] std::size_t UseableEntries() const noexcept;
+    [[nodiscard]] constexpr MemoryMapEntry& 
+    Entry(std::size_t index) noexcept{ return m_entries[index];};
 
-  [[nodiscard]] constexpr std::size_t Entries() const noexcept{ return MAX_ENTRIES;};
+    [[nodiscard]] constexpr const MemoryMapEntry& 
+    Entry(std::size_t index) const noexcept{ return m_entries[index];};
 
-  [[nodiscard]] constexpr MemoryMapEntry& 
-  Entry(std::size_t index) noexcept{ return m_entries[index];};
+    //-------------------------------------------------------------
+    //  Printing Functionalities
+    //-------------------------------------------------------------
 
-  [[nodiscard]] constexpr const MemoryMapEntry& 
-  Entry(std::size_t index) const noexcept{ return m_entries[index];};
+    void Print() const noexcept;
+    void PrintPageFrames() const noexcept;
 
-  //-------------------------------------------------------------
-  //  Printing Functionalities
-  //-------------------------------------------------------------
+  private:
+    // helpers for lifetime related functions
+    void LimineInitialise() noexcept;
+    void InitialiseUseableData() noexcept;
 
-  void Print() const noexcept;
-  void PrintPageFrames() const noexcept;
-
-private:
-  // helpers for lifetime related functions
-  void LimineInitialise() noexcept;
-  void InitialiseUseableData() noexcept;
-
-private:
-  Prim::StaticArray<MemoryMapEntry, MAX_ENTRIES> m_entries;
-  std::size_t m_totalUseableBytes;
+  private:
+    Prim::StaticArray<MemoryMapEntry, MAX_ENTRIES> m_entries;
+    std::size_t m_totalUseableBytes;
 };
 
 } // namespace Mem

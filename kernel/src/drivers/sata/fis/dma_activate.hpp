@@ -24,9 +24,10 @@ struct Initialiser{
 
 class Frame{
   static constexpr std::uint8_t TYPE_VALUE = 
-    static_cast<std::uint8_t>(FisType::DMAActivate);
+    GetUnderlying(FisType::DMAActivate);
 
   public:
+    constexpr Frame() noexcept;
     constexpr Frame(Initialiser&& src) noexcept;
 
     [[nodiscard]] constexpr std::uint8_t Type() const noexcept{
@@ -39,12 +40,19 @@ class Frame{
 
   private:
     // Dword 0
-    std::uint8_t m_type = TYPE_VALUE;
+    const std::uint8_t m_type = TYPE_VALUE;
     std::uint8_t m_portMultiplier;
     [[maybe_unused]] std::uint16_t m_reserved = 0;
 };
 
 static_assert(sizeof(Frame) == 4);
+
+constexpr Frame::Frame() noexcept
+  :
+    m_portMultiplier{0}
+{
+
+}
 
 constexpr Frame::Frame(Initialiser&& src) noexcept
   : m_portMultiplier{src.portMultiplier.data}
