@@ -1,5 +1,4 @@
-#ifndef DRIVERS_AHCI_COMMAND_TABLE_HPP
-#define DRIVERS_AHCI_COMMAND_TABLE_HPP
+#pragma once
 
 // AHCI port's Command Headers points to a Command Table
 
@@ -10,7 +9,7 @@
 #include "drivers/sata/fis/h2d_register.hpp"
 #include "lib/string.h"
 #include "lib/kassert.hpp"
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 
 namespace Drivers::Ahci{
 
@@ -29,10 +28,10 @@ class CommandTable{
     std::uint8_t* PrdtBase(){return reinterpret_cast<std::uint8_t*>(&m_prdt[0]);};
 
   public:
-    Prim::StaticArray<std::uint8_t, 64> m_cfis; 
-    Prim::StaticArray<std::uint8_t, 16> m_acmd; 
-    Prim::StaticArray<std::uint8_t, 48> m_rsv;
-    Prim::StaticArray<PrdtEntry, PRDT_SLOTS> m_prdt;
+    Aii::Array<std::uint8_t, 64> m_cfis; 
+    Aii::Array<std::uint8_t, 16> m_acmd; 
+    Aii::Array<std::uint8_t, 48> m_rsv;
+    Aii::Array<PrdtEntry, PRDT_SLOTS> m_prdt;
 
     static_assert(sizeof(m_cfis) == 64);
     static_assert(sizeof(m_acmd) == 16);
@@ -44,7 +43,7 @@ static_assert(sizeof(CommandTable) == 64 + 16 + 48 + sizeof(PrdtEntry)*PRDT_SLOT
 
 //-------------------------------------------------------------
 
-CommandTable::CommandTable(){
+inline CommandTable::CommandTable(){
   for(std::size_t i = 0; i < m_cfis.Size(); i++){
     m_cfis[i] = 0;
   }
@@ -56,15 +55,13 @@ CommandTable::CommandTable(){
   }
 }
 
-void CommandTable::SetCommandFis(Sata::Fis::H2DRegister::Frame& d2hrFis){
+inline void CommandTable::SetCommandFis(Sata::Fis::H2DRegister::Frame& d2hrFis){
   memcpy(&m_cfis, &d2hrFis, sizeof(Sata::Fis::H2DRegister::Frame));
 }
 
-void CommandTable::SetPrdtEntry(std::uint16_t entry, PrdtEntry prdt){
+inline void CommandTable::SetPrdtEntry(std::uint16_t entry, PrdtEntry prdt){
   kassert(entry < PRDT_SLOTS);
   m_prdt[entry] = prdt;
 }
 
 }
-
-#endif

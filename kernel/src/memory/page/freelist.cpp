@@ -1,4 +1,5 @@
 #include "freelist.hpp"
+#include "aii/string.h"
 
 namespace{
   using namespace Mem::Page::Freelist;
@@ -127,7 +128,7 @@ void* AllocatePage(OPT options) noexcept{
     allocd = AllocatePageImpl(Head());
   }
   if(allocd && options == OPT::Z){
-    memset(allocd, 0, PAGESIZE);
+    Aii::Memset(allocd, 0, PAGESIZE);
   }
   return allocd;
 }
@@ -213,7 +214,7 @@ void* AllocatePages(unsigned pages, OPT options) noexcept{
     allocd = AllocatePagesImpl(Head(), pages);
   }
   if(allocd && options == OPT::Z){
-    memset(allocd, 0, pages*PAGESIZE);
+    Aii::Memset(allocd, 0, pages*PAGESIZE);
   }
   return allocd;
 }

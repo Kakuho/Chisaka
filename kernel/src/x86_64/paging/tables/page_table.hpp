@@ -1,5 +1,4 @@
-#ifndef X8664_PAGE_TABLE_HPP
-#define X8664_PAGE_TABLE_HPP
+#pragma once
 
 // class to represent a page table, holding entries to pages
 
@@ -7,7 +6,7 @@
 #include <cstdint>
 
 #include "entries/pagetable_entry.hpp"
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 
 namespace X8664::Paging{
 
@@ -62,11 +61,9 @@ class PageTable{
     }
 
   private:
-    Prim::StaticArray<EntryType, ENTRIES> m_entries;
+    Aii::Array<EntryType, ENTRIES> m_entries;
 };
 
 static_assert(sizeof(PageTable) == 4096);
 
 }
-
-#endif

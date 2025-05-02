@@ -1,5 +1,4 @@
-#ifndef FIRMWARE_ACPI_TABLES_HPP
-#define FIRMWARE_ACPI_TABLES_HPP
+#pragma once
 
 //  ACPI Table Definitions
 //
@@ -15,7 +14,7 @@
 #include <cassert>
 
 #include "memory/address.hpp"
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 #include "drivers/serial/kostream.hpp"
 
 namespace Firmware::Acpi{
@@ -23,7 +22,7 @@ namespace Firmware::Acpi{
   // Reference: ACPI: 5.2.6
   //  - Most ACPI table shares this common header
   struct TableHeader{
-    Prim::StaticArray<char, 4> signature;
+    Aii::Array<char, 4> signature;
     std::uint32_t length;
     std::uint8_t revision;
     std::uint8_t checksum;
@@ -39,7 +38,7 @@ namespace Firmware::Acpi{
   // Reference: ACPI 5.2.5 
   //  - Root System Description Pointer RSDP
   struct [[gnu::packed]] RsdpTable{
-    static constexpr Prim::StaticArray<char, 8> SIG ={
+    static constexpr Aii::Array<char, 8> SIG ={
       'R', 'S', 'D', ' ', 'P', 'T', 'R', ' '
     };
 
@@ -48,7 +47,7 @@ namespace Firmware::Acpi{
         return signature == SIG;
       }
 
-      Prim::StaticArray<char, 8> signature;
+      Aii::Array<char, 8> signature;
       std::uint8_t checksum;
       char oemId[6];
       std::uint8_t revision;
@@ -63,7 +62,7 @@ namespace Firmware::Acpi{
   // Reference ACPI: 5.2.7
   //  - Root System Description Table (RSDT)
   struct [[gnu::packed]] RsdtTable{
-      static constexpr Prim::StaticArray<char, 4> SIG ={
+      static constexpr Aii::Array<char, 4> SIG ={
         'R', 'S', 'D', 'T'
       };
 
@@ -93,7 +92,7 @@ namespace Firmware::Acpi{
   // Reference ACPI: 5.2.8
   //  - Extended System Description Table (XSDT)
   class [[gnu::packed]] XsdtTable{
-      static constexpr Prim::StaticArray<char, 4> SIG ={
+      static constexpr Aii::Array<char, 4> SIG ={
         'X', 'S', 'D', 'T'
       };
 
@@ -106,5 +105,3 @@ namespace Firmware::Acpi{
       Mem::physaddr64_t* tablePointers;
   };
 }
-
-#endif

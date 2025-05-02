@@ -1,5 +1,4 @@
-#ifndef X8664_TABLE_TYPES_HPP
-#define X8664_TABLE_TYPES_HPP
+#pragma once
 
 // Type aliases class for the upper level page tables.
 
@@ -8,7 +7,7 @@
 
 #include "common_table.hpp"
 #include "entries/common_entry.hpp"
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 
 namespace X8664::Paging{
   
@@ -21,5 +20,3 @@ static_assert(sizeof(PdptTable) == 4096);
 static_assert(sizeof(PdTable) == 4096);
 
 }
-
-#endif

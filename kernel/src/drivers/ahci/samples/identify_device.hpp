@@ -13,6 +13,8 @@
 #include "drivers/sata/fis/h2d_register.hpp"
 #include "memory/address.hpp"
 
+#include "aii/string.h"
+
 namespace Drivers::Ahci::Samples::IdentifyDevice{
 
 // Magic Address - FIXED ADDRESSES FOR NOW
@@ -58,7 +60,7 @@ void Try(){
 
   // Setup Buffer - IDENTIFY DEVICE gives 256 words = 512 bytes
   std::uint16_t* payloadBuffer = reinterpret_cast<std::uint16_t*>(DATABUFFER_ADDR);
-  memset(payloadBuffer, 0, 512);
+  Aii::Memset(payloadBuffer, 0, 512);
   // 256 words
 
   // Setup the CommandList's Entry Command Table

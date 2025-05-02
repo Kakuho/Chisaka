@@ -10,7 +10,7 @@
 
 #include "lib/kassert.hpp"
 #include "drivers/serial/kostream.hpp"
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 
 namespace Mem::Heap{
 

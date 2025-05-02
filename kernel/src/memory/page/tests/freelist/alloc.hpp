@@ -42,7 +42,7 @@ namespace Mem::Page::Test::Freelist::Alloc{
   }
 
   inline bool IsZeroPage(void* pageaddr){
-    auto* pagebase = reinterpret_cast<Prim::StaticArray<std::uint8_t, 0x1000>*>(pageaddr);
+    auto* pagebase = reinterpret_cast<Aii::Array<std::uint8_t, 0x1000>*>(pageaddr);
     for(std::size_t i = 0; i < 0x1000; i++){
       if((*(pagebase))[i] != 0){
         return false;
@@ -55,7 +55,7 @@ namespace Mem::Page::Test::Freelist::Alloc{
     MemoryMapDescriptor memmap{};
     Page::Freelist::Initialise(memmap);
 
-    auto* page = reinterpret_cast<Prim::StaticArray<std::uint8_t, 0x1000>*>(Page::Freelist::NextFree());
+    auto* page = reinterpret_cast<Aii::Array<std::uint8_t, 0x1000>*>(Page::Freelist::NextFree());
     Fill<std::uint8_t, 0x1000>(*page, 0xAA);
 
     void* allocPage = Page::Freelist::AllocatePage(OPT::Z);

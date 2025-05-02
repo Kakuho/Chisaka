@@ -7,7 +7,7 @@
 #include "buffer.hpp"
 #include "options.hpp"
 
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 #include "palloc.hpp"
 
 namespace Mem::Heap::Allocator{

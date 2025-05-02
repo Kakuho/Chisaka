@@ -1,5 +1,4 @@
-#ifndef DRIVERS_AHCI_COMMAND_LIST_HPP
-#define DRIVERS_AHCI_COMMAND_LIST_HPP
+#pragma once
 
 // each AHCI port requires a Command List
 
@@ -7,7 +6,7 @@
 #include <cassert>
 
 #include "command_header.hpp"
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 
 #include "lib/string.h"
 
@@ -18,7 +17,7 @@ class CommandList{
     CommandList() = default;
 
   public:
-    Prim::StaticArray<CommandHeader, 32> m_headers;
+    Aii::Array<CommandHeader, 32> m_headers;
 };
 
 static_assert(sizeof(CommandList) == 0x400);
@@ -26,5 +25,3 @@ static_assert(sizeof(CommandList) == 0x400);
 //-------------------------------------------------------------
 
 }
-
-#endif

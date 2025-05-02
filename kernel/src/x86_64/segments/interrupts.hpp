@@ -1,5 +1,4 @@
-#ifndef INTERRUPTS_DESCRIPTORS_HPP
-#define INTERRUPTS_DESCRIPTORS_HPP
+#pragma once
 
 // class definitions for descriptors relating to interrupts including:
 //  IDT Descriptor
@@ -7,7 +6,7 @@
 
 #include <cstdint>
 
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 
 namespace X8664{
 
@@ -28,5 +27,3 @@ namespace X8664{
   };
 
 } // namespace X8664
-
-#endif

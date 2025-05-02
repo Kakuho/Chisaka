@@ -1,10 +1,9 @@
-#ifndef MEMORY_STACK_MANAGER_HPP 
-#define MEMORY_STACK_MANAGER_HPP
+#pragma once
 
 // Class to encapsulate the management of Stacks as a class.
 
 #include "stack_descriptor.hpp"
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 #include "lib/kassert.hpp"
 
 extern "C" void switch_stack(std::uint64_t rsp, std::uint64_t code);
@@ -18,7 +17,7 @@ class StackManager final{
   using paddr_t = std::uint64_t;
   static constexpr std::size_t ENTRIES = 10;
 
-  using StackTableType = Prim::StaticArray<StackDescriptor, ENTRIES>;
+  using StackTableType = Aii::Array<StackDescriptor, ENTRIES>;
 
   public:
     explicit StackManager() noexcept;
@@ -36,5 +35,3 @@ class StackManager final{
 };
 
 } // namespace Mem
-
-#endif

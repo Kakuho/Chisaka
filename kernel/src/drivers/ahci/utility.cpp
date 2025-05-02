@@ -1,5 +1,6 @@
 #include "utility.hpp"
 #include "kmalloc.hpp"
+#include "aii/string.h"
 
 namespace Drivers::Ahci{
 
@@ -144,7 +145,7 @@ void InitialiseAhci(){
   ResetController();
   EnableAhci();
   EnumerateImplementedPorts();
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   if(!IsHbaIdle()){
     kout << "HBA is not idle, so we force to idle" << '\n';
     ForceHbaIdle();
@@ -230,9 +231,9 @@ void EnumerateImplementedPorts(){
   }
 }
 
-Prim::StaticArray<bool, 32> GetImplementedPorts(){
+Aii::Array<bool, 32> GetImplementedPorts(){
   kassert(AhciEnabled);
-  Prim::StaticArray<bool, 32> payload{false};
+  Aii::Array<bool, 32> payload{false};
   const std::uint32_t* piRegister = GetPiPtr();
   const std::uint32_t piVal = *piRegister;
   for(std::uint8_t i = 0; i < 32; i++){
@@ -246,7 +247,7 @@ Prim::StaticArray<bool, 32> GetImplementedPorts(){
 bool IsHbaIdle(){
   kassert(AhciEnabled);
   kout << "Checking If HBA is Idle..." << '\n';
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   for(std::uint8_t i = 0; i < 32; i++){
     if(implementedPorts[i] == true){
       if(!Ports::PortIdle(i)){
@@ -260,7 +261,7 @@ bool IsHbaIdle(){
 
 void ForceHbaIdle(){
   kassert(AhciEnabled);
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   for(std::uint8_t i = 0; i < 32; i++){
     if(implementedPorts[i] == true){
       if(Ports::PortIdle(i)){
@@ -290,7 +291,7 @@ bool Supports64BitAddress(){
 void SetupMemory(){
   kassert(AhciEnabled);
   kassert(Supports64BitAddress());
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   for(std::uint8_t i = 0; i < 32; i++){
     if(implementedPorts[i] == true){
       kout << "Setting up Memory for Port " << i << '\n';
@@ -313,10 +314,10 @@ void SetupMemory64FIXED(){
   kassert(AhciEnabled);
   kassert(Supports64BitAddress());
   kout << "Setting up Memory for Command Table and RFis..." << '\n';
-  memset(reinterpret_cast<void*>(COMMANDLIST_START), 0x00, 32*sizeof(CommandList));
-  memset(reinterpret_cast<void*>(FIS_START), 0x00, 32*sizeof(RecievedFis));
+  Aii::Memset(reinterpret_cast<void*>(COMMANDLIST_START), 0x00, 32*sizeof(CommandList));
+  Aii::Memset(reinterpret_cast<void*>(FIS_START), 0x00, 32*sizeof(RecievedFis));
   kout << "Cleared Memory for Memory Structures" << '\n';
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   for(std::uint8_t i = 0; i < 32; i++){
     if(implementedPorts[i] == true){
       kout << "Setting up Memory for Port " << i << '\n';
@@ -335,7 +336,7 @@ void SetupMemory64FIXED(){
 void EnablePortsFre(){
   kassert(AhciEnabled);
   static constexpr std::uint32_t CMD_FRE = 0x10;
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   for(std::uint8_t i = 0; i < 32; i++){
     if(implementedPorts[i] == true){
       std::uint32_t* portCmd = Ports::GetCmdPtr(i);
@@ -348,7 +349,7 @@ void EnablePortsFre(){
 
 void ClearAllPortSerr(){
   kassert(AhciEnabled);
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   for(std::uint8_t i = 0; i < 32; i++){
     if(implementedPorts[i] == true){
       kout << "Port " << i << " Serr is set" << '\n';
@@ -366,7 +367,7 @@ void ClearHostInterruptStatus(){
 
 void ClearPortsInterruptStatus(){
   kassert(AhciEnabled);
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   for(std::uint8_t i = 0; i < 32; i++){
     if(implementedPorts[i] == true){
       Ports::ClearInterruptStatus(i);
@@ -384,7 +385,7 @@ void EnableHostInterrupts(){
 
 void EnablePortsInterrupts(){
   kassert(AhciEnabled);
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   for(std::uint8_t i = 0; i < 32; i++){
     if(implementedPorts[i] == true){
       Ports::EnableInterrupts(i);
@@ -404,7 +405,7 @@ void EnableInterrupts(){
 
 void StartDMAEngines(){
   kassert(AhciEnabled);
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   for(std::uint8_t i = 0; i < 32; i++){
     if(implementedPorts[i] == true){
       if(Ports::StartPortDMAEngine(i)){
@@ -421,7 +422,7 @@ void StartDMAEngines(){
 
 void CheckDevicePresent(){
   kassert(AhciEnabled);
-  Prim::StaticArray<bool, 32> implementedPorts = GetImplementedPorts();
+  Aii::Array<bool, 32> implementedPorts = GetImplementedPorts();
   for(std::uint8_t i = 0; i < 32; i++){
     if(implementedPorts[i] == true){
       if(Ports::PortHasDevicePresent(i)){

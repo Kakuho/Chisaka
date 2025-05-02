@@ -1,5 +1,4 @@
-#ifndef TASK_SEGMENT_HPP
-#define TASK_SEGMENT_HPP
+#pragma once
 
 // Class definition for the Task State Segment
 //
@@ -14,14 +13,14 @@
 
 #include <cstdint>
 
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 #include "lib/kassert.hpp"
 
 namespace X8664{
 
 struct [[gnu::packed]] TaskSegment{
-  using RspTableType = Prim::StaticArray<std::uint64_t, 3>;
-  using IstTableType = Prim::StaticArray<std::uint64_t, 7>;
+  using RspTableType = Aii::Array<std::uint64_t, 3>;
+  using IstTableType = Aii::Array<std::uint64_t, 7>;
 
   public:
     //---------------------------------------------------------------//
@@ -72,5 +71,3 @@ struct [[gnu::packed]] TaskSegment{
 static_assert(sizeof(TaskSegment) == 104);
 
 } // namespace X8664
-
-#endif

@@ -13,6 +13,8 @@
 #include "drivers/sata/fis/h2d_register.hpp"
 #include "memory/address.hpp"
 
+#include "aii/string.h"
+
 namespace Drivers::Ahci::Samples::Write{
   
 // Magic Addresses
@@ -47,7 +49,7 @@ inline Sata::Fis::H2DRegister::Frame CreateDmaWriteFrame(){
 inline std::uint8_t* CreateDataArea(){
   // Setup Buffer - What do you want to write and how much data?
   std::uint8_t* dataArea = reinterpret_cast<std::uint8_t*>(DATABUFFER_ADDR);
-  memset(dataArea, 0, 512);
+  Aii::Memset(dataArea, 0, 512);
   dataArea[0] = 0xDE;
   dataArea[1] = 0xAD;
   dataArea[2] = 0xBE;

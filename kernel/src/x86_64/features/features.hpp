@@ -1,5 +1,4 @@
-#ifndef CPU_FEATURES_CPUID_HPP
-#define CPU_FEATURES_CPUID_HPP
+#pragma once
 
 // Handles to processor identification and feature information, 
 // generally requiring use of the cpuid instruction
@@ -8,7 +7,7 @@
 
 #include "cpuid.hpp"
 #include "drivers/serial/kostream.hpp"
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 
 namespace X8664::Features{
   
@@ -17,7 +16,7 @@ std::uint32_t ReverseBytes(std::uint32_t src);
 // cpuid.0
 
 // should rename to VendorIdString like in the manual
-Prim::StaticArray<char, 24> ManufacturerId();
+Aii::Array<char, 24> ManufacturerId();
 void PrintManufacturerId();
 
 // cpuid.1
@@ -34,5 +33,3 @@ std::uint8_t LinearWidth();
 bool WbnoinvdAvailable();
 
 } // namespace X8664::CpuId
-
-#endif

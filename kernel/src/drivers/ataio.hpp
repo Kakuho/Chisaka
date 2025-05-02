@@ -1,5 +1,4 @@
-#ifndef ATAIO_HPP
-#define ATAIO_HPP
+#pragma once
 
 #include "drivers/serial/kostream.hpp"
 
@@ -13,5 +12,3 @@ namespace Disk{
   constexpr std::uint16_t StatusPort = 0x1F7;
   void InitialiseAtaPio(std::uint8_t drive, std::uint8_t bus);
 }
-
-#endif

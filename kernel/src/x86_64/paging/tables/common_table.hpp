@@ -1,5 +1,4 @@
-#ifndef X8664_COMMON_TABLE_HPP
-#define X8664_COMMON_TABLE_HPP
+#pragma once
 
 // class to represent the other page table types, holding pointers to other pages
 
@@ -7,7 +6,7 @@
 #include <cstdint>
 
 #include "entries/common_entry.hpp"
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 
 namespace X8664::Paging{
 
@@ -62,11 +61,10 @@ class CommonTable{
     }
 
   private:
-    Prim::StaticArray<EntryType, ENTRIES> m_entries;
+    Aii::Array<EntryType, ENTRIES> m_entries;
 };
 
 static_assert(sizeof(CommonTable) == 4096);
 
 }
 
-#endif

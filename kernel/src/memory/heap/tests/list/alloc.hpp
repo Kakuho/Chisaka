@@ -236,7 +236,7 @@ namespace Mem::Heap::Test::List::Alloc{
 
   inline void TryDeallocate2(){
     // TryDeallocate2()
-    using BufferType = Prim::StaticArray<std::uint8_t, 64>;
+    using BufferType = Aii::Array<std::uint8_t, 64>;
 
     kout << intmode::hex << "Base: " << BASE_ADDR << '\n';
     ListDescriptor desc{reinterpret_cast<void*>(BASE_ADDR), 64, 2};

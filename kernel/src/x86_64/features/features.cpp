@@ -13,8 +13,8 @@ std::uint32_t ReverseBytes(std::uint32_t src){
   return oriented;
 }
 
-Prim::StaticArray<char, 24> ManufacturerId(){
-  Prim::StaticArray <char, 24> manuid{};
+Aii::Array<char, 24> ManufacturerId(){
+  Aii::Array <char, 24> manuid{};
   std::uint64_t base = cpuid_0();
   std::uint32_t ebx = *(reinterpret_cast<std::uint32_t*>(base-8));
   std::uint32_t ecx = *(reinterpret_cast<std::uint32_t*>(base-12));

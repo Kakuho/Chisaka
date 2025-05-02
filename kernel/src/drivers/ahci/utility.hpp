@@ -1,10 +1,9 @@
-#ifndef DRIVERS_AHCI_UTILITY_HPP
-#define DRIVERS_AHCI_UTILITY_HPP
+#pragma once
 
 #include "structs/command_list.hpp"
 #include "structs/recieved_fis.hpp"
 
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 #include "kmalloc.hpp"
 
 #include "drivers/pci/constants.hpp"
@@ -93,7 +92,7 @@ bool CheckFirmwareInitialisation();
 void EnableAhci();
 
 void EnumerateImplementedPorts();
-Prim::StaticArray<bool, 32> GetImplementedPorts();
+Aii::Array<bool, 32> GetImplementedPorts();
 
 bool IsHbaIdle();
 void ForceHbaIdle();
@@ -144,5 +143,3 @@ void PrintBiosHandoff();
 
 void PerformBiosHandoff();
 }
-
-#endif

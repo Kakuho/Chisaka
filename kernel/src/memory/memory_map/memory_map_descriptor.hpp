@@ -1,5 +1,4 @@
-#ifndef MEMORY_MAP_DESCRIPTOR_HPP
-#define MEMORY_MAP_DESCRIPTOR_HPP
+#pragma once
 
 // Abstraction to encapsulate the memory mapping. 
 //
@@ -13,7 +12,7 @@
 #include "memory_map_entry.hpp"
 #include "./../address.hpp"
 
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 #include "lib/kassert.hpp"
 #include "firmware/limine/requests.hpp"
 #include "drivers/serial/kostream.hpp"
@@ -69,10 +68,8 @@ class MemoryMapDescriptor{
     void InitialiseUseableData() noexcept;
 
   private:
-    Prim::StaticArray<MemoryMapEntry, MAX_ENTRIES> m_entries;
+    Aii::Array<MemoryMapEntry, MAX_ENTRIES> m_entries;
     std::size_t m_totalUseableBytes;
 };
 
 } // namespace Mem
-
-#endif

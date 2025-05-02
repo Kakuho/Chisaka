@@ -1,5 +1,4 @@
-#ifndef IDT_TABLE_HPP
-#define IDT_TABLE_HPP
+#pragma once
 
 // Idt table
 // 
@@ -7,7 +6,7 @@
 
 #include <cstdint>
 
-#include "primrose/static_array.hpp"
+#include "aii/array.hpp"
 
 #include "lib/kassert.hpp"
 #include "x86_64/utilites.hpp"
@@ -47,12 +46,9 @@ class IdtTable{
     [[nodiscard]] const GateDescriptor& operator[](std::size_t index) const noexcept;
 
   private:
-    Prim::StaticArray<GateDescriptor, 256> m_entries;
+    Aii::Array<GateDescriptor, 256> m_entries;
 };
 
-// SIZE CHECK
 static_assert(sizeof(IdtTable) == 256*16);
 
 } // namespace X8664
-
-#endif
