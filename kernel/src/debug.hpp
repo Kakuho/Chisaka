@@ -9,6 +9,8 @@ namespace Debug{
 
   template<typename ...Args>
   void Print(Args... args){
-    (kout << ... << args) < '\n';
+    if constexpr(DEBUG_PRINT_ON){
+      (kout << ... << args) < '\n';
+    }
   }
 }
