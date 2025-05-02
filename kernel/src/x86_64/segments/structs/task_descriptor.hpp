@@ -1,5 +1,4 @@
-#ifndef TASK_DESCRIPTOR
-#define TASK_DESCRIPTOR
+#pragma once
 
 // Class to represent the Task State Segment Descriptor
 // Reference: intel vol3.8.2.3
@@ -8,7 +7,7 @@
 
 #include "segment_descriptor.hpp"
 #include "attributes.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "drivers/serial/kostream.hpp"
 
 namespace X8664{
@@ -84,5 +83,3 @@ struct [[gnu::packed]] TaskDescriptor{
 static_assert(sizeof(TaskDescriptor) == 16);
 
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef X86_64_INTERRUPTS_CONTROLLERS_PIC
-#define X86_64_INTERRUPTS_CONTROLLERS_PIC
+#pragma once
 
 // Code for the 8259 PIC Controller
 //
@@ -7,7 +6,7 @@
 
 #include <cstdint>
 
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 extern "C" {
   std::uint8_t inb(std::uint64_t port_addr);
@@ -65,5 +64,3 @@ class PicController{
 };
 
 }
-
-#endif

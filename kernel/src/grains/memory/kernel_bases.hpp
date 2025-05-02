@@ -2,7 +2,7 @@
 #include "memory/address.hpp"
 #include "memory/features.hpp"
 #include "grains/grains.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 namespace Grains::Mem{
 

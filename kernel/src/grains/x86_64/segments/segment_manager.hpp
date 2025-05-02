@@ -4,7 +4,7 @@
 #include "x86_64/segments/segment_manager.hpp"
 #include "drivers/serial/kostream.hpp"
 #include "grains/grains.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 namespace Grains::CPU{
 

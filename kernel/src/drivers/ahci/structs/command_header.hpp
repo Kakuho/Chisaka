@@ -1,12 +1,11 @@
-#ifndef DRIVERS_AHCI_COMMAND_HEADER_HPP
-#define DRIVERS_AHCI_COMMAND_HEADER_HPP
+#pragma once
 
 // AHCI port's Command List are comprised of Command Headers
 
 #include <cstdint>
 #include <cassert>
 
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 namespace Drivers::Ahci{
 
@@ -247,5 +246,3 @@ constexpr void CommandHeader::SetCfl(std::uint8_t val) noexcept{
 }
 
 }
-
-#endif

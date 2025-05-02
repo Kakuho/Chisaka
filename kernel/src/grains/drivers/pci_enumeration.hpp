@@ -1,7 +1,7 @@
 #include "drivers/serial/kostream.hpp"
 #include "drivers/pci/pci.hpp"
 #include "grains/grains.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 namespace Grains::Drivers{
 

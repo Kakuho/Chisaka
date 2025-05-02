@@ -1,12 +1,11 @@
-#ifndef DRIVERS_AHCI_INIT_HPP
-#define DRIVERS_AHCI_INIT_HPP
+#pragma once
 
 #include "drivers/pci/constants.hpp"
 #include "drivers/pci/pci.hpp"
 #include "drivers/serial/kostream.hpp"
 #include "memory/address.hpp"
 
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 namespace Drivers::Ahci{
 
@@ -99,5 +98,3 @@ void CheckAhciMode(){
 }
 
 }
-
-#endif

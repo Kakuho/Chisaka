@@ -1,5 +1,4 @@
-#ifndef DRIVERS_AHCI_PRDT_ENTRY_HPP
-#define DRIVERS_AHCI_PRDT_ENTRY_HPP
+#pragma once
 
 // A command table contains a Physical Region Descriptor Table, whose elements is to what will be 
 // abstracted
@@ -7,7 +6,7 @@
 #include <cstdint>
 #include <cassert>
 
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 namespace Drivers::Ahci{
 
@@ -84,5 +83,3 @@ constexpr void PrdtEntry::SetWord3(bool interrupt, std::uint32_t dataSize){
 }
 
 }
-
-#endif

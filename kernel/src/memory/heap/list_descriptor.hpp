@@ -8,7 +8,7 @@
 #include <cassert>
 #include <utility>
 
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "drivers/serial/kostream.hpp"
 #include "aii/array.hpp"
 

@@ -4,7 +4,7 @@
 
 #include "stack_descriptor.hpp"
 #include "aii/array.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 extern "C" void switch_stack(std::uint64_t rsp, std::uint64_t code);
 extern "C" std::uint64_t read_rsp();

@@ -140,6 +140,8 @@ inline void Try(){
 
   const std::uint8_t PORT_NUMBER = 0;
 
+  kassert(1 == 2);
+
   // Required to Perform BIOS OS Handoff??
   
   InitialiseAhci(); 

@@ -1,5 +1,4 @@
-#ifndef SEGMENT_DESCRIPTOR_HPP
-#define SEGMENT_DESCRIPTOR_HPP
+#pragma once
 
 // class to represent segment descriptors
 // Reference: intel docs vol3a 3.4.5
@@ -11,7 +10,7 @@
 
 #include "attributes.hpp"
 #include "memory/old/memory.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "drivers/serial/kostream.hpp"
 
 namespace X8664{
@@ -96,5 +95,3 @@ struct [[gnu::packed]] SegmentDescriptor{
 };
 
 } // namespace X8664
-
-#endif

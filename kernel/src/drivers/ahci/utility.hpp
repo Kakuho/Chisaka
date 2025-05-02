@@ -11,7 +11,7 @@
 #include "drivers/serial/kostream.hpp"
 #include "memory/address.hpp"
 
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 namespace Drivers::Ahci::Ports{
   //  Registers

@@ -8,7 +8,7 @@
 
 #include "aii/array.hpp"
 
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "x86_64/utilites.hpp"
 #include "gate_descriptor.hpp"
 

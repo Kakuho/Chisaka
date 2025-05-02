@@ -1,5 +1,4 @@
-#ifndef GATE_DESCRIPTOR_HPP
-#define GATE_DESCRIPTOR_HPP
+#pragma once
 
 // Class to represent a IDT 64-bit Gate Descriptor
 //
@@ -8,7 +7,7 @@
 #include <cstdint>
 #include <cassert>
 
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "attributes.hpp"
 #include "./../constants.hpp"
 
@@ -76,5 +75,3 @@ namespace X8664{
 static_assert(sizeof(GateDescriptor) == 16);
 
 } // X8664
-
-#endif

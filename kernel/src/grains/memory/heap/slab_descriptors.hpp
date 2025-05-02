@@ -1,6 +1,6 @@
 #include "grains/grains.hpp"
 #include "drivers/serial/kostream.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "memory/heap/slab/slab_descriptor.hpp"
 
 namespace Grains::Mem{

@@ -1,6 +1,6 @@
 #include "grains/grains.hpp"
 #include "drivers/serial/kostream.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "memory/physical/bitmap.hpp"
 #include "memory/memory_map/memory_map_descriptor.hpp"
 #include "memory/address.hpp"

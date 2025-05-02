@@ -14,7 +14,7 @@
 #include <cstdint>
 
 #include "aii/array.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 namespace X8664{
 

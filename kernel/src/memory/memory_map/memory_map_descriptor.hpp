@@ -13,7 +13,7 @@
 #include "./../address.hpp"
 
 #include "aii/array.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "firmware/limine/requests.hpp"
 #include "drivers/serial/kostream.hpp"
 

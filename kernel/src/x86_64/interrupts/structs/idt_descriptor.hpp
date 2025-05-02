@@ -1,5 +1,4 @@
-#ifndef IDT_DESCRIPTOR_HPP
-#define IDT_DESCRIPTOR_HPP
+#pragma once
 
 // Class to represent the Idt Register Descriptor. 
 //
@@ -8,7 +7,7 @@
 #include <cstdint>
 #include <cassert>
 
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "idt_table.hpp"
 
 extern "C" void load_idtr(void* address);
@@ -62,5 +61,3 @@ class [[gnu::packed]] IdtDescriptor{
 static_assert(sizeof(IdtDescriptor) == 10);
 
 } // namespace X8664
-
-#endif

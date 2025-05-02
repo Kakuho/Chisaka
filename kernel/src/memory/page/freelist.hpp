@@ -4,7 +4,7 @@
 
 #include "options.hpp"
 
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "aii/string.h"
 
 #include "./../address.hpp"

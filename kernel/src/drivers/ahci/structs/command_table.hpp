@@ -8,7 +8,7 @@
 #include "prdt_entry.hpp"
 #include "drivers/sata/fis/h2d_register.hpp"
 #include "aii/string.h"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "aii/array.hpp"
 
 namespace Drivers::Ahci{

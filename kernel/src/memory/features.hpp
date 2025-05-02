@@ -1,5 +1,4 @@
-#ifndef MEMORY_FEATURES_HPP
-#define MEMORY_FEATURES_HPP
+#pragma once 
 
 // Functionalities to get the features of the memory mapping 
 // at boot
@@ -7,7 +6,7 @@
 #include <cstdint>
 
 #include "address.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 #include "drivers/serial/kostream.hpp"
 #include "firmware/limine/requests.hpp"
 
@@ -42,5 +41,3 @@ void ProbeLowerLimit();
 [[noreturn]] void CorruptMemory();
 
 } // namespace Mem
-
-#endif

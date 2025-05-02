@@ -5,7 +5,7 @@
 #include "x86_64/segments/structs/task_descriptor.hpp"
 #include "drivers/serial/kostream.hpp"
 #include "grains/grains.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 namespace Grains::CPU{
 

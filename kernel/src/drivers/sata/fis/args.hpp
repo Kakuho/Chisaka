@@ -1,5 +1,4 @@
-#ifndef DRIVERS_SATA_FIS_ARGS_HPP
-#define DRIVERS_SATA_FIS_ARGS_HPP
+#pragma once
 
 //  Type safe classes for SATA FIS constructor arguments
 //
@@ -21,8 +20,7 @@
 #include <cstdint>
 #include <tuple>
 
-#include "lib/kassert.hpp"
-
+#include "kassert.hpp"
 
 namespace Drivers::Sata::Args{
 
@@ -205,5 +203,3 @@ struct Error{
 };
 
 } // namespace Drivers::Sata::Args
-
-#endif
