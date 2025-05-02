@@ -1,5 +1,4 @@
-#ifndef KASSERT_HPP
-#define KASSERT_HPP
+#pragma once
 
 // A non returning assert to enforce pre conditions within the kernel
 //
@@ -45,5 +44,3 @@ void kassert_fail_impl(
     const char* filename, 
     std::size_t
 );
-
-#endif

@@ -5,6 +5,7 @@ limine/
 *.txt
 *.hdd
 *.img
+*.swp
 compile_commands.json
 
 Tasks

@@ -7,7 +7,7 @@
 
 #include "prdt_entry.hpp"
 #include "drivers/sata/fis/h2d_register.hpp"
-#include "lib/string.h"
+#include "aii/string.h"
 #include "lib/kassert.hpp"
 #include "aii/array.hpp"
 

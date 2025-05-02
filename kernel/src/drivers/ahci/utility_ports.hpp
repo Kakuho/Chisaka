@@ -1,5 +1,4 @@
-#ifndef DRIVERS_AHCI_UTILITY_PORTS_HPP
-#define DRIVERS_AHCI_UTILITY_PORTS_HPP
+#pragma once
 
 #include "utility.hpp"
 #include "structs/command_list.hpp"
@@ -11,7 +10,7 @@
 #include "memory/address.hpp"
 
 #include "lib/kassert.hpp"
-#include "lib/string.h"
+#include "aii/string.h"
 
 namespace Drivers::Ahci::Ports{
 
@@ -114,5 +113,3 @@ bool InterfaceErrorsPresent(std::uint8_t portno);
 void PrintAllCommandListBase();
 
 }
-
-#endif

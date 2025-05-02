@@ -5,7 +5,7 @@
 #include "options.hpp"
 
 #include "lib/kassert.hpp"
-#include "lib/string.h"
+#include "aii/string.h"
 
 #include "./../address.hpp"
 #include "./../alignment.hpp"
@@ -14,7 +14,6 @@
 #include "firmware/limine/limine.h"
 #include "firmware/limine/requests.hpp"
 #include "drivers/serial/kostream.hpp"
-#include "lib/string.h"
 
 namespace Mem::Page::Freelist{
 

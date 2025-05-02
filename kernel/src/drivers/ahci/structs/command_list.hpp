@@ -8,7 +8,7 @@
 #include "command_header.hpp"
 #include "aii/array.hpp"
 
-#include "lib/string.h"
+#include "aii/string.h"
 
 namespace Drivers::Ahci{
 
