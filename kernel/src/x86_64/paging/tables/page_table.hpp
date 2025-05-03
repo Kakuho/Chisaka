@@ -5,7 +5,7 @@
 #include <cassert>
 #include <cstdint>
 
-#include "entries/pagetable_entry.hpp"
+#include "page_table_entry.hpp"
 #include "aii/array.hpp"
 
 namespace X8664::Paging{

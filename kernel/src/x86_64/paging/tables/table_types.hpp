@@ -5,18 +5,18 @@
 #include <cassert>
 #include <cstdint>
 
-#include "common_table.hpp"
-#include "entries/common_entry.hpp"
+#include "upper_page_table.hpp"
+#include "upper_page_entry.hpp"
 #include "aii/array.hpp"
 
-namespace X8664::Paging{
+namespace X8664{
   
-using Pm4lTable = CommonTable;
-using PdptTable = CommonTable;
-using PdTable   = CommonTable;
+using Pm4lTable = UpperPageTable;
+using PdptTable = UpperPageTable;
+using PdTable   = UpperPageTable;
 
 static_assert(sizeof(Pm4lTable) == 4096);
 static_assert(sizeof(PdptTable) == 4096);
-static_assert(sizeof(PdTable) == 4096);
+static_assert(sizeof(PdTable)   == 4096);
 
 }
