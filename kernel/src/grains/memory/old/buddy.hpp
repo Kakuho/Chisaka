@@ -1,3 +1,4 @@
+/*
 #include "memory/pageframe.hpp"
 #include "memory/pmm/buddy.hpp"
 #include "helpers.hpp"
@@ -59,12 +60,12 @@ namespace integ{
     integ::End();
   }
 
-  /*
   pmtor.FindChunks(1);
   pmtor.FindChunks(2);
   pmtor.FindChunks(3);
   pmtor.FindChunks(4);
-  */
+
   //pmtor.PrintChunkDescriptors(0);
 
 }
+*/

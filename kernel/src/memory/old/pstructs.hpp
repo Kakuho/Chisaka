@@ -1,3 +1,4 @@
+/*
 #ifndef PSTRUCT_HPP
 #define PSTRUCT_HPP
 
@@ -81,7 +82,6 @@ namespace memory::paging{
     ParsePageTableCommon(PagingEntryDescriptor::EntryType::Pdpte, pdptaddr); 
   }
 
-  /*
   inline void SetPDPTEntry(std::uint16_t entry, P4eDescriptor pdptr){
     kout << "SetPDPTEntry not implemented\n";
     x8664::haltAndCatchFire();
@@ -91,8 +91,6 @@ namespace memory::paging{
     kout << "DeletePDPTEntry not implemented\n";
     x8664::haltAndCatchFire();
   }
-  */
-
 
   // Page Directory Related
 
@@ -100,7 +98,6 @@ namespace memory::paging{
     ParsePageTableCommon(PagingEntryDescriptor::EntryType::Pde, pdaddr); 
   }
 
-  /*
   inline void SetPDEntry(std::uint16_t entry, P4eDescriptor pdptr){
     kout << "SetPDEntry not implemented\n";
     x8664::haltAndCatchFire();
@@ -110,7 +107,6 @@ namespace memory::paging{
     kout << "DeletePDEntry not implemented\n";
     x8664::haltAndCatchFire();
   }
-  */
 
   // Page Table Related
 
@@ -118,7 +114,6 @@ namespace memory::paging{
     ParsePageTableCommon(PagingEntryDescriptor::EntryType::Pte, ptaddr); 
   }
 
-  /*
   inline void SetPTEntry(std::uint16_t entry){
     kout << "SetPTEntry() not implemented\n";
     x8664::haltAndCatchFire();
@@ -128,7 +123,6 @@ namespace memory::paging{
     kout << "DeletePDEntry() not implemented\n";
     x8664::haltAndCatchFire();
   }
-  */
 
   // Page frame Related
 
@@ -194,3 +188,5 @@ namespace memory::paging{
 } // namespace memory::paging
 
 #endif
+
+*/

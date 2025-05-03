@@ -1,4 +1,5 @@
 #include "interrupt_handlers.hpp"
+#include "memory/address.hpp"
 
 extern "C"{
 
@@ -50,12 +51,12 @@ void contextSwitchISR(void* stackaddr){
 void PageFaultISR(){
   //kassert("Pagefault isr not implemented" && false);
   /*
-  memory::paddr64_t faultingAddr = readcr2();
+  Mem::physaddr_t faultingAddr = readcr2();
   kout << intmode::hex;
   kout << "PAGEFAULTING" << '\n'
        << "faulting address: " << faultingAddr << '\n';
   // now we need to resolve faulting address
-  memory::ExtractPagingIndices(faultingAddr);
+  Mem::ExtractPagingIndices(faultingAddr);
   */
 }
 

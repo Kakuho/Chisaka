@@ -1,3 +1,5 @@
+/*
+
 #include "memory/memory.hpp"
 #include "memory/pages.hpp"
 
@@ -80,7 +82,6 @@ namespace integ::mem{
     memory::paging::ParsePD(0x7FF23000);
     kout << "----\n";
     memory::paging::ParsePT(0x7FC00000);
-    */
   }
 
   inline void IDK(){
@@ -107,7 +108,6 @@ namespace integ::mem{
     memory::paging::ParsePD(0x7FF23000);
     kout << "----\n";
     memory::paging::ParsePT(0x7FC00000);
-    */
 
     //memory::paging::ParsePage(0x53B0B3A0E031000);
     /*
@@ -115,7 +115,6 @@ namespace integ::mem{
     kout << "start of ram " << memory::startOfRam << '\n';
     memory::paddr64_t paddr = 0x4f901;
     kout << "physical memory location :: " << paddr << " :: page frame number :: " << memory::PhysicalToPageN(paddr) << '\n';
-    */
 
     //memory::PrintPageFrames();
 
@@ -123,7 +122,8 @@ namespace integ::mem{
     kout << "attempting to read from pci device: " << io::pci::ReadDeviceHeader() << '\n';
     io::pci::EnumeratePCI();
     //Disk::InitialiseAtaPio(0, 0);
-    */
   }
 
 } // namespace integ
+
+*/

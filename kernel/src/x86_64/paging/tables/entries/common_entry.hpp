@@ -9,8 +9,8 @@
 #include <cstdint>
 #include <cassert>
 
-#include "memory/updated/alignment.hpp"
-#include "memory/updated/address.hpp"
+#include "memory/alignment.hpp"
+#include "memory/address.hpp"
 
 namespace X8664::Paging{
 

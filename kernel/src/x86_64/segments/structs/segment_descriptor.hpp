@@ -9,8 +9,9 @@
 #include <cassert>
 
 #include "attributes.hpp"
-#include "memory/old/memory.hpp"
 #include "kassert.hpp"
+
+#include "memory/address.hpp"
 #include "drivers/serial/kostream.hpp"
 
 namespace X8664{

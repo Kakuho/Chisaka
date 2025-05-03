@@ -1,5 +1,4 @@
-#ifndef MEMORY_MAP_ENTRY_HPP
-#define MEMORY_MAP_ENTRY_HPP
+#pragma once
 
 #include <cstdint>
 
@@ -89,5 +88,3 @@ constexpr const char* MemTypeToString(MemoryMapEntry::Type type) noexcept{
 }
 
 } // namespace Mem
-
-#endif

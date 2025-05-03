@@ -40,8 +40,8 @@ SegmentDescriptor::SegmentDescriptor
 
 void SegmentDescriptor::SetBaseAddress(void* baseAddress) noexcept{
   // parse the virtual address
-  memory::vaddr64_t vaddr = 
-    reinterpret_cast<memory::vaddr64_t>(baseAddress);
+  Mem::kvirtaddr_t vaddr = 
+    reinterpret_cast<Mem::kvirtaddr_t>(baseAddress);
   std::uint16_t vaddr0 = vaddr & 0xFFFF;
   std::uint8_t vaddr1 = (vaddr & (0xFFul << 0x10)) >> 0x10;
   std::uint8_t vaddr2 = (vaddr & (0xFFul << 0x18)) >> 0x18;
