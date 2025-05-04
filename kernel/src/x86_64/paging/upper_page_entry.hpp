@@ -10,19 +10,23 @@
 
 #include "memory/alignment.hpp"
 #include "memory/address.hpp"
+#include "drivers/serial/kostream.hpp"
 
 namespace X8664{
 
+class UpperPageTable;
+
 // Helper flag modifier for page table entry attributes
 
-enum UPeOpt{
-  Present = 1 << 0,
-  Writeable = 1 << 1,
-  UserAccessible = 1 << 2,
-  CacheWritethrough = 1 << 3,
-  CacheDisable = 1 << 4,
-  Accessed = 1 << 5,
-};
+namespace UPeOpt{
+  using Underlying_T = std::uint16_t;
+  static inline constexpr Underlying_T Present = 1 << 0;
+  static inline constexpr Underlying_T Writeable = 1 << 1;
+  static inline constexpr Underlying_T UserAccessible = 1 << 2;
+  static inline constexpr Underlying_T CacheWritethrough = 1 << 3;
+  static inline constexpr Underlying_T CacheDisable = 1 << 4;
+  static inline constexpr Underlying_T Accessed = 1 << 5;
+}
 
 class UpperPageEntry{
   using VirtAddr_t = std::uint64_t;
@@ -36,7 +40,13 @@ class UpperPageEntry{
     constexpr operator std::uint64_t() const noexcept{ return m_buffer;}
     constexpr operator std::uint64_t() noexcept{ return m_buffer;}
 
+    void PrintValues() noexcept;
+
     constexpr std::uint64_t BaseAddress() const noexcept;
+
+    void* TablePtr() const noexcept{
+      return reinterpret_cast<void*>(BaseAddress());
+    }
 
     constexpr bool IsPresent() const noexcept;
     constexpr void SetPresent(bool b) noexcept;
@@ -58,7 +68,7 @@ class UpperPageEntry{
 
   private:
     constexpr void InitialiseBuffer(VirtAddr_t address, std::uint8_t flags) noexcept;
-    constexpr void SetAttribute(bool val, UPeOpt modifier) noexcept;
+    constexpr void SetAttribute(bool val, UPeOpt::Underlying_T flag) noexcept;
 
   private:
     std::uint64_t m_buffer;
@@ -66,7 +76,7 @@ class UpperPageEntry{
 
 static_assert(sizeof(UpperPageEntry) == 8);
 
-} // namespace X8664::Paging
+} // namespace X8664
 
 // impl
 
@@ -93,8 +103,25 @@ X8664::UpperPageEntry::operator=( std::uint64_t src)
   return *this;
 }
 
+inline void X8664::UpperPageEntry::PrintValues() noexcept{
+  kout << intmode::hex
+       << "0x" << m_buffer << " ::"
+       << "(Base: " << BaseAddress() 
+       << ", P: " << IsPresent() 
+       << ", W: " << IsWriteable() 
+       << ", U: " << IsUserAccessible()
+       << ", Pwt: " << IsPwt() 
+       << ", Pcd: " << IsPcd()
+       << ", A: " << IsAccessed()
+       << ')' << '\n';
+}
+
+constexpr std::uint64_t 
+X8664::UpperPageEntry::BaseAddress() const noexcept 
+{ return m_buffer & ADDRESS_MASK;  }
+
 constexpr void 
-X8664::UpperPageEntry::SetAttribute(bool val, UPeOpt modifier) noexcept{
+X8664::UpperPageEntry::SetAttribute(bool val, UPeOpt::Underlying_T modifier) noexcept{
   if(val){
     m_buffer |= modifier;
   }
@@ -102,10 +129,6 @@ X8664::UpperPageEntry::SetAttribute(bool val, UPeOpt modifier) noexcept{
     m_buffer &= ~modifier;
   }
 }
-
-constexpr std::uint64_t 
-X8664::UpperPageEntry::BaseAddress() const noexcept 
-{ return m_buffer & ADDRESS_MASK;  }
 
 constexpr bool 
 X8664::UpperPageEntry::IsPresent() const noexcept 

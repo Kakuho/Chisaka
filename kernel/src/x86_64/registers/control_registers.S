@@ -18,11 +18,17 @@ readcr2:
   movq %cr2, %rax 
   ret
 
-.globl readcr3
-.type readcr3, @function
-readcr3:
+.globl get_cr3
+.type get_cr3, @function
+get_cr3:
   xorq %rax, %rax
   movq %cr3, %rax 
+  ret
+
+.globl set_cr3
+.type set_cr3, @function
+set_cr3:
+  movq %rdi, %cr3
   ret
 
 .globl readcr4

@@ -1,1 +1,1 @@
-Functionalities to get the value within cpu registers
+Low level procedures whose purpose are to fetch the value of cpu registers

@@ -1,14 +1,12 @@
 #pragma once
 
-// functionalities regarding the paging table for x86_64 processors
-
 #include "../registers/control_registers.hpp"
 #include "memory/address.hpp"
 
-namespace X8664::Paging{
+namespace X8664{
 
-  Mem::physaddr_t PagingTableBase();
+  Mem::physaddr_t GetBaseTable();
 
   void ParsePageTableCommon();
   
-} // namespace X8664::Paging
+} // namespace X8664

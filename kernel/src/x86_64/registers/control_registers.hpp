@@ -1,7 +1,6 @@
-#ifndef CPU_CONTROL_REGISTERS_HPP
-#define CPU_CONTROL_REGISTERS_HPP
+#pragma once
 
-// Hooks to get the value of control registers
+// Hooks to the control registers
 
 #include <cstdint>
 
@@ -11,8 +10,7 @@ extern "C" void writecr0(std::uint32_t val);
 
 extern "C" std::uint64_t readcr2();
 
-extern "C" std::uint64_t readcr3();
+extern "C" std::uint64_t get_cr3();
+extern "C" void set_cr3(std::uint64_t);
 
 extern "C" std::uint64_t readcr4();
-
-#endif
