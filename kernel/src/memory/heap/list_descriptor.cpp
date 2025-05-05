@@ -12,8 +12,8 @@ ListDescriptor::ListDescriptor(
   m_nextList{this},
   m_prevList{this},
   m_bufferSize{bufferSize},
-  m_pages{pages},
-  m_buffersUsed{0}
+  m_buffersUsed{0},
+  m_pages{pages}
 {
   m_totalBuffers = (m_pages * 0x1000) / m_bufferSize;
   kassert(m_bufferSize >= 8);
@@ -109,6 +109,7 @@ void ListDescriptor::Deallocate(void* address){
     m_nextFree = address; 
     *reinterpret_cast<std::uintptr_t*>(m_nextFree) = 0;
     m_buffersUsed--;
+    return;
   }
   if(address > m_nextFree){
     *reinterpret_cast<std::uintptr_t*>(m_nextFree) 

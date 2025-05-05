@@ -2,7 +2,8 @@
 
 #include "firmware/limine/requests.hpp"
 #include "x86_64/utilites.hpp"
-#include "x86_64/paging/samples/parse_pm4l.hpp"
+#include "memory/heap/tests/test.hpp"
+#include "memory/heap/tests/page_size/test_run.hpp"
 
 // Extern declarations for global constructor array.
 
@@ -24,7 +25,7 @@ extern "C" void _start() {
       __init_array[i]();
   }
 
-  X8664::Samples::ParsePm4l::Try(); 
+  Mem::Heap::Test::Start();
 
   kout << "Rarity is cute pony" << '\n';
   X8664::HaltCatchFire();

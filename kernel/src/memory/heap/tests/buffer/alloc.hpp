@@ -21,6 +21,8 @@ namespace Mem::Heap::Test::Buffer::Alloc{
   static constexpr std::uintptr_t BASE_ADDR8 = 0x62000;
 
   static constexpr std::uintptr_t VBASE_ADDR = 0xFFFF800000055000;
+
+  static constexpr std::uintptr_t BUFFER_SIZE = 8;
   static constexpr std::uint16_t PAGE_SIZE = 0x1000;
 
   void TryAllocate_Mock1(); void TryAllocate_Mock2();

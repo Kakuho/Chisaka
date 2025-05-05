@@ -273,7 +273,12 @@ Buffer::DeStatus Buffer::DeallocFull(void* objaddr){
 void Buffer::Grow(){
   // Grow create a new list descriptor
   ListDescriptor* list = Allocator::NewListDescriptor(m_bufferSize, 1);
-  m_freeLists->AddList(list);
+  if(m_freeLists){
+    m_freeLists->AddList(list);
+  }
+  else{
+    m_freeLists = list;
+  }
 }
 
 void Buffer::Reap(){
