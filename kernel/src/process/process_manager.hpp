@@ -12,7 +12,7 @@ namespace Proc{
 class ProcessManager{
   public:
     ProcessManager() = default;
-    ~ProcessManager();
+    ~ProcessManager() = default;
     void Init();
     ProcessManager& Get();
 

@@ -4,6 +4,7 @@
 
 #include "../registers/control_registers.hpp"
 #include "memory/address.hpp"
+#include "kassert.hpp"
 
 namespace X8664{
 
@@ -19,7 +20,8 @@ void Map( UpperPageTable& uptbl,
 
 void MapKernel( UpperPageTable& uptbl);
 
-UpperPageTable* KernelPageTable();
+inline UpperPageTable* KernelPageTable()
+{ kassert(false && "KernelPageTable() not impl"); }
 
 
 } // namespace X8664
