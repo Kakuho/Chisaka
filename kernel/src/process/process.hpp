@@ -11,6 +11,7 @@
 #include <cstdint>
 
 #include "x8664pcb.hpp"
+#include "x86_64/paging/upper_page_table.hpp"
 
 namespace Proc{
 
@@ -20,27 +21,26 @@ enum class Status{
   ExitDead
 };
 
+using pid_t = std::uint8_t;
+
 struct UserExecution;
 
 struct Process{
-  // Todo:
-  //  * Provide a Page Table
+  public:
+    void SetParent(Process* proc);
+    void InsertSibling(Process* proc);
+    void InsertChild(Process* proc);
 
-  static std::uint8_t pid_count;
-
-  Process();
-  ~Process();                 // destruct all
-                              // associated resources
-  void SetupSwapp();
-                              
-  void SpawnChildren();
-  void MoveChildren();
-
-  std::uint8_t m_id;
-  std::uint8_t m_parentid;
-  Status m_stat;
-  Process* m_sibling;
-  UserExecution* m_user;
+  public:
+    pid_t id;
+    pid_t parentId;
+    pid_t childId;
+    Status m_stat;
+    Process* parent;
+    Process* sibling;
+    Process* child;
+    X8664::UpperPageTable* pageTable;
+    UserExecution* m_user;
 };
 
 struct UserExecution{

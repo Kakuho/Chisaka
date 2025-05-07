@@ -19,7 +19,7 @@ class UpperPageTable;
 // Helper flag modifier for page table entry attributes
 
 namespace UPeOpt{
-  using Underlying_T = std::uint16_t;
+  using Underlying_T = std::uint8_t;
   static inline constexpr Underlying_T Present = 1 << 0;
   static inline constexpr Underlying_T Writeable = 1 << 1;
   static inline constexpr Underlying_T UserAccessible = 1 << 2;
@@ -34,6 +34,9 @@ class UpperPageEntry{
   public:
     constexpr explicit UpperPageEntry(): m_buffer{0}{}
     constexpr explicit UpperPageEntry(VirtAddr_t address, std::uint8_t flags) noexcept;
+    constexpr explicit UpperPageEntry(void* address, std::uint8_t flags) noexcept:
+      UpperPageEntry(reinterpret_cast<std::uint64_t>(address), flags){};
+
     constexpr explicit UpperPageEntry(std::uint64_t src) noexcept : m_buffer{src}{}
 
     constexpr const UpperPageEntry& operator=(std::uint64_t src);

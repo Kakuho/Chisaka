@@ -9,6 +9,7 @@ limine/
 compile_commands.json
 
 Tasks
+tasks
 kernel/src/primrose
 
 clangd_gen/build
