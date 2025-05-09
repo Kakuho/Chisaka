@@ -87,7 +87,7 @@ run-gdb: $(IMAGE_NAME).iso
 		-s -S \
 		-cdrom $(IMAGE_NAME).iso -hda disk.img \
 		-boot d & \
-	gdb -ex "target remote localhost:1234" -ex "symbol-file ./kernel/bin/kernel"
+	gdb -ex "target remote localhost:1234" -ex "symbol-file ./kernel/build/bin/kernel"
 
 .PHONY: run-uefi
 run-uefi: ovmf $(IMAGE_NAME).iso
@@ -129,7 +129,7 @@ kernel:
 $(IMAGE_NAME).iso: limine kernel
 	rm -rf iso_root
 	mkdir -p iso_root/boot
-	cp -v kernel/bin/kernel iso_root/boot/
+	cp -v kernel/build/bin/kernel iso_root/boot/
 	mkdir -p iso_root/boot/limine
 	cp -v limine.cfg limine/limine-bios.sys limine/limine-bios-cd.bin limine/limine-uefi-cd.bin iso_root/boot/limine/
 	mkdir -p iso_root/EFI/BOOT
@@ -150,7 +150,7 @@ $(IMAGE_NAME).hdd: limine kernel
 	./limine/limine bios-install $(IMAGE_NAME).hdd
 	mformat -i $(IMAGE_NAME).hdd@@1M
 	mmd -i $(IMAGE_NAME).hdd@@1M ::/EFI ::/EFI/BOOT ::/boot ::/boot/limine
-	mcopy -i $(IMAGE_NAME).hdd@@1M kernel/bin/kernel ::/boot
+	mcopy -i $(IMAGE_NAME).hdd@@1M kernel/build/bin/kernel ::/boot
 	mcopy -i $(IMAGE_NAME).hdd@@1M limine.cfg limine/limine-bios.sys ::/boot/limine
 	mcopy -i $(IMAGE_NAME).hdd@@1M limine/BOOTX64.EFI ::/EFI/BOOT
 	mcopy -i $(IMAGE_NAME).hdd@@1M limine/BOOTIA32.EFI ::/EFI/BOOT

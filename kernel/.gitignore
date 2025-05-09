@@ -1,5 +1,4 @@
-/bin/
-/obj/
+build/*
 *.map
 
-./src/primrose
+ext/aii
