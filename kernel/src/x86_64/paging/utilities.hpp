@@ -23,5 +23,4 @@ void MapKernel( UpperPageTable& uptbl);
 inline UpperPageTable* KernelPageTable()
 { kassert(false && "KernelPageTable() not impl"); }
 
-
 } // namespace X8664
