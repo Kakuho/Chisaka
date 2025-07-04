@@ -23,22 +23,6 @@ PicController::PicController(
   ClearMasks();
 }
 
-void PicController::FlushICWs(){
-  // Flush the buffered ICWs to the ports
-  // ICW1
-  outb(MASTER_BASE_PORT, m_masterIcws.icw1);
-  outb(SLAVE_BASE_PORT, m_slaveIcws.icw1);
-  // ICW2
-  outb(MASTER_BASE_PORT+1, m_masterIcws.icw2);
-  outb(SLAVE_BASE_PORT+1, m_slaveIcws.icw2);
-  // ICW3
-  outb(MASTER_BASE_PORT+1, m_masterIcws.icw3);
-  outb(SLAVE_BASE_PORT+1, m_slaveIcws.icw3);
-  // ICW4
-  outb(MASTER_BASE_PORT+1, m_masterIcws.icw4);
-  outb(SLAVE_BASE_PORT+1, m_slaveIcws.icw4);
-}
-
 void PicController::Initialise(){
   // First set up of the ICWs
   // ICW1
@@ -57,10 +41,38 @@ void PicController::Initialise(){
   FlushICWs();
 }
 
+void PicController::FlushICWs(){
+  // Flush the buffered ICWs to the ports
+  // ICW1
+  outb(MASTER_BASE_PORT, m_masterIcws.icw1);
+  outb(SLAVE_BASE_PORT, m_slaveIcws.icw1);
+  // ICW2
+  outb(MASTER_BASE_PORT+1, m_masterIcws.icw2);
+  outb(SLAVE_BASE_PORT+1, m_slaveIcws.icw2);
+  // ICW3
+  outb(MASTER_BASE_PORT+1, m_masterIcws.icw3);
+  outb(SLAVE_BASE_PORT+1, m_slaveIcws.icw3);
+  // ICW4
+  outb(MASTER_BASE_PORT+1, m_masterIcws.icw4);
+  outb(SLAVE_BASE_PORT+1, m_slaveIcws.icw4);
+}
+
+void PicController::Enable(){
+  ClearMasks();
+}
+
 void PicController::Disable(){
-  // essentially, masks all the IRQs
-  outb(MASTER_BASE_PORT+1, 0xFF);
-  outb(MASTER_BASE_PORT+1, 0xFF);
+  MaskAll();
+}
+
+void PicController::SignalEOI(std::uint8_t irq){
+  if(irq < 8){
+	  outb(MASTER_BASE_PORT, 0x20);
+  }
+  else{
+		outb(SLAVE_BASE_PORT, 0x20);
+	  outb(MASTER_BASE_PORT, 0x20);
+  }
 }
 
 [[nodiscard]] constexpr std::uint8_t 
@@ -73,12 +85,6 @@ PicController::IrqToVector(std::uint8_t irq) const noexcept{
     return m_slaveOffset + (irq - 8);
   }
 }
-
-//-------------------------------------------------------------
-// Register Reading R/W
-//-------------------------------------------------------------
-
-//  Masking
 
 [[nodiscard]] std::uint16_t 
 PicController::Masksbm() const noexcept{
@@ -107,6 +113,12 @@ void PicController::MaskIrq(std::uint8_t irq) noexcept{
   }
 }
 
+void PicController::MaskAll(){
+  // essentially, masks all the IRQs
+  outb(MASTER_BASE_PORT+1, 0xFF);
+  outb(SLAVE_BASE_PORT+1, 0xFF);
+}
+
 void PicController::SetIrq(std::uint8_t irq) noexcept{
   kassert(irq < 15);
   if(irq < 8){
@@ -120,8 +132,6 @@ void PicController::SetIrq(std::uint8_t irq) noexcept{
     outb(SLAVE_BASE_PORT+1, masks);
   }
 }
-
-// Other Registers
 
 [[nodiscard]] std::uint16_t 
 PicController::GetIrr() noexcept{

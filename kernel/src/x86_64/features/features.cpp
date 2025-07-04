@@ -2,6 +2,8 @@
 
 namespace X8664::Features{
 
+// Vendor Identification
+
 std::uint32_t ReverseBytes(std::uint32_t src){
   std::uint32_t oriented = src & 0xFF;
   oriented <<= 8;
@@ -56,13 +58,7 @@ void PrintManufacturerId(){
   kout << '\n';
 }
 
-// cpuid.1
-
-bool Supportsx2APiC(){
-  std::uint64_t base = cpuid_1();
-  std::uint32_t ecx = *(reinterpret_cast<std::uint32_t*>(base-12));
-  return (ecx >> 22) & 1;
-}
+// APIC
 
 bool SupportsAPIC(){
   std::uint64_t base = cpuid_1();
@@ -70,17 +66,50 @@ bool SupportsAPIC(){
   return (edx >> 9) & 1;
 }
 
+Mem::physaddr64_t GetApicBase(){
+  std::uint64_t ia32_base = read_ia32_apic_base();
+  std::uint64_t apicBase = (ia32_base >> 12) << 12;
+  return apicBase;
+}
+
+void EnableApic(){
+  std::uint64_t ia32_base = read_ia32_apic_base();
+  ia32_base |= 0x800;
+  write_ia32_apic_base(ia32_base >> 32, ia32_base & 0xFFFFFFFF);
+}
+
+void DisableApic(){
+  std::uint64_t ia32_base = read_ia32_apic_base();
+  ia32_base &= ~(0x800);
+  write_ia32_apic_base(ia32_base >> 32, ia32_base & 0xFFFFFFFF);
+}
+
+// x2APIC
+
+bool Supportsx2APiC(){
+  std::uint64_t base = cpuid_1();
+  std::uint32_t ecx = *(reinterpret_cast<std::uint32_t*>(base-12));
+  return (ecx >> 22) & 1;
+}
+
+void Disablex2Apic(){
+  std::uint64_t ia32_base = read_ia32_apic_base();
+  ia32_base &= ~(0x400);
+  write_ia32_apic_base(ia32_base >> 32, ia32_base & 0xFFFFFFFF);
+}
+
+// ACPI
+
 bool SupportsACPI(){
   std::uint64_t base = cpuid_1();
   std::uint32_t edx = *(reinterpret_cast<std::uint32_t*>(base-16));
   return (edx >> 22) & 1;
 }
 
-// CPUID.80000008
+// Memory Width
 
 std::uint8_t PhysicalWidth(){
-  std::uint64_t base = cpuid_80000008();
-  std::uint32_t eax = *(reinterpret_cast<std::uint32_t*>(base-4));
+  std::uint32_t eax = cpuid_80000008_eax();
   return eax & 0xFF;
 }
 

@@ -36,6 +36,7 @@ cpuid_1:
   movl %edx, -16(%rbp)
   movq %rbp, %rax
   pop %rbp
+  ret
 
 .globl cpuid_80000008
 .type cpuid_80000008, @function
@@ -43,8 +44,21 @@ cpuid_80000008:
   pushq %rbp
   movq %rsp, %rbp
   xorq %rax, %rax
+  movl $0x80000008, %eax
   cpuid
   movl %eax, -4(%rbp)
   movl %ebx, -8(%rbp)
   movq %rbp, %rax
   pop %rbp
+  ret
+
+.globl cpuid_80000008_eax
+.type cpuid_80000008_eax, @function
+cpuid_80000008_eax:
+  pushq %rbp
+  movq %rsp, %rbp
+  xorq %rax, %rax
+  movl $0x80000008, %eax
+  cpuid
+  pop %rbp
+  ret

@@ -6,30 +6,38 @@
 // Reference: Intel vol3 CPUID
 
 #include "cpuid.hpp"
+#include "msr.hpp"
 #include "drivers/serial/kostream.hpp"
 #include "aii/array.hpp"
 
 namespace X8664::Features{
   
-std::uint32_t ReverseBytes(std::uint32_t src);
+// Vendor Identification
 
-// cpuid.0
-
-// should rename to VendorIdString like in the manual
 Aii::Array<char, 24> ManufacturerId();
+std::uint32_t ReverseBytes(std::uint32_t src);
 void PrintManufacturerId();
 
-// cpuid.1
+// APIC
 
-bool Supportsx2APiC();      // interrupts
-bool SupportsAPIC();        // interrupts
+bool SupportsAPIC();
+Mem::physaddr64_t GetApicBase();
+void EnableApic();
+void DisableApic();
 
-bool SupportsACPI();        // sw controlling hw
+// x2APIC
 
-// cpuid.80000008
+bool Supportsx2APiC();
+void Disablex2Apic();
+
+// ACPI
+
+bool SupportsACPI();
+
+// Memory Width
 
 std::uint8_t PhysicalWidth();
 std::uint8_t LinearWidth();
 bool WbnoinvdAvailable();
 
-} // namespace X8664::CpuId
+} // namespace X8664::Features

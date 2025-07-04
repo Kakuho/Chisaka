@@ -30,25 +30,20 @@ class PicController{
   public:
     PicController(std::uint16_t vectorOffset);
     PicController(std::uint16_t masterOffset, std::uint16_t slaveOffset);
-
     void FlushICWs();
+
+    void Enable();
     void Disable();
 
+    void SignalEOI(std::uint8_t irq);
     [[nodiscard]] constexpr 
     std::uint8_t IrqToVector(std::uint8_t irq) const noexcept;
-
-    //-------------------------------------------------------------
-    // Register Reading R/W
-    //-------------------------------------------------------------
-
-    // Masking
 
     [[nodiscard]] std::uint16_t Masksbm() const noexcept;
     void ClearMasks() noexcept;
     void MaskIrq(std::uint8_t irq) noexcept;
+    void MaskAll();
     void SetIrq(std::uint8_t irq) noexcept;
-
-    // Other Registers
 
     [[nodiscard]] std::uint16_t GetIrr() noexcept;
     [[nodiscard]] std::uint16_t GetIsr() noexcept;

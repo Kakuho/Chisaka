@@ -10,5 +10,7 @@ extern "C" std::uint64_t cpuid_0();
 extern "C" std::uint64_t cpuid_1();
 
 extern "C" std::uint64_t cpuid_80000008();
+extern "C" std::uint64_t cpuid_80000008_eax();
+extern "C" std::uint64_t cpuid_80000008_ebx();
 
 #endif
