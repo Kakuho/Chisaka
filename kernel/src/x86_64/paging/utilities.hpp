@@ -21,5 +21,4 @@ void MapKernel( UpperPageTable& uptbl);
 
 UpperPageTable* KernelPageTable();
 
-
 } // namespace X8664

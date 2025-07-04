@@ -28,7 +28,6 @@ class UpperPageTable{
     bool AreEntriesZero() const noexcept;
     void ClearEntries() noexcept;
 
-
     constexpr void AddEntry(std::size_t index, 
                             EntryType& entry) noexcept{m_entries[index] = entry;}
     constexpr void AddEntry(std::size_t index, 
