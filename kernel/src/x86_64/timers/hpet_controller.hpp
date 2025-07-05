@@ -1,12 +1,10 @@
-#ifndef X8664_TIMERS_HPET_CONTROLLER_HPP
-#define X8664_TIMERS_HPET_CONTROLLER_HPP
+#pragma once
 
 #include <cstdint>
 #include <cassert>
 
-#include "primrose/static_array.hpp"
-#include "lib/kassert.hpp"
-
+#include "aii/array.hpp"
+#include "kassert.hpp"
 #include "./../../firmware/acpi/hpet_table.hpp"
 
 namespace X8664::Timers::Hpet{
@@ -43,7 +41,7 @@ class Controller{
     [[maybe_unused]] const std::uint64_t rsv1;
 
     std::uint64_t gInterruptStatus;
-    [[maybe_unused]] Prim::StaticArray<std::uint8_t, 0xc7> rsv2;
+    [[maybe_unused]] Aii::StaticArray<std::uint8_t, 0xc7> rsv2;
 
     std::uint32_t gMainCounterLo;
     std::uint32_t gMainCounterHi;
@@ -99,5 +97,3 @@ class Controller{
 };
 
 }
-
-#endif

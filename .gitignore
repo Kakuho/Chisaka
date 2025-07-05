@@ -1,4 +1,5 @@
 .cache/
+clangd_gen/
 
 chisaka.iso
 limine/
