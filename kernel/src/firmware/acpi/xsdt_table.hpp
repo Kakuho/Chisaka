@@ -10,15 +10,12 @@
 #include "memory/address.hpp"
 
 namespace Firmware::Acpi{
-
   class [[gnu::packed]] XsdtTable{
-      static constexpr Aii::Array<char, 4> SIG ={
-        'X', 'S', 'D', 'T'
-      };
+    static constexpr Aii::Array<char, 4> SIG ={'X', 'S', 'D', 'T'};
 
     public:
-      [[nodiscard]] const Mem::physaddr64_t* 
-      operator[](std::size_t index) const;
+      constexpr bool IsSignatureCorrect(){ return header.signature == SIG;}
+      [[nodiscard]] const Mem::physaddr64_t* operator[](std::size_t index) const;
 
     private:
       TableHeader header;

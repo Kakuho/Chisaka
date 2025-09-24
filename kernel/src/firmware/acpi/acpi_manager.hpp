@@ -1,8 +1,10 @@
-#ifndef FIRMWARE_ACPI_ACPI_MANAGER_HPP
-#define FIRMWARE_ACPI_ACPI_MANAGER_HPP
+#pragma once
 
-#include "tables.hpp"
-#include "fadt.hpp"
+#include "rsdp_table.hpp"
+#include "fadt_table.hpp"
+#include "rsdt_table.hpp"
+#include "xsdt_table.hpp"
+
 #include "firmware/limine/requests.hpp"
 #include "memory/address.hpp"
 
@@ -11,11 +13,6 @@ namespace Firmware::Acpi{
 class AcpiManager{
   public:
     AcpiManager();
-
-    // ------------------------------------------------------ //
-    // Parsing
-    // ------------------------------------------------------ //
-
     void ParseRsdt();
     void ParseXsdt();
 
@@ -27,5 +24,3 @@ class AcpiManager{
 };
 
 }
-
-#endif

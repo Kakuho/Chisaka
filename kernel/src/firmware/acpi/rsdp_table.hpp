@@ -11,14 +11,13 @@
 namespace Firmware::Acpi{
 
   struct [[gnu::packed]] RsdpTable{
-    public:
       static constexpr Aii::Array<char, 8> SIG ={
         'R', 'S', 'D', ' ', 'P', 'T', 'R', ' '
       };
 
-      [[nodiscard]] constexpr bool IsSignatureCorrect(){
-        return signature == SIG;
-      }
+    public:
+      constexpr bool IsSignatureCorrect(){ return signature == SIG;}
+      bool XsdtPresent(){return xsdtAddr != 0;}
 
     public:
       Aii::Array<char, 8> signature;

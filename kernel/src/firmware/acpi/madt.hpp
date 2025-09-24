@@ -6,8 +6,9 @@
 //  Multiple APIC Table Definition and supporting structures to implement 
 //  MADT
 
+#include "table_header.hpp"
+
 #include "memory/address.hpp"
-#include "tables.hpp"
 
 namespace Firmware::Acpi{
 
@@ -60,7 +61,6 @@ namespace Firmware::Acpi{
     Mem::physaddr32_t ioapicAddr;
     std::uint32_t globalSystemInterruptBase;
   };
-
 }
 
 #endif
