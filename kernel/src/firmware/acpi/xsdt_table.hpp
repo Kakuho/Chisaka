@@ -1,0 +1,27 @@
+#pragma once
+
+//  Reference ACPI: 5.2.8
+//  Extended System Description Table (XSDT)
+//  Must be used if the RSDP table contains a XSDT pointer
+
+#include "table_header.hpp"
+
+#include "aii/array.hpp"
+#include "memory/address.hpp"
+
+namespace Firmware::Acpi{
+
+  class [[gnu::packed]] XsdtTable{
+      static constexpr Aii::Array<char, 4> SIG ={
+        'X', 'S', 'D', 'T'
+      };
+
+    public:
+      [[nodiscard]] const Mem::physaddr64_t* 
+      operator[](std::size_t index) const;
+
+    private:
+      TableHeader header;
+      Mem::physaddr64_t* tablePointers;
+  };
+}

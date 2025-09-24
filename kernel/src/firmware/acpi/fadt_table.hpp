@@ -1,15 +1,18 @@
-#ifndef FIRMWARE_ACPI_FADT_HPP
-#define FIRMWARE_ACPI_FADT_HPP
+#pragma once
 
 // Reference - 5.2.9
 //
 // The Fixed ACPI Description Table definition is separated from the 
 // other table definitions as it is quite a large structure
 
-#include "tables.hpp"
+#include "table_header.hpp"
+#include "aii/array.hpp"
+
+#include "memory/address.hpp"
 
 namespace Firmware::Acpi{
   struct FadtTable{
+    static constexpr Aii::Array<char, 4> SIG = {'F', 'A', 'C', 'P'};
     TableHeader header;
     Mem::physaddr32_t firmwareCtrl; // ptr to FACS
     Mem::physaddr32_t dsdt;         // ptr to DSDT
@@ -22,5 +25,3 @@ namespace Firmware::Acpi{
     // THERE's MORE FIELDS TO ADD!!!
   };
 }
-
-#endif
