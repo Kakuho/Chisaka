@@ -4,20 +4,29 @@
 //  - ACPI table shares this common header
 
 #include <cstdint>
+
 #include "aii/array.hpp"
+#include "drivers/serial/kostream.hpp"
 
 namespace Firmware::Acpi{
 
   struct TableHeader{
-    Aii::Array<char, 4> signature;
-    std::uint32_t length;
-    std::uint8_t revision;
-    std::uint8_t checksum;
-    char oemId[6];
-    char oemTableId[8];
-    std::uint32_t oemRevision;
-    std::uint32_t creatorId;
-    std::uint32_t creatorRevision;
+    public:
+      void PrintHeader() const{
+        for(std::size_t i = 0; i < signature.Size(); i++){
+          kout << signature[i];
+        }
+      }
+    public:
+      Aii::Array<char, 4> signature;
+      std::uint32_t length;
+      std::uint8_t revision;
+      std::uint8_t checksum;
+      char oemId[6];
+      char oemTableId[8];
+      std::uint32_t oemRevision;
+      std::uint32_t creatorId;
+      std::uint32_t creatorRevision;
   };
 
   static_assert(sizeof(TableHeader) == 36);

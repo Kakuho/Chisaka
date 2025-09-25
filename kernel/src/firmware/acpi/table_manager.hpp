@@ -10,7 +10,11 @@ namespace Firmware::Acpi{
   class TableManager{
     public:
       TableManager() = default;
+
+      RsdtTable* RsdtPtr(){ return m_rsdt;}
+
       void Initialise(RsdpTable* addr);
+      void InitialisePointers();
 
     private:
       RsdpTable* m_rsdp; 
@@ -19,5 +23,6 @@ namespace Firmware::Acpi{
         XsdtTable* m_xsdt;
       };
       bool isXsdt;
+
   };
 }
