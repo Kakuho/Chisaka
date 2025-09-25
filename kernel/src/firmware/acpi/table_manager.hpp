@@ -18,6 +18,7 @@ namespace Firmware::Acpi{
       TableManager() = default;
 
       RsdtTable* RsdtPtr(){ return m_rsdt;}
+      HpetTable* HpetPtr(){ return m_hpet;}
 
       void Initialise(RsdpTable* addr);
       void InitialiseRoot(RsdpTable* addr);

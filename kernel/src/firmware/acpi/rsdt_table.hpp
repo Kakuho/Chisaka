@@ -19,6 +19,7 @@ namespace Firmware::Acpi{
     public:
       constexpr bool IsSignatureCorrect() noexcept{return header.signature == SIG;}
 
+
       TableHeader* EntryHeader(std::size_t index) const noexcept{
         //return reinterpret_cast<TableHeader*>(&tablePointers[index]);
       }

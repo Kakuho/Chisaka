@@ -8,7 +8,8 @@
 #include "kassert.hpp"
 
 namespace Firmware::Acpi{
-  struct Gas{
+
+  struct [[gnu::packed]] Gas{
     public:
       static const char* AddressSpaceIdString(std::uint8_t id);
 
@@ -19,6 +20,9 @@ namespace Firmware::Acpi{
       std::uint8_t addressSpaceId;
       std::uint8_t regBitWidth;
       std::uint8_t regBitOffset;
+      std::uint8_t accessSize;
       std::uint64_t address;
   };
+
+  static_assert(sizeof(Gas) == 12);
 }

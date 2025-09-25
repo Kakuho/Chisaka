@@ -10,7 +10,7 @@
 
 namespace Firmware::Acpi{
 
-  struct TableHeader{
+  struct [[gnu::packed]] TableHeader{
     public:
       void PrintHeader() const{
         for(std::size_t i = 0; i < signature.Size(); i++){
