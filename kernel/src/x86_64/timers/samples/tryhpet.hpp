@@ -1,23 +1,24 @@
-#ifndef X8664_TRYHPET_HPP
-#define X8664_TRYHPET_HPP
+#pragma once
 
-#include "hpet_controller.hpp"
+#include "x86_64/timers/hpet_controller.hpp"
 #include "x86_64/interrupts/controllers/pic.hpp"
-#include "firmware/acpi/hpet_table.hpp"
-#include "firmware/acpi/acpi_manager.hpp"
-
 #include "x86_64/interrupts/interrupt_manager.hpp"
 #include "x86_64/segments/segment_manager.hpp"
+
+#include "firmware/acpi/hpet_table.hpp"
+#include "firmware/acpi/table_manager.hpp"
+
+#include "firmware/limine/requests.hpp"
 
 extern "C"{
   void enable_interrupts();
 }
 
-namespace X8664::TryHpet{
+namespace X8664::Timers::Samples::TryHpet{
   static constexpr std::uint64_t MATCH_VALUE = 0x50000;
 
-  Timers::Hpet::Controller hpetController;
-  Interrupts::PicController picController{0x20};
+  Timers::HpetController hpetController;
+  Interrupt::PicController picController{0x20};
 
   void InterruptHandler_Period(){
     //hpetController.Disable();
@@ -62,10 +63,13 @@ namespace X8664::TryHpet{
     intManager.EnableInterrupts();
     intManager.InstallISR(0x20, InterruptHandler_Period);
     //Interrupts::PicController picController{0x20};
-    Firmware::Acpi::AcpiManager acpi{};
-    Firmware::Acpi::HpetTable* pHpetTable = acpi.GetHpet();
-    kout << "Hpet Base Address = " << pHpetTable->GetHpetBaseAddress() << '\n';
-    hpetController.SetBaseAddress(pHpetTable->GetHpetBaseAddress());
+    //-------------------------------------------------------------
+    Firmware::Acpi::TableManager acpiTables{};
+    acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(limine::requests::rsdp_request.response->address));
+    auto pHpetTable = acpiTables.HpetPtr();
+    kout << "Hpet Base Address = " << pHpetTable->BaseAddress() << '\n';
+    //-------------------------------------------------------------
+    hpetController.SetBaseAddress(pHpetTable->BaseAddress());
     hpetController.EnumerateCapabilities();
     hpetController.Disable();
     hpetController.SetMainCounter(0x00);
@@ -88,10 +92,10 @@ namespace X8664::TryHpet{
       volatile std::uint32_t low = hpetController.ReadMainCounterLow();
       volatile std::uint32_t high = hpetController.ReadMainCounterHigh();
       std::uint64_t counter = hpetController.ReadMainCounter();
-      kout << "Counter: " << counter << ", high: " << high << ", low: " << low << '\n';
+      //kout << "Counter: " << counter << ", high: " << high << ", low: " << low << '\n';
 
       volatile std::uint32_t comparator = hpetController.Timers()[0].GetMatchValue();
-      kout << "Timer Comparator Value: " << comparator << '\n';
+      //kout << "Timer Comparator Value: " << comparator << '\n';
     }
   }
 
@@ -104,10 +108,12 @@ namespace X8664::TryHpet{
     intManager.EnableInterrupts();
     intManager.InstallISR(32, InterruptHandler_OneShot);
     //Interrupts::PicController picController{32};
-    Firmware::Acpi::AcpiManager acpi{};
-    Firmware::Acpi::HpetTable* pHpetTable = acpi.GetHpet();
-    kout << "Hpet Base Address = " << pHpetTable->GetHpetBaseAddress() << '\n';
-    hpetController.SetBaseAddress(pHpetTable->GetHpetBaseAddress());
+    Firmware::Acpi::TableManager acpiTables{};
+    acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(limine::requests::rsdp_request.response->address));
+    auto pHpetTable = acpiTables.HpetPtr();
+    //-------------------------------------------------------------
+    kout << "Hpet Base Address = " << pHpetTable->BaseAddress() << '\n';
+    hpetController.SetBaseAddress(pHpetTable->BaseAddress());
     hpetController.EnumerateCapabilities();
     hpetController.Disable();
     hpetController.SetMainCounter(0x00);
@@ -128,9 +134,7 @@ namespace X8664::TryHpet{
       volatile std::uint32_t low = hpetController.ReadMainCounterLow();
       volatile std::uint32_t high = hpetController.ReadMainCounterHigh();
       std::uint64_t counter = hpetController.ReadMainCounter();
-      kout << "Counter: " << counter << ", high: " << high << ", low: " << low << '\n';
+      //kout << "Counter: " << counter << ", high: " << high << ", low: " << low << '\n';
     }
   }
 }
-
-#endif

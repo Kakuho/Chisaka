@@ -1,9 +1,13 @@
 #include <cstdint>
 
 #include "firmware/limine/requests.hpp"
+#include "x86_64/timers/hpet_controller.hpp"
 #include "x86_64/utilites.hpp"
 #include "memory/heap/tests/test.hpp"
 #include "memory/heap/tests/page_size/test_run.hpp"
+
+#include "x86_64/timers/samples/hpet_poll.hpp"
+#include "x86_64/timers/samples/tryhpet.hpp"
 
 // Extern declarations for global constructor array.
 
@@ -25,7 +29,7 @@ extern "C" void _start() {
       __init_array[i]();
   }
 
-  Mem::Heap::Test::Start();
+  X8664::Timers::Samples::TryHpet::TryOneShot();
 
   kout << "Rarity is cute pony" << '\n';
   X8664::HaltCatchFire();

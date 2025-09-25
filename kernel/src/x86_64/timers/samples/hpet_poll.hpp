@@ -4,6 +4,7 @@
 
 #include "firmware/acpi/hpet_table.hpp"
 #include "firmware/acpi/acpi_manager.hpp"
+#include "firmware/acpi/table_manager.hpp"
 
 #include "x86_64/interrupts/interrupt_manager.hpp"
 #include "x86_64/interrupts/controllers/pic.hpp"
@@ -11,16 +12,18 @@
 
 // Code sample to poll main counter and timer comparators
 
-namespace X8664::Hpet::Samples::Poll{
+namespace X8664::Timers::Samples::HpetPoll{
     static constexpr std::uint64_t MATCH_VALUE = 0x50000;
 
     inline void PollPeriodic(){
       // Polling the value of a periodic comparator
-      Firmware::Acpi::AcpiManager acpi{};
-      Firmware::Acpi::HpetTable* pHpetTable = acpi.GetHpet();
+      Firmware::Acpi::TableManager acpiTables{};
+      acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(limine::requests::rsdp_request.response->address));
+      auto pHpetTable = acpiTables.HpetPtr();
+      kout << "Hpet Base Address = " << pHpetTable->BaseAddress() << '\n';
 
-      Timers::Hpet::Controller hpetController{};
-      hpetController.SetBaseAddress(pHpetTable->GetHpetBaseAddress());
+      Timers::HpetController hpetController{};
+      hpetController.SetBaseAddress(pHpetTable->BaseAddress());
       hpetController.Disable();
       hpetController.SetMainCounter(0x00);
 
@@ -46,10 +49,12 @@ namespace X8664::Hpet::Samples::Poll{
       }
     }
 
-    inline void PollMainCounter(){
-    Firmware::Acpi::AcpiManager acpi{};
-    Firmware::Acpi::HpetTable* pHpetTable = acpi.GetHpet();
-    Timers::Hpet::Controller hpetController{pHpetTable->GetHpetBaseAddress()};
+  inline void PollMainCounter(){
+    Firmware::Acpi::TableManager acpiTables{};
+    acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(limine::requests::rsdp_request.response->address));
+    auto pHpetTable = acpiTables.HpetPtr();
+    kout << "Hpet Base Address = " << pHpetTable->BaseAddress() << '\n';
+    Timers::HpetController hpetController{pHpetTable->BaseAddress()};
 
     hpetController.Disable();
     kout << "Hpet Disabled" << '\n';

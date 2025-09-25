@@ -1,8 +1,8 @@
 #include "hpet_controller.hpp"
 
-namespace X8664::Timers::Hpet{
+namespace X8664::Timers{
 
-Controller::Controller()
+HpetController::HpetController()
   : m_regBase{nullptr},
     m_freq{0},
     m_numTimers{0}
@@ -10,7 +10,7 @@ Controller::Controller()
 
 }
 
-Controller::Controller(Registers* base)
+HpetController::HpetController(Registers* base)
   : m_regBase{base},
     m_freq{0},
     m_numTimers{CalculateNumTimers()}
@@ -19,27 +19,27 @@ Controller::Controller(Registers* base)
   SetLegacyReplacementRoute();
 }
 
-Controller::Controller(std::uint64_t base)
-  : Controller(reinterpret_cast<Registers*>(base)) {}
+HpetController::HpetController(std::uint64_t base)
+  : HpetController(reinterpret_cast<Registers*>(base)) {}
 
-void Controller::SetBaseAddress(Registers* base){
+void HpetController::SetBaseAddress(Registers* base){
   m_regBase = base;
   m_numTimers = CalculateNumTimers();
   SetLegacyReplacementRoute();
 
 }
 
-void Controller::SetBaseAddress(std::uint64_t base){
+void HpetController::SetBaseAddress(std::uint64_t base){
   m_regBase = reinterpret_cast<Registers*>(base);
   m_numTimers = CalculateNumTimers();
   SetLegacyReplacementRoute();
 }
 
-void Controller::InitialiseTimer(std::uint8_t timerno){
+void HpetController::InitialiseTimer(std::uint8_t timerno){
 
 }
 
-std::uint64_t Controller::CalculateFrequency() const{
+std::uint64_t HpetController::CalculateFrequency() const{
   if(m_regBase){
     std::uint32_t fsPeriod = (m_regBase->gCapabilities) >> 32;
     //return 0x10000000000000000 / fsPeriod;
@@ -50,7 +50,7 @@ std::uint64_t Controller::CalculateFrequency() const{
   }
 }
 
-std::uint8_t Controller::CalculateNumTimers() const{
+std::uint8_t HpetController::CalculateNumTimers() const{
   if(m_regBase){
     return (m_regBase->gCapabilities & 0x1F00) >> 8;
   }
@@ -59,20 +59,20 @@ std::uint8_t Controller::CalculateNumTimers() const{
   }
 }
 
-void Controller::SetLegacyReplacementRoute() const{
+void HpetController::SetLegacyReplacementRoute() const{
   if(LegacyRouteCapable()){
   }
   m_regBase->gConfig |= 2;
 }
 
-void Controller::EnumerateCapabilities() const{
+void HpetController::EnumerateCapabilities() const{
   const std::uint64_t cap = m_regBase->gCapabilities;
   kout << "LegacyReplacement Route Capable: " << ((cap & 0x8000) >> 15) << '\n';
   kout << "Main Counter: " << (cap & 0x200 ? "64 Bits" : "32 Bits") << '\n';
   kout << "Number of Timers: " << m_numTimers << '\n';
 }
 
-void Controller::EnumerateTimerCapabilities(std::uint8_t timerno) const{
+void HpetController::EnumerateTimerCapabilities(std::uint8_t timerno) const{
   kassert(timerno < m_numTimers);
   const volatile std::uint64_t& timerConfig = m_regBase->timers[timerno].config;
 
@@ -134,11 +134,11 @@ void Controller::EnumerateTimerCapabilities(std::uint8_t timerno) const{
         <<  m_regBase->timers[timerno].comparator << '\n';
 }
 
-void Controller::ClearInterrupt(std::uint8_t timerno){
+void HpetController::ClearInterrupt(std::uint8_t timerno){
   m_regBase->gInterruptStatus |= (1 << timerno);
 }
 
-std::uint64_t Controller::ReadMainCounter(){
+std::uint64_t HpetController::ReadMainCounter(){
   std::uint32_t high = m_regBase->gMainCounterHi;
   std::uint32_t low = m_regBase->gMainCounterLo;
   std::uint32_t high2 = m_regBase->gMainCounterHi;
@@ -153,7 +153,7 @@ std::uint64_t Controller::ReadMainCounter(){
   return count;
 }
 
-void Controller::SetMainCounter(std::uint64_t val){
+void HpetController::SetMainCounter(std::uint64_t val){
   while(m_regBase->gConfig & 1){
     continue;
   }
@@ -161,4 +161,4 @@ void Controller::SetMainCounter(std::uint64_t val){
   m_regBase->gMainCounterHi = val>>32;
 }
 
-} // namespace X8664::Timers::Hpet
+} 

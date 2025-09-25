@@ -9,6 +9,7 @@
 #include "msr.hpp"
 #include "drivers/serial/kostream.hpp"
 #include "aii/array.hpp"
+#include "memory/address.hpp"
 
 namespace X8664::Features{
   

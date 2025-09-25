@@ -12,7 +12,7 @@
 #include "x86_64/features/features.hpp"
 #include "x86_64/features/msr.hpp"
 #include "memory/address.hpp"
-#include "lib/kassert.hpp"
+#include "kassert.hpp"
 
 namespace X8664::Interrupts{
 

@@ -3,13 +3,15 @@
 #include <cstdint>
 #include <cassert>
 
-#include "aii/array.hpp"
+
 #include "kassert.hpp"
-#include "./../../firmware/acpi/hpet_table.hpp"
+#include "firmware/acpi/hpet_table.hpp"
 
-namespace X8664::Timers::Hpet{
+#include "aii/array.hpp"
 
-class Controller{
+namespace X8664::Timers{
+
+class HpetController{
 
   struct TimerRegisters{
     void Enable() {config |=  0x04;}
@@ -41,21 +43,21 @@ class Controller{
     [[maybe_unused]] const std::uint64_t rsv1;
 
     std::uint64_t gInterruptStatus;
-    [[maybe_unused]] Aii::StaticArray<std::uint8_t, 0xc7> rsv2;
+    [[maybe_unused]] Aii::Array<std::uint8_t, 0xc7> rsv2;
 
     std::uint32_t gMainCounterLo;
     std::uint32_t gMainCounterHi;
 
-    Prim::StaticArray<TimerRegisters, 0> timers;
+    Aii::Array<TimerRegisters, 0> timers;
   };
 
   static_assert(sizeof(TimerRegisters) == 0x20);
   static_assert(sizeof(Registers) == 0xf8);
 
   public:
-    explicit Controller();
-    explicit Controller(Registers* base);
-    explicit Controller(std::uint64_t base);
+    explicit HpetController();
+    explicit HpetController(Registers* base);
+    explicit HpetController(std::uint64_t base);
 
     void SetBaseAddress(Registers* base);
     void SetBaseAddress(std::uint64_t);
@@ -63,7 +65,7 @@ class Controller{
     void Enable() { m_regBase->gConfig |= 1;}
     void Disable(){ m_regBase->gConfig &= ~1;}
 
-    Prim::StaticArray<TimerRegisters, 0>& Timers(){ return m_regBase->timers;}
+    Aii::Array<TimerRegisters, 0>& Timers(){ return m_regBase->timers;}
 
     void EnumerateCapabilities() const;
     void EnumerateTimerCapabilities(std::uint8_t timerno) const;
