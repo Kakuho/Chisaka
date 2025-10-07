@@ -14,7 +14,9 @@ struct FileDescriptor{
     FileDescriptor(std::uint8_t fd): m_fd{fd}{}
 
     bool IsNull() const{ return m_fd == NULLFD;}
+
     std::uint8_t Get() const{ return m_fd;}
+    void Reset(){ m_fd = NULLFD;}
 
   private:
     std::uint8_t m_fd;
@@ -55,13 +57,15 @@ struct FileDescriptorTable{
     bool Full() const{ return m_full;}
     std::size_t MaxEntries() const{ return m_maxEntries;}
 
-    const FileDescriptor* GetFd(std::uint8_t fd) const;
-    FileDescriptor* CreateNewFd();
+    const FileDescriptor* Get(std::uint8_t fd) const;
+    FileDescriptor* Allocate();
+    void Remove(std::uint8_t fd);
 
     constexpr std::uint8_t TableEntries() const{ return TableChunk::entries;}
+    std::size_t NumberOfChunks() const;
 
   private:
-    void AllocateChunk();
+    TableChunk* AllocateChunk();
 
   private:
     TableChunk* m_root;
@@ -73,8 +77,9 @@ struct FileDescriptorManager{
   public:
     FileDescriptorManager() = default;
 
-    void InsertFd();
-    const FileDescriptor* GetFd(std::uint8_t fd) const;
+    const FileDescriptor* GetFd(std::uint8_t fd) const{ return fdtable.Get(fd); }
+    FileDescriptor* CreateNewFd(){ return fdtable.Allocate(); }
+    void Remove(std::uint8_t fd){fdtable.Remove(fd); }
 
   private:
     FileDescriptorTable fdtable;

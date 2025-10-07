@@ -10,8 +10,8 @@ namespace Fs::Merofs{
 
 FileDescriptorTable::TableChunk::TableChunk()
   :
-    next{nullptr},
     prev{nullptr},
+    next{nullptr},
     used{0},
     table{}
 {
@@ -42,14 +42,21 @@ FileDescriptorTable::~FileDescriptorTable(){
   }
 }
 
-void FileDescriptorTable::AllocateChunk(){
+auto FileDescriptorTable::AllocateChunk() -> TableChunk*{
   auto allocchunk = Mem::Heap::Allocator::New<TableChunk>();
-  if(m_root){
-    m_root->next = allocchunk;
+  TableChunk* parent = m_root;
+  while(parent){
+    if(parent->next){
+      parent = parent->next;
+    }
+    else{
+      parent->next = allocchunk;
+    }
   }
+  return allocchunk;
 }
 
-const FileDescriptor* FileDescriptorTable::GetFd(std::uint8_t fd) const{
+const FileDescriptor* FileDescriptorTable::Get(std::uint8_t fd) const{
   TableChunk* tableIndexer = m_root;
   if(fd > TableEntries()){
     tableIndexer = tableIndexer->next;
@@ -58,16 +65,48 @@ const FileDescriptor* FileDescriptorTable::GetFd(std::uint8_t fd) const{
   return &tableIndexer->Entry(fd);
 }
 
-FileDescriptor* FileDescriptorTable::CreateNewFd(){
+FileDescriptor* FileDescriptorTable::Allocate(){
   TableChunk* tableIndexer = m_root;
-  if(tableIndexer && !tableIndexer->Full()){
-    std::uint8_t freeindex = tableIndexer->NextFree();
-    tableIndexer->Entry(freeindex) = FileDescriptor{freeindex};
-    return &tableIndexer->Entry(freeindex);
+  // first iterate through the existing table chunks to find a free fd
+  while(tableIndexer){
+    if(tableIndexer->Full()){
+      tableIndexer = tableIndexer->next;
+      continue;
+    }
+    else{
+      // we have a free table chunk
+      std::uint8_t freeindex = tableIndexer->NextFree();
+      tableIndexer->Entry(freeindex) = FileDescriptor{freeindex};
+      return &tableIndexer->Entry(freeindex);
+    }
   }
-  else{
-    return nullptr;
+  // no existing table was free, so allocate a new chunk
+  auto* newchunk = AllocateChunk();
+  std::uint8_t freeindex = newchunk->NextFree();
+  newchunk->Entry(freeindex) = FileDescriptor(freeindex);
+  return &newchunk->Entry(freeindex);
+}
+
+void FileDescriptorTable::Remove(std::uint8_t fd){
+  TableChunk* tableIndexer = m_root;
+  if(fd > TableEntries()){
+    tableIndexer = tableIndexer->next;
+    fd -= TableEntries();
   }
+  tableIndexer->Entry(fd).Reset();
+}
+
+std::size_t FileDescriptorTable::NumberOfChunks() const{
+  TableChunk* tableIndexer = m_root;
+  std::size_t count = 0;
+  if(!tableIndexer){
+    return count;
+  }
+  while(tableIndexer->next){
+    tableIndexer = tableIndexer->next;
+    count++;
+  }
+  return count;
 }
 
 }
