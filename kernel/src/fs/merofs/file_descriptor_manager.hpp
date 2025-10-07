@@ -1,0 +1,66 @@
+#include <cstdint>
+
+#include "memory/heap/allocator.hpp"
+#include "aii/array.hpp"
+
+namespace Fs::Merofs{
+
+struct FileDescriptor{
+  // immutable
+  // file descriptors starts at 1, 0 is the null value
+  static constexpr std::uint8_t NULLFD= 0;
+  public:
+    FileDescriptor(): m_fd{NULLFD}{}
+    FileDescriptor(std::uint8_t fd): m_fd{fd}{}
+
+    bool IsNull() const{ return m_fd == NULLFD;}
+    std::uint8_t Get() const{ return m_fd;}
+
+  private:
+    std::uint8_t m_fd;
+};
+
+struct FileDescriptorTable{
+  struct TableChunk{
+    // uses a linked list of table entries
+      static constexpr std::uint8_t entries = 32;
+    public:
+      TableChunk();
+      ~TableChunk();
+
+    public:
+      TableChunk* prev;
+      TableChunk* next;
+      Aii::Array<FileDescriptor, entries> table;
+  };
+
+  public:
+    FileDescriptorTable();
+    ~FileDescriptorTable();
+    bool Full() const{ return m_full;}
+    std::size_t MaxEntries() const{ return m_maxEntries;}
+
+    const FileDescriptor* GetFd(std::uint8_t fd) const;
+    void InsertFd();
+
+  private:
+    void AllocateChunk();
+
+  private:
+    TableChunk* m_root;
+    std::size_t m_maxEntries;
+    bool m_full;
+};
+
+struct FileDescriptorManager{
+  public:
+    FileDescriptorManager() = default;
+
+    void InsertFd();
+    const FileDescriptor* GetFd(std::uint8_t fd) const;
+
+  private:
+    FileDescriptorTable fdtable;
+};
+
+}
