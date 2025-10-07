@@ -38,6 +38,19 @@ namespace Mem::Heap::Allocator{
   void* Allocate(std::size_t bytes);
   void Deallocate(void* pobj);
 
+  // heap management w.r.t types
+  template<typename T>  
+  T* New(){ 
+    T* alloc = static_cast<T*>(Allocate(sizeof(T)));
+    alloc = new(alloc) T;
+    return alloc;
+  }
+
+  template<typename T>  
+  void Delete(T* pobj){
+    Deallocate(pobj);
+  }
+
   // Todo:
   //  NewBuffer from low memory address
   //  Allocate from low memory address
