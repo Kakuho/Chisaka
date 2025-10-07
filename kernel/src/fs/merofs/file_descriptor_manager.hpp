@@ -28,9 +28,24 @@ struct FileDescriptorTable{
       TableChunk();
       ~TableChunk();
 
+      bool Full() const{ return used == entries;}
+      std::uint8_t NextFree() const;
+
+      FileDescriptor& Entry(std::uint8_t index){
+        return table[index];
+      }
+
+      const FileDescriptor& Entry(std::uint8_t index) const{
+        return table[index];
+      }
+
+      FileDescriptor& operator[](std::uint8_t index){ return Entry(index); }
+      const FileDescriptor& operator[](std::uint8_t index) const{ return table[index];}
+
     public:
       TableChunk* prev;
       TableChunk* next;
+      std::uint8_t used;
       Aii::Array<FileDescriptor, entries> table;
   };
 
@@ -41,7 +56,9 @@ struct FileDescriptorTable{
     std::size_t MaxEntries() const{ return m_maxEntries;}
 
     const FileDescriptor* GetFd(std::uint8_t fd) const;
-    void InsertFd();
+    FileDescriptor* CreateNewFd();
+
+    constexpr std::uint8_t TableEntries() const{ return TableChunk::entries;}
 
   private:
     void AllocateChunk();
