@@ -15,6 +15,14 @@ struct AhciPort{
     volatile std::uint32_t intStat;
     volatile std::uint32_t intEnable;
     volatile std::uint32_t cmd;
+    volatile std::uint32_t rsv;
+    volatile std::uint32_t tfd;
+    volatile std::uint32_t sig;
+    volatile std::uint32_t ssts;
+    volatile std::uint32_t sctl;
+    volatile std::uint32_t serr;
+    volatile std::uint32_t sact;
+    volatile std::uint32_t ci;
   };
 
   // useful constants for the command status registers
@@ -36,16 +44,17 @@ struct AhciPort{
     void SetFisB(std::uint32_t addr){ m_registers->fisb = addr;}
     void SetFisB(std::uint64_t addr){ m_registers->fisb = addr;}
     volatile std::uint32_t& CommandStatus(){ return m_registers->cmd;}
-  
-    bool Idle();
+    // a few other registers...
+    void ClearSERR();
 
+    bool Idle();
     void ForceIdle();
 
-  private:
+    void EnableFRE();
+    void DisableFRE();
 
-
   private:
-    PortRegisters* m_registers;
+    volatile PortRegisters* m_registers;
     bool m_present;
 };
 

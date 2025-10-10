@@ -27,6 +27,9 @@ void AhciDriver::Initialise(){
     ForceHbaIdle();
   }
   kout << "Hba is idle... \n";
+  EnablePortsFRE();
+  ClearPortsSERR();
+  EnableInterrupts();
 }
 
 void AhciDriver::InitAbar(){
@@ -127,6 +130,28 @@ void AhciDriver::Enable(){
   return;
 }
 
+void AhciDriver::EnablePortsFRE(){
+  // set the ports fis recieved enable bit
+  for(std::uint32_t i = 0; i < MAX_PORTS; i++){
+    if(Port(i).Present()){
+      Port(i).EnableFRE();
+    }
+  }
+}
+
+void AhciDriver::DisablePortsFRE(){
+  // set the ports fis recieved enable bit
+  for(std::uint32_t i = 0; i < MAX_PORTS; i++){
+    if(Port(i).Present()){
+      Port(i).DisableFRE();
+    }
+  }
+}
+
+void AhciDriver::EnableInterrupts(){
+
+}
+
 void AhciDriver::ResetController(){
   kout << "Resetting the Ahci Controller..." << '\n';
   kassert(Present());
@@ -162,6 +187,15 @@ void AhciDriver::ForceHbaIdle(){
         Port(i).ForceIdle();
         kout << "Port " << i << " is now idle" << '\n';
       }
+    }
+
+  }
+}
+
+void AhciDriver::ClearPortsSERR(){
+  for(std::uint8_t i = 0; i < MAX_PORTS; i++){
+    if(Port(i).Present()){
+      Port(i).ClearSERR();
     }
   }
 }

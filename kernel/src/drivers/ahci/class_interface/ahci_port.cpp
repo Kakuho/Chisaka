@@ -19,6 +19,10 @@ bool AhciPort::Idle(){
   return true;
 }
 
+void AhciPort::ClearSERR(){
+  m_registers->serr = 0;
+}
+
 void AhciPort::ForceIdle(){
   volatile std::uint32_t cmdstatus = CommandStatus();
   // Checking CMD_ST -> and CMD_CR
@@ -51,6 +55,18 @@ void AhciPort::ForceIdle(){
       kout << "CMD.FR is not cleared..." << '\n';
     }
   }
+}
+
+void AhciPort::EnableFRE(){
+  // set the FIS Recieved Enable bit
+  volatile std::uint32_t& cmdstatus = CommandStatus();
+  cmdstatus |= CMD_FRE;
+}
+
+void AhciPort::DisableFRE(){
+  // clear the FIS Recieved Enable bit
+  volatile std::uint32_t& cmdstatus = CommandStatus();
+  cmdstatus &= ~CMD_FRE;
 }
 
 }

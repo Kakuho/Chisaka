@@ -28,6 +28,10 @@ struct AhciDriver{
   }; static_assert(sizeof(HostRegisters) == 4*4);
 
   constexpr static std::uint32_t MAX_PORTS = 32;
+  constexpr static std::uint64_t COMMANDLIST_START = 0x100000000;
+  constexpr static std::uint64_t FIS_START = 0x123000000;
+  constexpr static std::uint64_t HBA_RAM_START = COMMANDLIST_START;
+  constexpr static std::uint64_t HBA_RAM_END = FIS_START + 32*sizeof(RecievedFis);
 
   public:
     AhciDriver();
@@ -50,6 +54,9 @@ struct AhciDriver{
     void Enable();
     void Disable();
 
+    void EnableInterrupts();
+    void DisableInterrupts();
+
     void ResetController();
 
     bool HbaIdle();
@@ -66,12 +73,16 @@ struct AhciDriver{
     void InitPorts();
     void InitMemory();
 
+    void EnablePortsFRE();
+    void DisablePortsFRE();
+    void ClearPortsSERR();
+
   private:
     bool m_present;
     bool m_enabled;
     std::uint64_t m_abar;
     std::uint64_t m_mmioBase;
-    HostRegisters* m_hostregs;
+    volatile HostRegisters* m_hostregs;
     Aii::Array<AhciPort, 32> m_ports;
 };
 
