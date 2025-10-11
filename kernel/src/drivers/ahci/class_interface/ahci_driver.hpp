@@ -21,47 +21,79 @@ namespace Drivers::Ahci{
 
 struct AhciDriver{
   struct [[gnu::packed]] HostRegisters{
-    std::uint32_t cap;    // host capabilities
-    std::uint32_t ghc;    // global host control
-    std::uint32_t is;     // interrupt status
-    std::uint32_t pi;     // ports implemented
+    volatile std::uint32_t cap;    // host capabilities
+    volatile std::uint32_t ghc;    // global host control
+    volatile std::uint32_t is;     // interrupt status
+    volatile std::uint32_t pi;     // ports implemented
   }; static_assert(sizeof(HostRegisters) == 4*4);
 
   constexpr static std::uint32_t MAX_PORTS = 32;
+
+  // useful for troubleshooting the driver by giving fixed addresses
   constexpr static std::uint64_t COMMANDLIST_START = 0x100000000;
   constexpr static std::uint64_t FIS_START = 0x123000000;
   constexpr static std::uint64_t HBA_RAM_START = COMMANDLIST_START;
   constexpr static std::uint64_t HBA_RAM_END = FIS_START + 32*sizeof(RecievedFis);
+
+  enum CAP_FLAGS: std::uint32_t{
+    S64A = 0x8000'0000,
+    SNCQ = 0x4000'0000,
+    SSNTF = 0x2000'0000,
+    SAM = 0x0001'0000,
+    NCS = 0x1F00
+  };
 
   public:
     AhciDriver();
 
     bool Present() const { return m_present;}
     bool& AhciEnabled(){ return m_enabled;}
-    std::uint64_t Abar(){ return m_abar;}
-    std::uint64_t MMIOBase(){ return m_mmioBase;}
+    std::uint64_t Abar() const{ return m_abar;}
+
+    std::uint64_t MMIOBase() const{ return m_mmioBase;}
     AhciPort& Port(std::uint32_t index){ return m_ports[index];}
+    Aii::Array<AhciPort, MAX_PORTS>& GetPorts()
+    { return m_ports;}
 
     // host registers
-    std::uint32_t Capabilites(){ return m_hostregs->cap;}
+    std::uint32_t Capabilites() const{ return m_hostregs->cap;}
     void SetCapabilites(std::uint32_t val){ m_hostregs->cap = val;}
-    std::uint32_t Ghc(){ return m_hostregs->ghc;}
+    std::uint32_t Ghc() const{ return m_hostregs->ghc;}
     void SetGhc(std::uint32_t val){m_hostregs->ghc = val;}
     std::uint32_t Is(){ return m_hostregs->is;}
+    void ClearIs();
     void ClearIs(std::uint32_t index);
     std::uint32_t PortsImplemented(){ return m_hostregs->pi;}
 
     void Enable();
     void Disable();
+    void ResetController();
+
+    void ClearHBAInterruptStatus();
+    void EnableHBAInterrupts();
+    void DisableHBAInterrupts();
+
+    void ClearPortsInterruptStatus();
+    void EnablePortsInterrupts();
+    void DisablePortsInterrupts();
 
     void EnableInterrupts();
-    void DisableInterrupts();
-
-    void ResetController();
+    
+    std::uint32_t HBACommandSlots() const;
 
     bool HbaIdle();
     void ForceHbaIdle();
     void EnumerateImplementedPorts();
+
+    void StartDMAEngines();
+
+    void PrintPortDevicePresent();
+    void PrintCapabilities();
+
+    void Read(std::uint64_t address, char* buffer);
+    void Write(std::uint64_t address, char* buffer);
+
+    void ReadSector(std::uint64_t address);
 
   private:
     void Initialise();
@@ -69,8 +101,9 @@ struct AhciDriver{
 
     void InitAbar();
     void InitMMIOBase();
-    void SetHostRegisters(HostRegisters* base);
+    void SetHostRegisters(HostRegisters* hostregs){ m_hostregs = hostregs;}
     void InitPorts();
+    void SetPortDevices();
     void InitMemory();
 
     void EnablePortsFRE();
@@ -83,7 +116,7 @@ struct AhciDriver{
     std::uint64_t m_abar;
     std::uint64_t m_mmioBase;
     volatile HostRegisters* m_hostregs;
-    Aii::Array<AhciPort, 32> m_ports;
+    Aii::Array<AhciPort, MAX_PORTS> m_ports;
 };
 
 }

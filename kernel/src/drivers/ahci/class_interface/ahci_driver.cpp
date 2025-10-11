@@ -13,41 +13,26 @@ AhciDriver::AhciDriver()
 void AhciDriver::Initialise(){
   InitPresent();
   if(!Present()){
-    kout << "Ahci driver is not present...\n";
+    kout << intmode::hex << "Ahci driver is not present...\n";
   }
   kout <<"Initialising Ahci...\n";
   InitAbar();
   InitMMIOBase();
-  InitPorts();
-  InitMemory();
   Enable();
   ResetController();
+  kout << "HBA Command Slots: " << HBACommandSlots() << '\n';
   if(!HbaIdle()){
     kout << "Hba is not idle... forcing to idle...\n";
     ForceHbaIdle();
   }
   kout << "Hba is idle... \n";
+  InitPorts();
+  InitMemory();
   EnablePortsFRE();
   ClearPortsSERR();
+  SetPortDevices();
   EnableInterrupts();
-}
-
-void AhciDriver::InitAbar(){
-  kassert(Present());
-  Pci::ioaddr32_t abarOffset = Pci::FormConfigAddress(1, 0, 31, 2, 0x24);
-  outl(Pci::CONFIG_ADDRESS, abarOffset);
-  const std::uint32_t abar = inl(Pci::CONFIG_DATA);
-  m_abar = abar;
-}
-
-void AhciDriver::InitMMIOBase(){
-  kassert(Present());
-  Pci::ioaddr32_t abarOffset = Pci::FormConfigAddress(1, 0, 31, 2, 0x24);
-  outl(Pci::CONFIG_ADDRESS, abarOffset);
-  const std::uint32_t abar = inl(Pci::CONFIG_DATA);
-  const std::uint32_t base = (abar >> 8) << 8;
-  m_mmioBase = base;
-  SetHostRegisters(reinterpret_cast<HostRegisters*>(m_mmioBase));
+  StartDMAEngines();
 }
 
 void AhciDriver::InitPresent(){
@@ -60,12 +45,33 @@ void AhciDriver::InitPresent(){
   kassert(baseClass == 0x1);
   kassert(subClass == 0x06);
   kassert(programmingInterface == 0x01);
-  if((baseClass != 0x1) && (subClass != 0x06) && (programmingInterface != 0x01)){
+  // pci spec for the values
+  if((baseClass == 0x1) && (subClass == 0x06) && (programmingInterface == 0x01)){
     m_present = true;
   }
   else{
     m_present = false;
   }
+}
+
+void AhciDriver::InitAbar(){
+  kassert(Present());
+  Pci::ioaddr32_t abarOffset = Pci::FormConfigAddress(1, 0, 31, 2, 0x24);
+  outl(Pci::CONFIG_ADDRESS, abarOffset);
+  const std::uint32_t abar = inl(Pci::CONFIG_DATA);
+  kout << intmode::hex << "abar: " << abar << '\n';
+  m_abar = abar;
+}
+
+void AhciDriver::InitMMIOBase(){
+  kassert(Present());
+  Pci::ioaddr32_t abarOffset = Pci::FormConfigAddress(1, 0, 31, 2, 0x24);
+  outl(Pci::CONFIG_ADDRESS, abarOffset);
+  const std::uint32_t abar = inl(Pci::CONFIG_DATA);
+  const std::uint32_t base = (abar >> 8) << 8;
+  kout << intmode::hex << "hba mmio base: " << base << '\n';
+  m_mmioBase = base;
+  SetHostRegisters(reinterpret_cast<HostRegisters*>(m_mmioBase));
 }
 
 void AhciDriver::EnumerateImplementedPorts(){
@@ -84,9 +90,25 @@ void AhciDriver::InitPorts(){
   const std::uint32_t piVal = PortsImplemented();
   for(std::uint8_t i = 0; i < 32; i++){
     if(piVal & (1 << i)){
+      kout << "Port " << i << " Present\n";
       std::uint32_t portmmiobase = MMIOBase() + 0x100 + (0x80*i);
       m_ports[i].SetMMIOBase(reinterpret_cast<AhciPort::PortRegisters*>(portmmiobase));
       m_ports[i].SetPresent();
+    }
+  }
+}
+
+void AhciDriver::SetPortDevices(){
+  kassert(AhciEnabled());
+  for(std::uint8_t i = 0; i < MAX_PORTS; i++){
+    if(Port(i).Present()){
+      if(Port(i).HasDevice()){
+        kout << "Port " << i << "Has Device\n";
+        Port(i).SetDevicePresent();
+      }
+      else{
+        kout << "Port " << i << "Has no device\n";
+      }
     }
   }
 }
@@ -104,8 +126,18 @@ void AhciDriver::InitMemory(){
       kassert(reinterpret_cast<std::uintptr_t>(portFisBase) % 0x100 == 0);
       Port(i).SetCLB(reinterpret_cast<std::uintptr_t>(portFisBase));
       kout << "Finished Setting up Memory for Port " << i << '\n';
+
+      kout << "Port " << i 
+           << " Command List Base: " << reinterpret_cast<std::uintptr_t>(portCommandBase) 
+           << '\n'
+           << "Fis Base: " << reinterpret_cast<std::uintptr_t>(portFisBase) << '\n';
+          
     }
   }
+}
+
+void AhciDriver::ClearIs(){
+  m_hostregs->is = 0;
 }
 
 void AhciDriver::ClearIs(std::uint32_t index){
@@ -148,8 +180,58 @@ void AhciDriver::DisablePortsFRE(){
   }
 }
 
-void AhciDriver::EnableInterrupts(){
+// Interrupts
 
+void AhciDriver::ClearHBAInterruptStatus(){
+  kassert(AhciEnabled());
+  ClearIs();
+  kout << "Hba IS Cleared" << '\n';
+}
+
+void AhciDriver::EnableHBAInterrupts(){
+  kassert(AhciEnabled());
+  SetGhc(Ghc() | 0b10);
+  kout << "Host Interrupts Enabled" << '\n';
+}
+
+void AhciDriver::DisableHBAInterrupts(){
+  kassert(AhciEnabled());
+  SetGhc(Ghc() & ~0b10);
+  kout << "Host Interrupts Disabled" << '\n';
+}
+
+void AhciDriver::ClearPortsInterruptStatus(){
+  kassert(AhciEnabled());
+  for(std::uint8_t i = 0; i < MAX_PORTS; i++){
+    if(Port(i).Present()){
+      Port(i).ClearInterruptStatus();
+    }
+  }
+}
+
+void AhciDriver::EnablePortsInterrupts(){
+  kassert(AhciEnabled());
+  for(std::uint8_t i = 0; i < MAX_PORTS; i++){
+    if(Port(i).Present()){
+      Port(i).EnableInterrupts();
+    }
+  }
+}
+
+void AhciDriver::DisablePortsInterrupts(){
+  kassert(AhciEnabled());
+  for(std::uint8_t i = 0; i < MAX_PORTS; i++){
+    if(Port(i).Present()){
+      Port(i).DisableInterrupts();
+    }
+  }
+}
+
+void AhciDriver::EnableInterrupts(){
+  ClearPortsInterruptStatus();
+  ClearHBAInterruptStatus();
+  EnablePortsInterrupts();
+  EnableHBAInterrupts();
 }
 
 void AhciDriver::ResetController(){
@@ -160,6 +242,11 @@ void AhciDriver::ResetController(){
     ;;
   }
   kout << "Finished Resetting the Ahci Controller" << '\n';
+}
+
+std::uint32_t AhciDriver::HBACommandSlots() const{
+  volatile std::uint32_t cap = Capabilites();
+  return cap & NCS >> 8;
 }
 
 bool AhciDriver::HbaIdle(){
@@ -193,11 +280,65 @@ void AhciDriver::ForceHbaIdle(){
 }
 
 void AhciDriver::ClearPortsSERR(){
+  kassert(AhciEnabled());
   for(std::uint8_t i = 0; i < MAX_PORTS; i++){
     if(Port(i).Present()){
       Port(i).ClearSERR();
     }
   }
+}
+
+void AhciDriver::StartDMAEngines(){
+  kassert(AhciEnabled());
+  for(std::uint8_t i = 0; i < 32; i++){
+    if(Port(i).Present() && Port(i).DevicePresent()){
+      Port(i).EnableDMAEngine();
+      if(Port(i).DmaRunning()){
+        kout << "Port " << i << " DMA Engine Started" << '\n';
+      }
+      else{
+        kout << "Failed to start Port " << i << " DMA Engine" << '\n';
+      }
+    }
+  }
+}
+
+void AhciDriver::PrintPortDevicePresent(){
+  kassert(AhciEnabled());
+  for(std::uint8_t i = 0; i < MAX_PORTS; i++){
+    if(Port(i).Present() && Port(i).DevicePresent()){
+      kout << "Port " << i << " has device present" << '\n';
+    }
+  }
+}
+
+void AhciDriver::PrintCapabilities(){
+  kassert(AhciEnabled());
+  // For now im just gonna get the obvious ones,
+  // later i will do complete enumeration
+  const volatile std::uint32_t cap = Capabilites();
+  kout << "Cap: " << cap << '\n';
+  kout << "Enumerating Capabilities" << '\n';
+  // Bit flags
+  if(cap & CAP_FLAGS::S64A){
+    kout << "Supports 64-bit Addressing" << '\n';
+  }
+  if(cap & CAP_FLAGS::SNCQ){
+    kout << "Supports Native Command Queueing" << '\n';
+  }
+  if(cap & CAP_FLAGS::SSNTF){
+    kout << "Supports SNotification Register" << '\n';
+  }
+  if(cap & CAP_FLAGS::SAM){
+    kout << "Supports AHCI Mode Only" << '\n';
+  }
+  // Quantities
+  kout << "Number of ports: " << (cap & 0x1F) << '\n'
+       << "Number of Command Slots: " << ((cap & NCS) >> 8) << '\n';
+}
+
+void AhciDriver::ReadSector(std::uint64_t address){
+
 }
 
 }
