@@ -4,18 +4,24 @@
 
 #include "ahci_port.hpp"
 
-#include "drivers/ahci/structs/command_list.hpp"
 #include "drivers/ahci/structs/recieved_fis.hpp"
+#include "drivers/ahci/structs/command_table.hpp"
+#include "drivers/ahci/structs/command_list.hpp"
+#include "drivers/ahci/structs/command_header.hpp"
 
-#include "aii/array.hpp"
-
-#include "kmalloc.hpp"
-#include "kassert.hpp"
+#include "drivers/sata/fis/h2d_register.hpp"
 
 #include "drivers/pci/constants.hpp"
 #include "drivers/pci/pci.hpp"
 #include "drivers/serial/kostream.hpp"
+
+#include "kmalloc.hpp"
+#include "kassert.hpp"
+
 #include "memory/address.hpp"
+#include "memory/heap/allocator.hpp"
+
+#include "aii/array.hpp"
 
 namespace Drivers::Ahci{
 
@@ -90,10 +96,16 @@ struct AhciDriver{
     void PrintPortDevicePresent();
     void PrintCapabilities();
 
-    void Read(std::uint64_t address, char* buffer);
-    void Write(std::uint64_t address, char* buffer);
+    void WriteSector(std::uint8_t port, std::uint64_t sector, std::uint8_t* ibuffer);
+    void ReadSector(std::uint8_t port, std::uint64_t address, std::uint8_t* buffer);
 
-    void ReadSector(std::uint64_t address);
+    /*
+     * todo: read and write to multiple sectors
+    void WriteSector(std::uint8_t port, std::uint64_t base, 
+                     std::uint8_t count, std::uint8_t* buffer);
+    void ReadSector(std::uint8_t port, std::uint64_t base, 
+                    std::uint8_t count, std::uint8_t* buffer);
+    */
 
   private:
     void Initialise();

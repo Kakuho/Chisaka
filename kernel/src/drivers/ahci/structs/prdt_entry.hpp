@@ -66,7 +66,7 @@ constexpr PrdtEntry::PrdtEntry(void* dataBase, bool interrupt, std::uint32_t dat
   SetWord3(interrupt, dataSize);
 }
 
-void PrdtEntry::SetDataBaseAddress(void* data){
+inline void PrdtEntry::SetDataBaseAddress(void* data){
   std::uint64_t addr = reinterpret_cast<std::uint64_t>(data);
   kassert((addr & 0x1) == 0);
   m_dba = addr & 0xFFFF'FFFF;

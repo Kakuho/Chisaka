@@ -1,4 +1,6 @@
 #include "ahci_driver.hpp"
+#include "drivers/sata/fis/h2d_register.hpp"
+#include "memory/heap/allocator.hpp"
 #include <cstdint>
 
 namespace Drivers::Ahci{
@@ -337,8 +339,77 @@ void AhciDriver::PrintCapabilities(){
        << "Number of Command Slots: " << ((cap & NCS) >> 8) << '\n';
 }
 
-void AhciDriver::ReadSector(std::uint64_t address){
+void AhciDriver::WriteSector(
+    std::uint8_t port, 
+    std::uint64_t sector, 
+    std::uint8_t* ibuffer
+){
+  auto writeFis = Sata::Fis::H2DRegister::Frame::CreateWriteFrame(sector);
+  // create the command table
+  auto cmdtable = Mem::Heap::Allocator::New<CommandTable>();
+  cmdtable->SetCommandFis(writeFis);
+  cmdtable->SetPrdtEntry(0,
+      PrdtEntry{reinterpret_cast<void*>(ibuffer), true, 511}
+  );
 
+  // set the new command header
+  auto cmdheader = CommandHeader{cmdtable,
+    1,
+    0b0000'0'100,
+    0b010'00101,
+  };
+
+  // now perform the logic to read / write
+  int freeSlot = Port(port).EmptyCommandSlot();
+  auto cmdlist = Port(port).CommandListPtr();
+  cmdlist->m_headers[freeSlot] = cmdheader;
+  Port(port).IssueCommand(freeSlot);
+
+  // Now we need to wait for the command to finish
+  while(Port(port).CommandSlotSet(freeSlot)){
+    // spin lol
+    ;;
+  }
+
+  Mem::Heap::Allocator::Delete(cmdtable);
+  kout << "Ahci Driver Written to Sector" << sector << '\n'; 
 }
+
+void AhciDriver::ReadSector(
+    std::uint8_t port, 
+    std::uint64_t sector, 
+    std::uint8_t* ibuffer
+){
+  auto readFis = Sata::Fis::H2DRegister::Frame::CreateReadFrame(sector);
+  // create the command table
+  auto cmdtable = Mem::Heap::Allocator::New<CommandTable>();
+  cmdtable->SetCommandFis(readFis);
+  cmdtable->SetPrdtEntry(0,
+      PrdtEntry{reinterpret_cast<void*>(ibuffer), true, 511}
+  );
+
+  // set the new command header
+  auto cmdheader = CommandHeader{cmdtable,
+    1,
+    0b0000'0'100,
+    0b010'00101,
+  };
+
+  // now perform the logic to read / write
+  int freeSlot = Port(port).EmptyCommandSlot();
+  auto cmdlist = Port(port).CommandListPtr();
+  cmdlist->m_headers[freeSlot] = cmdheader;
+  Port(port).IssueCommand(freeSlot);
+
+  // Now we need to wait for the command to finish
+  while(Port(port).CommandSlotSet(freeSlot)){
+    // spin lol
+    ;;
+  }
+
+  Mem::Heap::Allocator::Delete(cmdtable);
+  kout << "Ahci Driver Read Sector " << sector << '\n';
+}
+
 
 }

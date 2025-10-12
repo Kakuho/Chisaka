@@ -16,6 +16,7 @@
 #include "memory/address.hpp"
 
 #include "aii/string.h"
+#include "memory/heap/allocator.hpp"
 
 namespace Drivers::Ahci::Class::Sample{
 inline Sata::Fis::H2DRegister::Frame CreateDmaWriteFrame(){
@@ -41,37 +42,31 @@ inline Sata::Fis::H2DRegister::Frame CreateDmaWriteFrame(){
   return dmaWriteFis;
 }
 
-inline std::uint8_t* CreateDataArea(){
+inline std::uint8_t* CreateDataAreaFixed(){
   // Setup Buffer - What do you want to write and how much data?
   std::uint8_t* dataArea = reinterpret_cast<std::uint8_t*>(DATABUFFER_ADDR);
   Aii::Memset(dataArea, 0, 512);
-  dataArea[0] = 0b01001110;
-  dataArea[1] = 0b01111001;
-  dataArea[2] = 0b01100001; 
-  dataArea[3] = 0b01101110;
-  dataArea[4] = 0b01100100;
-  dataArea[5] = 0b01100101;
-  dataArea[6] = 0b01110010;
-  dataArea[7] = 0b01100110;
-  dataArea[8] = 0b01110101;
-  dataArea[9] = 0b01101100;
-  dataArea[10] = 0b00100000;
-  dataArea[11] = 0b01001110;
-  dataArea[12] = 0b01111001;
-  dataArea[13] = 0b01100001;
-  dataArea[14] = 0b01101110;
-  dataArea[15] = 0b00100000;
-  dataArea[16] = 0b01001110;
-  dataArea[17] = 0b01111001;
-  dataArea[18] = 0b01100001;
-  dataArea[19] = 0b01101110;
+  dataArea[0] = 0b01001101; 
+  dataArea[1] = 0b01100101;
+  dataArea[2] = 0b01110010;
+  dataArea[3] = 0b01101111; 
+  dataArea[4] = 0b00100000; 
+  dataArea[5] = 0b01001101;
+  dataArea[6] = 0b01100101;
+  dataArea[7] = 0b01110010; 
+  dataArea[8] = 0b01101111;
+  dataArea[9] = 0b00100000;
+  dataArea[10] = 0b01001101; 
+  dataArea[11] = 0b01100101; 
+  dataArea[12] = 0b01110010;
+  dataArea[13] = 0b01101111;
+  dataArea[14] = 0b00100001;
   // there ought to be a much better way to do this no?
   return dataArea;
 }
 
-inline std::uint8_t* CreateDataArea_Mero(){
+inline std::uint8_t* SetDataArea(std::uint8_t* dataArea){
   // Setup Buffer - What do you want to write and how much data?
-  std::uint8_t* dataArea = reinterpret_cast<std::uint8_t*>(DATABUFFER_ADDR);
   Aii::Memset(dataArea, 0, 512);
   dataArea[0] = 0b01001101; 
   dataArea[1] = 0b01100101;
@@ -185,7 +180,7 @@ inline void WriteRead(){
   auto ahciPorts = ahcidriver.GetPorts();
 
   auto writeFrame = CreateDmaWriteFrame();
-  std::uint8_t* dataArea = CreateDataArea_Mero();
+  std::uint8_t* dataArea = CreateDataAreaFixed();
   CommandTable* commandTable = CreateCommandTable(writeFrame, dataArea);
   CommandHeader cmdHead = CreateCommandHeader(commandTable);
 
@@ -201,12 +196,12 @@ inline void WriteRead(){
     ;;
   }
 
-
   kout << "We've written stuff!" << '\n';
 
   ResetDataArea(dataArea);
   kout << "Prior: " << '\n';
   PrintDataArea(dataArea);
+
 
   //-------------------------------------------------------------
   //
@@ -227,6 +222,33 @@ inline void WriteRead(){
   }
 
   kout << "Read Finish, Data Area: " << '\n';
+  PrintDataArea(dataArea);
+}
+
+inline void WriteRead_AhciFuncs(){
+  // Aim: Try to issue Write to the device
+
+  const std::uint8_t PORT_NUMBER = 0;
+
+  // Required to Perform BIOS OS Handoff??
+
+  Mem::PageAllocator::Initialise();
+  Mem::Heap::Allocator::Initialise();
+  AhciDriver ahcidriver{};
+  ahcidriver.StartDMAEngines();
+
+  std::uint8_t* dataArea = static_cast<std::uint8_t*>(Mem::Heap::Allocator::Allocate(512));
+  SetDataArea(dataArea);
+
+  ahcidriver.WriteSector(PORT_NUMBER, 0, dataArea);
+
+  ResetDataArea(dataArea);
+  kout << "Prior: " << '\n';
+  PrintDataArea(dataArea);
+
+  kout << "Attemping to read Sata Disk sector 0 into data area..." << '\n';
+
+  ahcidriver.ReadSector(PORT_NUMBER, 0, dataArea);
   PrintDataArea(dataArea);
 }
 

@@ -22,6 +22,7 @@
 
 #include "fis_types.hpp"
 #include "args.hpp"
+#include "lib.hpp"
 
 namespace Drivers::Sata::Fis::H2DRegister{
 
@@ -45,6 +46,49 @@ class Frame{
   public:
     constexpr Frame(Initialiser&& src) noexcept;
     constexpr Frame();
+
+    static Frame CreateWriteFrame(std::uint64_t sector_address){
+      static constexpr std::uint8_t DMA_WRITE_EXT_CODE = 0x35;
+      auto addresses = ExtractAddress(sector_address);
+
+      Sata::Fis::H2DRegister::Frame dmaWriteFis{};
+      kassert(dmaWriteFis.m_type == 0x27);
+      dmaWriteFis.m_sectorCountReg = 1;
+      // LBA
+      dmaWriteFis.m_lbaLowReg0    = std::get<2>(addresses) & 0xFF;
+      dmaWriteFis.m_lbaLowReg1    = std::get<2>(addresses) >> 8;
+      dmaWriteFis.m_lbaMidReg0    = std::get<1>(addresses) & 0xFF;
+      dmaWriteFis.m_lbaMidReg1    = std::get<1>(addresses) >> 8;
+      dmaWriteFis.m_lbaHighReg0   = std::get<0>(addresses) & 0xFF;
+      dmaWriteFis.m_lbaHighReg1   = std::get<0>(addresses) >> 8;
+      // Rest of the features
+      dmaWriteFis.m_deviceReg = 0x40;
+      dmaWriteFis.m_c_portMultiplier = 0x80;
+      dmaWriteFis.m_commandReg = DMA_WRITE_EXT_CODE;
+      return dmaWriteFis;
+    }
+
+    static Frame CreateReadFrame(std::uint64_t sector_address){
+      static constexpr std::uint8_t DMA_READ_EXT_CODE = 0x25;
+      auto addresses = ExtractAddress(sector_address);
+
+      Sata::Fis::H2DRegister::Frame dmaReadFis{};
+      kassert(dmaReadFis.m_type == 0x27);
+      dmaReadFis.m_sectorCountReg = 1;
+      // LBA
+      dmaReadFis.m_lbaLowReg0    = std::get<2>(addresses) & 0xFF;
+      dmaReadFis.m_lbaLowReg1    = std::get<2>(addresses) >> 8;
+      dmaReadFis.m_lbaMidReg0    = std::get<1>(addresses) & 0xFF;
+      dmaReadFis.m_lbaMidReg1    = std::get<1>(addresses) >> 8;
+      dmaReadFis.m_lbaHighReg0   = std::get<0>(addresses) & 0xFF;
+      dmaReadFis.m_lbaHighReg1   = std::get<0>(addresses) >> 8;
+      // Rest of the features
+      dmaReadFis.m_deviceReg = 0x40;
+      dmaReadFis.m_c_portMultiplier = 0x80;
+      dmaReadFis.m_commandReg = DMA_READ_EXT_CODE;
+      return dmaReadFis;
+    }
+    
 
     //-------------------------------------------------------------
     //  Queries
