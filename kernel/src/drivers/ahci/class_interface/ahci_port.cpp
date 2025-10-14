@@ -128,6 +128,24 @@ std::uint64_t AhciPort::CommandListBaseAddr() const{
   return clbBase;
 }
 
+std::uint64_t AhciPort::RecievedFisBaseAddr() const{
+  volatile std::uint32_t fisLow = FisLow();
+  volatile std::uint32_t fisHigh = FisHigh();
+  std::uint64_t fisBase = 0;
+  /*
+  if(Supports64BitAddress()){
+    clbBase = clbHigh;
+    clbBase = (clbBase << 32) | clbLow;
+  }
+  else{
+    clbBase |= clbLow;
+  }
+  */
+  fisBase = fisLow;
+  return fisBase;
+}
+
+
 int AhciPort::EmptyCommandSlot(){
   // we check the device status (sata active) and the command issue bits to 
   // see if any are empty
@@ -155,6 +173,13 @@ bool AhciPort::CommandSlotSet(std::uint8_t slot) const{
   kassert(slot < 32);
   volatile const std::uint32_t& commandIssue = CommandIssue();
   return commandIssue & (1 << slot);
+}
+
+void AhciPort::WaitOnDHRS(){
+  static constexpr std::uint32_t DHRS_MASK = 1;
+  while(IE() & DHRS_MASK){
+
+  }
 }
 
 }

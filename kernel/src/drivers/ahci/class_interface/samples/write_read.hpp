@@ -10,13 +10,19 @@
 #include "drivers/ahci/structs/command_header.hpp"
 #include "drivers/ahci/structs/command_table.hpp"
 #include "drivers/ahci/structs/prdt_entry.hpp"
+#include "drivers/ahci/structs/recieved_fis.hpp"
 
 #include "drivers/sata/commands.hpp"
 #include "drivers/sata/fis/h2d_register.hpp"
+
+#include "x86_64/interrupts/controllers/pic.hpp"
+#include "x86_64/interrupts/interrupt_manager.hpp"
+#include "x86_64/segments/segment_manager.hpp"
+
 #include "memory/address.hpp"
+#include "memory/heap/allocator.hpp"
 
 #include "aii/string.h"
-#include "memory/heap/allocator.hpp"
 
 namespace Drivers::Ahci::Class::Sample{
 inline Sata::Fis::H2DRegister::Frame CreateDmaWriteFrame(){
@@ -235,12 +241,110 @@ inline void WriteRead_AhciFuncs(){
   Mem::PageAllocator::Initialise();
   Mem::Heap::Allocator::Initialise();
   AhciDriver ahcidriver{};
+
+  ahcidriver.StartDMAEngines();
+  std::uint8_t* dataArea = static_cast<std::uint8_t*>(Mem::Heap::Allocator::Allocate(512));
+  SetDataArea(dataArea);
+
+  volatile auto& rfis = ahcidriver.Port(PORT_NUMBER).RecievedFisPtr()->Rfis();
+
+  kout << "Fis Recieve Base: " << ahcidriver.Port(PORT_NUMBER).RecievedFisBaseAddr() << '\n';
+
+  kout << "Before:\n"
+       << "Device: " << rfis.Device() << '\n'
+       << "Status: " << rfis.Status() << '\n';
+
+  ahcidriver.ClearIs(PORT_NUMBER);
+  kout << "Is: " << ahcidriver.Is() << '\n';
+  ahcidriver.WriteSector(PORT_NUMBER, 0xFC003E + 0x20000, dataArea);
+  ahcidriver.WaitForPortInterrupt(PORT_NUMBER);
+  kout << "Is: " << ahcidriver.Is() << '\n';
+
+  kout << "After:\n"
+       << "Device: " << rfis.Device() << '\n'
+       << "Status: " << rfis.Status() << '\n';
+
+  /*
+  ResetDataArea(dataArea);
+  kout << "Prior: " << '\n';
+  PrintDataArea(dataArea);
+
+
+  kout << "Attemping to read Sata Disk sector 0 into data area..." << '\n';
+
+  ahcidriver.ReadSector(PORT_NUMBER, 0, dataArea);
+  PrintDataArea(dataArea);
+  */
+}
+
+void HandleDiskInterrupt(){
+  kout << "INTERRUPT Disk Interrupt occured" << '\n';
+  kassert(1 == 2);
+  return;
+}
+
+inline void WriteInterrupt(){
+  // Aim: Try to make the pic interrrupt
+  // ... not sure why it's not working
+  using namespace X8664;
+  const std::uint8_t PORT_NUMBER = 0;
+  const std::size_t SECTOR_NUMBER = 0xFC003E + 0x200000;
+
+  // memory init
+  Mem::PageAllocator::Initialise();
+  Mem::Heap::Allocator::Initialise();
+
+  // x86 init
+  SegmentManager segManager{};
+  segManager.LoadCurrent();
+  segManager.ReloadSegmentRegisters();
+  InterruptManager intManager{};
+  intManager.EnableInterrupts();
+
+  intManager.InstallISR(0x20, HandleDiskInterrupt);
+  intManager.InstallISR(0x21, HandleDiskInterrupt);
+  intManager.InstallISR(0x22, HandleDiskInterrupt);
+  intManager.InstallISR(0x23, HandleDiskInterrupt);
+  intManager.InstallISR(0x24, HandleDiskInterrupt);
+  intManager.InstallISR(0x25, HandleDiskInterrupt);
+  intManager.InstallISR(0x26, HandleDiskInterrupt);
+  intManager.InstallISR(0x27, HandleDiskInterrupt);
+  intManager.InstallISR(0x30, HandleDiskInterrupt);
+  intManager.InstallISR(0x31, HandleDiskInterrupt);
+  intManager.InstallISR(0x32, HandleDiskInterrupt);
+  intManager.InstallISR(0x33, HandleDiskInterrupt);
+  intManager.InstallISR(0x34, HandleDiskInterrupt);
+  intManager.InstallISR(0x35, HandleDiskInterrupt);
+  intManager.InstallISR(0x36, HandleDiskInterrupt);
+  intManager.InstallISR(0x37, HandleDiskInterrupt);
+
+  Interrupt::PicController picController{0x20, 0x30};
+
+  // Required to Perform BIOS OS Handoff??
+
+  AhciDriver ahcidriver{};
   ahcidriver.StartDMAEngines();
 
   std::uint8_t* dataArea = static_cast<std::uint8_t*>(Mem::Heap::Allocator::Allocate(512));
   SetDataArea(dataArea);
 
-  ahcidriver.WriteSector(PORT_NUMBER, 0, dataArea);
+  volatile auto& rfis = ahcidriver.Port(PORT_NUMBER).RecievedFisPtr()->Rfis();
+
+  kout << "Fis Recieve Base: " << ahcidriver.Port(PORT_NUMBER).RecievedFisBaseAddr() << '\n';
+
+  kout << "Before:\n"
+       << "Device: " << rfis.Device() << '\n'
+       << "Status: " << rfis.Status() << '\n'
+       << "i_pm: " << rfis.m_i_portMultiplier << '\n';
+
+  ahcidriver.WriteSector(PORT_NUMBER, SECTOR_NUMBER, dataArea);
+  //ahcidriver.Port(PORT_NUMBER).WaitOnDHRS();
+  ahcidriver.WaitForPortInterrupt(PORT_NUMBER);
+
+  kout << "After:\n"
+       << "Device: " << rfis.Device() << '\n'
+       << "Status: " << rfis.Status() << '\n'
+       << "i_pm: " << rfis.m_i_portMultiplier << '\n';
 
   ResetDataArea(dataArea);
   kout << "Prior: " << '\n';
@@ -249,6 +353,9 @@ inline void WriteRead_AhciFuncs(){
   kout << "Attemping to read Sata Disk sector 0 into data area..." << '\n';
 
   ahcidriver.ReadSector(PORT_NUMBER, 0, dataArea);
+
+  ahcidriver.WaitForPortInterrupt(PORT_NUMBER);
+
   PrintDataArea(dataArea);
 }
 

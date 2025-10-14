@@ -3,6 +3,7 @@
 #include <cstdint>
 
 #include "fixed_addresses.hpp"
+#include "../identify_device_buffer.hpp"
 
 #include "drivers/ahci/class_interface/ahci_driver.hpp"
 #include "drivers/ahci/structs/command_list.hpp"
@@ -39,6 +40,7 @@ void CheckCommandHeader(CommandHeader& header, void* tablePtr){
   kassert(header.CommandTableBase() == reinterpret_cast<std::uint64_t>(tablePtr));
 }
 
+
 void IdentifyDevice(){
   // Aim: Try to issue identify device to the device
   const std::uint8_t PORT_NUMBER = 0;
@@ -46,7 +48,8 @@ void IdentifyDevice(){
   // Required to Perform BIOS OS Handoff??
   Mem::PageAllocator::Initialise();
   Mem::Heap::Allocator::Initialise();
-  AhciDriver ahcidriver{};
+  AhciDriver& ahcidriver = AhciDriver::Get();
+  ahcidriver.Init();
   ahcidriver.StartDMAEngines();
 
   // Construct the Identify Device Fis
@@ -57,7 +60,7 @@ void IdentifyDevice(){
   identifyDeviceFis.m_c_portMultiplier = 0x80;
 
   // Setup Buffer - IDENTIFY DEVICE gives 256 words = 512 bytes
-  std::uint16_t* payloadBuffer = reinterpret_cast<std::uint16_t*>(DATABUFFER_ADDR);
+  auto* payloadBuffer = reinterpret_cast<IdentifyDeviceBuffer*>(DATABUFFER_ADDR);
   Aii::Memset(payloadBuffer, 0, 512);
   // 256 words
 
@@ -88,17 +91,54 @@ void IdentifyDevice(){
   ahcidriver.Port(PORT_NUMBER).IssueCommand(freeSlot);
 
   // Now we need to wait for the command to finish
-  while(true){
-    if(!ahcidriver.Port(PORT_NUMBER).CommandSlotSet(freeSlot)){
-      break;
-    }
+  while(ahcidriver.Port(PORT_NUMBER).CommandSlotSet(freeSlot)){
+    ;;
   }
+
   for(std::uint16_t i = 1; i < 256 + 1; i++){
-    kout << payloadBuffer[i-1] << ' ';
+    kout << payloadBuffer->buffer[i-1] << ' ';
     if(i % 32 == 0){
       kout << '\n';
     }
   }
+
+  kout << "Number of Addressable Logical Sectors: " << payloadBuffer->UserAccessibleSectors() << '\n';
+  kout << "Serial Number: ";
+  payloadBuffer->PrintSerialNumber(); 
+  kout << '\n';
+  payloadBuffer->PrintCHS();
+
+}
+
+void IdentifyDevice_MemFun(){
+  // Aim: Try to issue identify device to the device
+  const std::uint8_t PORT_NUMBER = 0;
+
+  // Required to Perform BIOS OS Handoff??
+  Mem::PageAllocator::Initialise();
+  Mem::Heap::Allocator::Initialise();
+  AhciDriver& ahcidriver = AhciDriver::Get();
+  ahcidriver.Init();
+  //ahcidriver.StartDMAEngines();
+
+  auto* payloadBuffer = Mem::Heap::Allocator::New<IdentifyDeviceBuffer>();
+  Aii::Memset(payloadBuffer, 0, 512);
+
+  ahcidriver.IdentifyDevice(PORT_NUMBER, payloadBuffer);
+
+  for(std::uint16_t i = 1; i < 256 + 1; i++){
+    kout << payloadBuffer->buffer[i-1] << ' ';
+    if(i % 32 == 0){
+      kout << '\n';
+    }
+  }
+
+  kout << "Number of Addressable Logical Sectors: " << payloadBuffer->UserAccessibleSectors() << '\n';
+  kout << "Serial Number: ";
+  payloadBuffer->PrintSerialNumber(); 
+  kout << '\n';
+  payloadBuffer->PrintCHS();
+
 }
 
 }

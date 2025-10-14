@@ -5,11 +5,18 @@
 
 namespace Drivers::Ahci{
 
+namespace{
+  AhciDriver ahciDriver;
+}
+
 AhciDriver::AhciDriver()
   :
     m_present{}
 {
-  Initialise();
+}
+
+AhciDriver& AhciDriver::Get(){
+  return ahciDriver;
 }
 
 void AhciDriver::Initialise(){
@@ -35,6 +42,7 @@ void AhciDriver::Initialise(){
   SetPortDevices();
   EnableInterrupts();
   StartDMAEngines();
+  InitDisks();
 }
 
 void AhciDriver::InitPresent(){
@@ -138,12 +146,20 @@ void AhciDriver::InitMemory(){
   }
 }
 
-void AhciDriver::ClearIs(){
-  m_hostregs->is = 0;
+void AhciDriver::InitDisks(){
+  for(std::uint8_t i = 0; i < MAX_PORTS; i++){
+    if(Port(i).Present()){
+      SetupDisk(i);
+    }
+  }
 }
 
-void AhciDriver::ClearIs(std::uint32_t index){
-  m_hostregs->is &= ~(1 << index);
+void AhciDriver::SetupDisk(std::uint8_t port){
+  m_disks[port] = AhciDisk{port};
+  // perform identify device, and then set its total sectors
+  auto* identbuffer = Mem::Heap::Allocator::New<IdentifyDeviceBuffer>();
+  IdentifyDevice(port, identbuffer);
+  m_disks[port].SetTotalSectors(identbuffer->NumSectors());
 }
 
 void AhciDriver::Enable(){
@@ -183,6 +199,14 @@ void AhciDriver::DisablePortsFRE(){
 }
 
 // Interrupts
+
+void AhciDriver::ClearIs(){
+  m_hostregs->is = 1;
+}
+
+void AhciDriver::ClearIs(std::uint32_t index){
+  m_hostregs->is |= (1 << index);
+}
 
 void AhciDriver::ClearHBAInterruptStatus(){
   kassert(AhciEnabled());
@@ -339,6 +363,56 @@ void AhciDriver::PrintCapabilities(){
        << "Number of Command Slots: " << ((cap & NCS) >> 8) << '\n';
 }
 
+void AhciDriver::WaitForPortInterrupt(std::uint8_t port){
+  //kout << "Is: " << Is() << '\n';
+  //kout << "Port IS: " << Port(port).IS() << '\n';
+
+  while(!(Is() & (1 << port))){
+  }
+  ClearIs(port);
+  Port(port).ClearInterruptStatus();
+
+  //kout << "Is: " << Is() << '\n';
+  //kout << "Port IS: " << Port(port).IS() << '\n';
+}
+
+// Disk operations
+
+void AhciDriver::IdentifyDevice(
+    std::uint8_t port, 
+    std::uint8_t* buffer
+){
+  auto identFis = Sata::Fis::H2DRegister::Frame::CreateIdentifyDeviceFrame();
+  // create the command table
+  auto* cmdtable = Mem::Heap::Allocator::New<CommandTable>();
+  cmdtable->SetCommandFis(identFis);
+  cmdtable->SetPrdtEntry(0,
+      PrdtEntry{reinterpret_cast<void*>(buffer), true, 511}
+  );
+
+  // set the new command header
+  auto cmdheader = CommandHeader{
+    cmdtable,
+    1,
+    0b0000'0'100,
+    0b100'00101,
+  };
+
+  // now perform the logic to read / write
+  int freeSlot = Port(port).EmptyCommandSlot();
+  auto cmdlist = Port(port).CommandListPtr();
+  cmdlist->m_headers[freeSlot] = cmdheader;
+  Port(port).IssueCommand(freeSlot);
+
+  // Now we need to wait for the command to finish
+  while(Port(port).CommandSlotSet(freeSlot)){
+    // spin lol
+    ;;
+  }
+
+  Mem::Heap::Allocator::Delete(cmdtable);
+}
+
 void AhciDriver::WriteSector(
     std::uint8_t port, 
     std::uint64_t sector, 
@@ -372,7 +446,7 @@ void AhciDriver::WriteSector(
   }
 
   Mem::Heap::Allocator::Delete(cmdtable);
-  kout << "Ahci Driver Written to Sector" << sector << '\n'; 
+  kout << "Ahci Driver Written to Sector " << sector << '\n'; 
 }
 
 void AhciDriver::ReadSector(
@@ -411,5 +485,22 @@ void AhciDriver::ReadSector(
   kout << "Ahci Driver Read Sector " << sector << '\n';
 }
 
+void AhciDriver::WriteSectorPolled(
+  std::uint8_t port, 
+  std::uint64_t sector, 
+  std::uint8_t* buffer
+){
+  WriteSector(port, sector, buffer);
+  WaitForPortInterrupt(port);
+}
+
+void AhciDriver::ReadSectorPolled(
+  std::uint8_t port, 
+  std::uint64_t sector, 
+  std::uint8_t* buffer
+){
+  ReadSector(port, sector, buffer);
+  WaitForPortInterrupt(port);
+}
 
 }

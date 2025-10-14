@@ -4,6 +4,8 @@
 
 #include "drivers/serial/kostream.hpp"
 #include "drivers/ahci/structs/command_list.hpp"
+#include "drivers/ahci/structs/recieved_fis.hpp"
+
 
 namespace Drivers::Ahci{
 
@@ -83,8 +85,15 @@ struct AhciPort{
     void DisableFRE();
     bool FisRecievedEnabled() const{ return m_fre;}
 
-    void ClearInterruptStatus(){IS() = 0;}
-    void EnableInterrupts(){IE() = ENABLE_ALL_INTS;}
+    void ClearInterruptStatus(){IS() = ENABLE_ALL_INTS;}
+
+    void ClearInterruptStatus(std::uint8_t index){
+      IS() |= 1 << index;}
+
+    void EnableInterrupts(){
+      IE() = ENABLE_ALL_INTS & 0xFFFF;
+      kassert(IE() & ENABLE_ALL_INTS & 0xFFFF);
+    }
     void DisableInterrupts(){IE() = 0;}
 
     bool Idle() const;
@@ -97,14 +106,21 @@ struct AhciPort{
     { return reinterpret_cast<CommandList*>(CommandListBaseAddr());}
     int EmptyCommandSlot();
 
+    std::uint64_t RecievedFisBaseAddr() const;
+    RecievedFis* RecievedFisPtr() const
+    { return reinterpret_cast<RecievedFis*>(RecievedFisBaseAddr());}
 
     std::uint8_t NumCommandSlots();
     void IssueCommand(std::uint8_t slot);
     bool CommandSlotSet(std::uint8_t slot) const;
 
+    void WaitOnDHRS();
+
   private:
     std::uint32_t CLBLow() const{return m_registers->clistb;}
     std::uint32_t CLBHigh() const{return m_registers->clistbu;}
+    std::uint32_t FisLow() const{return m_registers->fisb;}
+    std::uint32_t FisHigh() const{return m_registers->fisbu;}
 
   private:
     volatile PortRegisters* m_registers;

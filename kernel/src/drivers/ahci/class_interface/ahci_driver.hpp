@@ -3,6 +3,8 @@
 #include <cstdint>
 
 #include "ahci_port.hpp"
+#include "ahci_disk.hpp"
+#include "identify_device_buffer.hpp"
 
 #include "drivers/ahci/structs/recieved_fis.hpp"
 #include "drivers/ahci/structs/command_table.hpp"
@@ -24,6 +26,8 @@
 #include "aii/array.hpp"
 
 namespace Drivers::Ahci{
+
+struct AhciDiskPolled;
 
 struct AhciDriver{
   struct [[gnu::packed]] HostRegisters{
@@ -52,6 +56,8 @@ struct AhciDriver{
   public:
     AhciDriver();
 
+    static AhciDriver& Get();
+    void Init(){ Initialise();}
     bool Present() const { return m_present;}
     bool& AhciEnabled(){ return m_enabled;}
     std::uint64_t Abar() const{ return m_abar;}
@@ -60,6 +66,8 @@ struct AhciDriver{
     AhciPort& Port(std::uint32_t index){ return m_ports[index];}
     Aii::Array<AhciPort, MAX_PORTS>& GetPorts()
     { return m_ports;}
+
+    AhciDisk& Disk(std::uint8_t index){ return m_disks[index];}
 
     // host registers
     std::uint32_t Capabilites() const{ return m_hostregs->cap;}
@@ -96,8 +104,21 @@ struct AhciDriver{
     void PrintPortDevicePresent();
     void PrintCapabilities();
 
+    void WaitForPortInterrupt(std::uint8_t port);
+
+    // Disk Operations
+    void IdentifyDevice(std::uint8_t port, std::uint8_t* buffer);
+    void IdentifyDevice(std::uint8_t port, IdentifyDeviceBuffer* buffer){
+      IdentifyDevice(port, reinterpret_cast<std::uint8_t*>(buffer));
+    }
+
     void WriteSector(std::uint8_t port, std::uint64_t sector, std::uint8_t* ibuffer);
     void ReadSector(std::uint8_t port, std::uint64_t address, std::uint8_t* buffer);
+
+    void WriteSectorPolled(std::uint8_t port, std::uint64_t sector, 
+        std::uint8_t* buffer);
+    void ReadSectorPolled(std::uint8_t port, std::uint64_t address, 
+        std::uint8_t* buffer);
 
     /*
      * todo: read and write to multiple sectors
@@ -106,6 +127,8 @@ struct AhciDriver{
     void ReadSector(std::uint8_t port, std::uint64_t base, 
                     std::uint8_t count, std::uint8_t* buffer);
     */
+
+    AhciDiskPolled CreatePolledDisk(std::uint8_t port);
 
   private:
     void Initialise();
@@ -122,6 +145,9 @@ struct AhciDriver{
     void DisablePortsFRE();
     void ClearPortsSERR();
 
+    void InitDisks();
+    void SetupDisk(std::uint8_t port);
+
   private:
     bool m_present;
     bool m_enabled;
@@ -129,6 +155,7 @@ struct AhciDriver{
     std::uint64_t m_mmioBase;
     volatile HostRegisters* m_hostregs;
     Aii::Array<AhciPort, MAX_PORTS> m_ports;
+    Aii::Array<AhciDisk, MAX_PORTS> m_disks;
 };
 
 }
