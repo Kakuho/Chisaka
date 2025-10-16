@@ -1,8 +1,6 @@
-#ifndef DRIVERS_AHCI_RECIEVED_FIS_HPP
-#define DRIVERS_AHCI_RECIEVED_FIS_HPP
+#pragma once
 
 // Each ahci port requires an recieved fis data structure
-
 
 #include <cstdint>
 
@@ -14,23 +12,27 @@
 namespace Drivers::Ahci{
 
 struct RecievedFis{
-  Sata::Fis::DmaSetup::Frame m_dsfis;
-  [[maybe_unused]] std::uint8_t padding0[4];
+  public:
+    volatile Sata::Fis::D2HRegister::Frame& Rfis(){
+      return m_rfis;
+    }
 
-  Sata::Fis::PioSetup::Frame m_psfis;
-  [[maybe_unused]] std::uint8_t padding1[12];
+  public:
+    Sata::Fis::DmaSetup::Frame m_dsfis;
+    [[maybe_unused]] std::uint8_t padding0[4];
 
-  Sata::Fis::D2HRegister::Frame m_rfis;
-  [[maybe_unused]] std::uint8_t padding2[4];
+    Sata::Fis::PioSetup::Frame m_psfis;
+    [[maybe_unused]] std::uint8_t padding1[12];
 
-  Sata::Fis::SetDeviceBits::Frame m_sdbfis;
-  std::uint8_t m_ufis[64];
+    Sata::Fis::D2HRegister::Frame m_rfis;
+    [[maybe_unused]] std::uint8_t padding2[4];
 
-  std::uint8_t m_rsv[0x100 - 0xa0];
+    Sata::Fis::SetDeviceBits::Frame m_sdbfis;
+    std::uint8_t m_ufis[64];
+
+    std::uint8_t m_rsv[0x100 - 0xa0];
 };
 
 static_assert(sizeof(RecievedFis) == 0x100);
 
 }
-
-#endif

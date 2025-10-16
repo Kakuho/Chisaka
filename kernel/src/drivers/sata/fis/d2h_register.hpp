@@ -34,11 +34,15 @@ class Frame{
     [[nodiscard]] constexpr std::uint8_t Status() const noexcept;
     [[nodiscard]] constexpr std::uint8_t Error() const noexcept;
     [[nodiscard]] constexpr std::uint8_t Device() const noexcept;
+
     [[nodiscard]] constexpr std::uint16_t SectorCount() const noexcept;
 
     [[nodiscard]] constexpr std::uint16_t LbaLow() const noexcept;
     [[nodiscard]] constexpr std::uint16_t LbaMid() const noexcept;
     [[nodiscard]] constexpr std::uint16_t LbaHigh() const noexcept;
+
+    [[nodiscard]] constexpr std::uint8_t Status() const volatile noexcept{ return  m_statusReg;}
+    [[nodiscard]] constexpr std::uint8_t Device() const volatile noexcept{ return m_deviceReg;}
 
   public:
     // public for now, but i will change its interface later on

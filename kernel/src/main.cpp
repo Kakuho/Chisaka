@@ -6,6 +6,10 @@
 #include "memory/heap/tests/test.hpp"
 #include "memory/heap/tests/page_size/test_run.hpp"
 
+#include "drivers/ahci/class_interface/samples/identify_device.hpp"
+#include "drivers/ahci/class_interface/samples/write_read.hpp"
+#include "fs/merofs/samples/init.hpp"
+
 #include "x86_64/timers/samples/hpet_poll.hpp"
 #include "x86_64/timers/samples/tryhpet.hpp"
 
@@ -29,8 +33,13 @@ extern "C" void _start() {
       __init_array[i]();
   }
 
-  X8664::Timers::Samples::TryHpet::TryOneShot();
-
-  kout << "Rarity is cute pony" << '\n';
+  //X8664::Timers::Samples::TryHpet::TryOneShot();
+  //Drivers::Ahci::Class::Sample::WriteRead_AhciFuncs();
+  //Drivers::Ahci::Class::Sample::WriteInterrupt();
+  //Drivers::Ahci::Class::Sample::IdentifyDevice();
+  //Drivers::Ahci::Class::Sample::IdentifyDevice_MemFun();
+  Fs::Merofs::Samples::Initialise();
+  //Fs::Merofs::Samples::Hehe();
+  //kout << "Rarity is cute pony" << '\n';
   X8664::HaltCatchFire();
 }

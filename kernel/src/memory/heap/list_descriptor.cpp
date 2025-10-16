@@ -215,8 +215,8 @@ ListDescriptor* ListDescriptor::ExtractSelf(){
   }
   else{
     ListDescriptor* newHead = NextList();
-    newHead->PrevList()->PrevList()->NextList() = newHead;
-    newHead->PrevList() = this->PrevList();
+    this->m_prevList->m_nextList = newHead;
+    newHead->m_prevList = this->m_prevList;
   }
   // fix up its own linkages
   this->NextList() = this;

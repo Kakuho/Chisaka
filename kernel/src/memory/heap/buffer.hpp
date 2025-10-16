@@ -59,7 +59,6 @@ class Buffer{
     void Grow(unsigned pages);
     void Reap(unsigned pages);
 
-
     ListDescriptor*& FreeListHead(){return m_freeLists;}
     ListDescriptor*& PartialListHead(){return m_partialLists;}
     ListDescriptor*& FullListHead(){return m_fullLists;}

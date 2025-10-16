@@ -89,6 +89,14 @@ class Frame{
       return dmaReadFis;
     }
     
+    static Frame CreateIdentifyDeviceFrame(){
+      Sata::Fis::H2DRegister::Frame identifyDeviceFis{};
+      identifyDeviceFis.m_commandReg = 0xec;    // 0xec is IDENTIFY DEVICE
+      kassert(identifyDeviceFis.m_type == 0x27);
+      identifyDeviceFis.m_deviceReg = 0;
+      identifyDeviceFis.m_c_portMultiplier = 0x80;
+      return identifyDeviceFis;
+    }
 
     //-------------------------------------------------------------
     //  Queries

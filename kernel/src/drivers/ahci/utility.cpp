@@ -152,6 +152,7 @@ void InitialiseAhci(){
   }
   kout << "Command Slots: " << GetCommandSlots() << '\n';
   SetupMemory();
+
   /*
   if(Supports64BitAddress()){
     SetupMemory64FIXED();
@@ -160,6 +161,7 @@ void InitialiseAhci(){
     kassert(false && "Have not implemented Ahci structures setup for 32bit");
   }
   */
+
   EnablePortsFre();
   ClearAllPortSerr();
   EnableInterrupts();
@@ -244,6 +246,7 @@ Aii::Array<bool, 32> GetImplementedPorts(){
   return payload;
 }
 
+
 bool IsHbaIdle(){
   kassert(AhciEnabled);
   kout << "Checking If HBA is Idle..." << '\n';
@@ -257,6 +260,7 @@ bool IsHbaIdle(){
     }
   }
   return true;
+
 }
 
 void ForceHbaIdle(){
@@ -307,6 +311,7 @@ void SetupMemory(){
     }
   }
 }
+
 
 void SetupMemory64FIXED(){
   // Fixed to a particular address for now,

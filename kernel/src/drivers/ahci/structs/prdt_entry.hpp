@@ -79,7 +79,9 @@ constexpr void PrdtEntry::SetWord3(bool interrupt, std::uint32_t dataSize){
   m_i_dbc = dataSize & 0x3'FFFFF;
   if(interrupt){
     m_i_dbc |= 0x8000'0000;
+    kassert(m_i_dbc & 0x8000'0000);
   }
+  m_i_dbc |= 0x8000'0000;
 }
 
 }

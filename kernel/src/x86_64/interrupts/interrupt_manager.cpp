@@ -12,8 +12,13 @@ InterruptManager::InterruptManager(){
 
 void InterruptManager::InitialiseGates(){
   // procedure to initialise the call gates of the interrupts
-  for(std::uint8_t i = 0; i < 34; i++){
-    InstallISR(i, reinterpret_cast<void(*)()>(isr[i]));
+  for(std::uint8_t i = 0; i < 240; i++){
+    if(i >= 32){
+      InstallISR(i, Null);
+    }
+    else{
+      InstallISR(i, reinterpret_cast<void(*)()>(isr[i]));
+    }
     /*
     InstallISR(i, reinterpret_cast<void(*)()>(
           reinterpret_cast<std::uint64_t>(isr[i])&0xFFFFFFFF

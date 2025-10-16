@@ -113,7 +113,13 @@ struct AhciDriver{
     }
 
     void WriteSector(std::uint8_t port, std::uint64_t sector, std::uint8_t* ibuffer);
+    void WriteSector(std::uint8_t port, std::uint64_t sector, 
+                    std::uint8_t* ibuffer, CommandTable* cmdtbl);
+
     void ReadSector(std::uint8_t port, std::uint64_t address, std::uint8_t* buffer);
+    void ReadSector(std::uint8_t port, std::uint64_t address, 
+                    std::uint8_t* buffer, CommandTable* cmdtable);
+
 
     void WriteSectorPolled(std::uint8_t port, std::uint64_t sector, 
         std::uint8_t* buffer);
@@ -128,7 +134,7 @@ struct AhciDriver{
                     std::uint8_t count, std::uint8_t* buffer);
     */
 
-    AhciDiskPolled CreatePolledDisk(std::uint8_t port);
+    static AhciDisk CreatePolledDisk(std::uint8_t port);
 
   private:
     void Initialise();

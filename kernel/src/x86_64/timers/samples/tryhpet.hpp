@@ -18,7 +18,7 @@ namespace X8664::Timers::Samples::TryHpet{
   static constexpr std::uint64_t MATCH_VALUE = 0x50000;
 
   Timers::HpetController hpetController;
-  Interrupt::PicController picController{0x20};
+  Interrupt::PicController picController{32};
 
   void InterruptHandler_Period(){
     //hpetController.Disable();
@@ -61,7 +61,8 @@ namespace X8664::Timers::Samples::TryHpet{
     segManager.ReloadSegmentRegisters();
     InterruptManager intManager{};
     intManager.EnableInterrupts();
-    intManager.InstallISR(0x20, InterruptHandler_Period);
+    intManager.InstallISR(32, InterruptHandler_Period);
+
     //Interrupts::PicController picController{0x20};
     //-------------------------------------------------------------
     Firmware::Acpi::TableManager acpiTables{};

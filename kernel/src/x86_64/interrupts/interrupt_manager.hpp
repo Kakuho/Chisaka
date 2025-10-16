@@ -20,6 +20,8 @@ extern "C"{
 
 extern "C" void(*isr[])();
 
+constexpr void Null(){}
+
 namespace X8664{
 
 class InterruptManager{

@@ -148,7 +148,8 @@ void AhciDriver::InitMemory(){
 
 void AhciDriver::InitDisks(){
   for(std::uint8_t i = 0; i < MAX_PORTS; i++){
-    if(Port(i).Present()){
+    if(Port(i).DevicePresent()){
+      kout << "Initialising Disk " << i << '\n';
       SetupDisk(i);
     }
   }
@@ -160,6 +161,7 @@ void AhciDriver::SetupDisk(std::uint8_t port){
   auto* identbuffer = Mem::Heap::Allocator::New<IdentifyDeviceBuffer>();
   IdentifyDevice(port, identbuffer);
   m_disks[port].SetTotalSectors(identbuffer->NumSectors());
+  kout << "Port " << port << " has " << m_disks[port].TotalSectors() << '\n';
 }
 
 void AhciDriver::Enable(){
@@ -420,6 +422,7 @@ void AhciDriver::WriteSector(
 ){
   auto writeFis = Sata::Fis::H2DRegister::Frame::CreateWriteFrame(sector);
   // create the command table
+  kout << "Size of Command Table: " << sizeof(CommandTable) << '\n';
   auto cmdtable = Mem::Heap::Allocator::New<CommandTable>();
   cmdtable->SetCommandFis(writeFis);
   cmdtable->SetPrdtEntry(0,
@@ -447,6 +450,41 @@ void AhciDriver::WriteSector(
 
   Mem::Heap::Allocator::Delete(cmdtable);
   kout << "Ahci Driver Written to Sector " << sector << '\n'; 
+}
+
+void AhciDriver::WriteSector(
+    std::uint8_t port, 
+    std::uint64_t sector, 
+    std::uint8_t* ibuffer,
+    CommandTable* cmdtable
+){
+  auto writeFis = Sata::Fis::H2DRegister::Frame::CreateWriteFrame(sector);
+  // create the command table
+  cmdtable->SetCommandFis(writeFis);
+  cmdtable->SetPrdtEntry(0,
+      PrdtEntry{reinterpret_cast<void*>(ibuffer), true, 511}
+  );
+
+  // set the new command header
+  auto cmdheader = CommandHeader{cmdtable,
+    1,
+    0b0000'0'100,
+    0b010'00101,
+  };
+
+  // now perform the logic to read / write
+  int freeSlot = Port(port).EmptyCommandSlot();
+  auto cmdlist = Port(port).CommandListPtr();
+  cmdlist->m_headers[freeSlot] = cmdheader;
+  Port(port).IssueCommand(freeSlot);
+
+  // Now we need to wait for the command to finish
+  while(Port(port).CommandSlotSet(freeSlot)){
+    // spin lol
+    ;;
+  }
+
+  //kout << "Ahci Driver Written to Sector " << sector << '\n'; 
 }
 
 void AhciDriver::ReadSector(
@@ -484,6 +522,42 @@ void AhciDriver::ReadSector(
   Mem::Heap::Allocator::Delete(cmdtable);
   kout << "Ahci Driver Read Sector " << sector << '\n';
 }
+
+void AhciDriver::ReadSector(
+    std::uint8_t port, 
+    std::uint64_t sector, 
+    std::uint8_t* ibuffer,
+    CommandTable* cmdtable
+){
+  auto readFis = Sata::Fis::H2DRegister::Frame::CreateReadFrame(sector);
+  // create the command table
+  cmdtable->SetCommandFis(readFis);
+  cmdtable->SetPrdtEntry(0,
+      PrdtEntry{reinterpret_cast<void*>(ibuffer), true, 511}
+  );
+
+  // set the new command header
+  auto cmdheader = CommandHeader{cmdtable,
+    1,
+    0b0000'0'100,
+    0b010'00101,
+  };
+
+  // now perform the logic to read / write
+  int freeSlot = Port(port).EmptyCommandSlot();
+  auto cmdlist = Port(port).CommandListPtr();
+  cmdlist->m_headers[freeSlot] = cmdheader;
+  Port(port).IssueCommand(freeSlot);
+
+  // Now we need to wait for the command to finish
+  while(Port(port).CommandSlotSet(freeSlot)){
+    // spin lol
+    ;;
+  }
+
+  kout << "Ahci Driver Read Sector " << sector << '\n';
+}
+
 
 void AhciDriver::WriteSectorPolled(
   std::uint8_t port, 

@@ -22,6 +22,15 @@ FileDescriptorTable::TableChunk::~TableChunk()
 {
 }
 
+std::uint8_t FileDescriptorTable::TableChunk::NextFree() const{
+  for(std::uint8_t i = 0; i < table.Size(); i++){
+    if(table[i].IsNull()){
+      return i;
+    }
+  }
+  return 0;
+}
+
 // File Descriptor Table
 
 FileDescriptorTable::FileDescriptorTable()

@@ -16,6 +16,7 @@ namespace Drivers::Ahci::Ports{
 
 using Pci::ioaddr32_t;
 
+
 constexpr static std::uint32_t CMD_ST   = 0x0000'0001;
 constexpr static std::uint32_t CMD_FRE  = 0x0000'0010;
 constexpr static std::uint32_t CMD_FR   = 0x0000'4000;
