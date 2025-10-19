@@ -48,44 +48,52 @@ class Frame{
     constexpr Frame();
 
     static Frame CreateWriteFrame(std::uint64_t sector_address){
-      static constexpr std::uint8_t DMA_WRITE_EXT_CODE = 0x35;
-      auto addresses = ExtractAddress(sector_address);
+      static constexpr std::uint8_t WRITE_DMA_EXT_CODE = 0x35;
 
+      kout << "Creating Write FIS...\n";
+
+      auto addresses = ExtractAddress(sector_address);
       Sata::Fis::H2DRegister::Frame dmaWriteFis{};
       kassert(dmaWriteFis.m_type == 0x27);
+
       dmaWriteFis.m_sectorCountReg = 1;
       // LBA
-      dmaWriteFis.m_lbaLowReg0    = std::get<2>(addresses) & 0xFF;
-      dmaWriteFis.m_lbaLowReg1    = std::get<2>(addresses) >> 8;
-      dmaWriteFis.m_lbaMidReg0    = std::get<1>(addresses) & 0xFF;
-      dmaWriteFis.m_lbaMidReg1    = std::get<1>(addresses) >> 8;
-      dmaWriteFis.m_lbaHighReg0   = std::get<0>(addresses) & 0xFF;
-      dmaWriteFis.m_lbaHighReg1   = std::get<0>(addresses) >> 8;
+      dmaWriteFis.m_lbaLowReg0    = std::get<0>(addresses);
+      dmaWriteFis.m_lbaMidReg0    = std::get<1>(addresses);
+      dmaWriteFis.m_lbaHighReg0   = std::get<2>(addresses);
+      // Expanded
+      dmaWriteFis.m_lbaLowReg1    = std::get<3>(addresses);
+      dmaWriteFis.m_lbaMidReg1    = std::get<4>(addresses);
+      dmaWriteFis.m_lbaHighReg1   = std::get<5>(addresses);
       // Rest of the features
       dmaWriteFis.m_deviceReg = 0x40;
       dmaWriteFis.m_c_portMultiplier = 0x80;
-      dmaWriteFis.m_commandReg = DMA_WRITE_EXT_CODE;
+      dmaWriteFis.m_commandReg = WRITE_DMA_EXT_CODE;
       return dmaWriteFis;
     }
 
     static Frame CreateReadFrame(std::uint64_t sector_address){
-      static constexpr std::uint8_t DMA_READ_EXT_CODE = 0x25;
-      auto addresses = ExtractAddress(sector_address);
+      static constexpr std::uint8_t READ_DMA_EXT_CODE = 0x25;
 
+      kout << "Creating Read FIS...\n";
+
+      auto addresses = ExtractAddress(sector_address);
       Sata::Fis::H2DRegister::Frame dmaReadFis{};
       kassert(dmaReadFis.m_type == 0x27);
+
       dmaReadFis.m_sectorCountReg = 1;
       // LBA
-      dmaReadFis.m_lbaLowReg0    = std::get<2>(addresses) & 0xFF;
-      dmaReadFis.m_lbaLowReg1    = std::get<2>(addresses) >> 8;
-      dmaReadFis.m_lbaMidReg0    = std::get<1>(addresses) & 0xFF;
-      dmaReadFis.m_lbaMidReg1    = std::get<1>(addresses) >> 8;
-      dmaReadFis.m_lbaHighReg0   = std::get<0>(addresses) & 0xFF;
-      dmaReadFis.m_lbaHighReg1   = std::get<0>(addresses) >> 8;
+      dmaReadFis.m_lbaLowReg0    = std::get<0>(addresses);
+      dmaReadFis.m_lbaMidReg0    = std::get<1>(addresses);
+      dmaReadFis.m_lbaHighReg0   = std::get<2>(addresses);
+      // Expanded
+      dmaReadFis.m_lbaLowReg1    = std::get<3>(addresses);
+      dmaReadFis.m_lbaMidReg1    = std::get<4>(addresses);
+      dmaReadFis.m_lbaHighReg1   = std::get<5>(addresses);
       // Rest of the features
       dmaReadFis.m_deviceReg = 0x40;
       dmaReadFis.m_c_portMultiplier = 0x80;
-      dmaReadFis.m_commandReg = DMA_READ_EXT_CODE;
+      dmaReadFis.m_commandReg = READ_DMA_EXT_CODE;
       return dmaReadFis;
     }
     
@@ -97,6 +105,20 @@ class Frame{
       identifyDeviceFis.m_c_portMultiplier = 0x80;
       return identifyDeviceFis;
     }
+
+    static Frame CreateReadMaxAddressFrame(){
+      static constexpr std::uint8_t READ_MAX_ADDRESS_CODE = 0xf8;
+      Sata::Fis::H2DRegister::Frame readMaxAddressFis{};
+      readMaxAddressFis.m_commandReg = READ_MAX_ADDRESS_CODE;
+      readMaxAddressFis.m_deviceReg = 0x40;
+      return readMaxAddressFis;
+    }
+
+    static Frame CreateInitDevFrame(){
+      static constexpr std::uint8_t INII_DEV_CODE = 0x91;
+      Sata::Fis::H2DRegister::Frame initDevFis{};
+    }
+
 
     //-------------------------------------------------------------
     //  Queries
