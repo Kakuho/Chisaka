@@ -240,9 +240,9 @@ inline void WriteRead_AhciFuncs(){
 
   Mem::PageAllocator::Initialise();
   Mem::Heap::Allocator::Initialise();
-  AhciDriver ahcidriver{};
+  AhciDriver& ahcidriver = AhciDriver::Get();
+  ahcidriver.Init();
 
-  ahcidriver.StartDMAEngines();
   std::uint8_t* dataArea = static_cast<std::uint8_t*>(Mem::Heap::Allocator::Allocate(512));
   SetDataArea(dataArea);
 
@@ -250,32 +250,130 @@ inline void WriteRead_AhciFuncs(){
 
   kout << "Fis Recieve Base: " << ahcidriver.Port(PORT_NUMBER).RecievedFisBaseAddr() << '\n';
 
-  kout << "Before:\n"
-       << "Device: " << rfis.Device() << '\n'
-       << "Status: " << rfis.Status() << '\n';
-
   ahcidriver.ClearIs(PORT_NUMBER);
   kout << "Is: " << ahcidriver.Is() << '\n';
   ahcidriver.WriteSector(PORT_NUMBER, 0xFC003E + 0x20000, dataArea);
   ahcidriver.WaitForPortInterrupt(PORT_NUMBER);
   kout << "Is: " << ahcidriver.Is() << '\n';
 
-  kout << "After:\n"
-       << "Device: " << rfis.Device() << '\n'
-       << "Status: " << rfis.Status() << '\n';
-
-  /*
   ResetDataArea(dataArea);
   kout << "Prior: " << '\n';
   PrintDataArea(dataArea);
-
 
   kout << "Attemping to read Sata Disk sector 0 into data area..." << '\n';
 
   ahcidriver.ReadSector(PORT_NUMBER, 0, dataArea);
   PrintDataArea(dataArea);
-  */
 }
+
+inline void WriteRead_AhciFuncsMany(){
+  // Aim: Try to issue Write to the device
+
+  const std::uint8_t PORT_NUMBER = 0;
+  constexpr std::size_t LIMIT = 0x401;
+
+  // Required to Perform BIOS OS Handoff??
+
+  Mem::PageAllocator::Initialise();
+  Mem::Heap::Allocator::Initialise();
+  auto& ahcidriver = Drivers::Ahci::AhciDriver::Get();
+  ahcidriver.Init();
+
+  std::uint8_t* dataArea = static_cast<std::uint8_t*>(Mem::Heap::Allocator::Allocate(512));
+  SetDataArea(dataArea);
+
+  auto* cmdTable = Mem::Heap::Allocator::New<Drivers::Ahci::CommandTable>();
+
+  for(std::size_t i = 0; i < LIMIT; i++){
+    Drivers::Ahci::AhciDriver::Get().WriteSector(
+        0,
+        i,
+        dataArea,
+        cmdTable
+    );
+    Drivers::Ahci::AhciDriver::Get().WaitForPortInterrupt(0);
+  }
+
+  ResetDataArea(dataArea);
+  kout << "Prior: " << '\n';
+  PrintDataArea(dataArea);
+  kout << "Attemping to read Sata Disk sector into data area..." << '\n';
+
+  ahcidriver.ReadSectorPolled(PORT_NUMBER, LIMIT-1, dataArea);
+  PrintDataArea(dataArea);
+  kout << "pony?" << '\n';
+}
+
+inline void Write_OutOfBounds(){
+  // Aim: Try to issue Write to the device
+
+  const std::uint8_t PORT_NUMBER = 0;
+
+  // lba low = 1, mid = 4
+  // lbas are 16 bit
+  // 0x4'0001
+  constexpr std::size_t LIMIT = 0x400'0000-1;
+  //constexpr std::size_t LIMIT = 0xfbf00;
+  //constexpr std::size_t LIMIT = 0x2;
+  //constexpr std::size_t LIMIT = 0x2000;
+
+
+
+  // Required to Perform BIOS OS Handoff??
+
+  Mem::PageAllocator::Initialise();
+  Mem::Heap::Allocator::Initialise();
+  auto& ahcidriver = Drivers::Ahci::AhciDriver::Get();
+  ahcidriver.Init();
+
+  volatile auto& rfis = ahcidriver.Port(PORT_NUMBER).RecievedFisPtr()->Rfis();
+
+  std::uint8_t* dataArea = static_cast<std::uint8_t*>(Mem::Heap::Allocator::Allocate(512));
+  SetDataArea(dataArea);
+
+  auto* cmdTable = Mem::Heap::Allocator::New<Drivers::Ahci::CommandTable>();
+
+  kout << intmode::hex << '\n';
+  kout << "Fis Fields Before Write:\n"
+       << "Error: " << rfis.Error() << '\n'
+       << "Lba Low: " << rfis.Low() << '\n'
+       << "Lba Mid: " << rfis.Mid() << '\n'
+       << "Lba High: " << rfis.High() << '\n';
+
+
+  Drivers::Ahci::AhciDriver::Get().WriteSector(
+      0,
+      LIMIT,
+      dataArea,
+      cmdTable
+  );
+  Drivers::Ahci::AhciDriver::Get().WaitForPortInterrupt(0);
+
+  kout << intmode::hex << '\n';
+  kout << "Fis Fields After Write:\n"
+       << "Error: " << rfis.Error() << '\n'
+       << "Lba Low: " << rfis.Low() << '\n'
+       << "Lba Mid: " << rfis.Mid() << '\n'
+       << "Lba High: " << rfis.High() << '\n';
+
+  ResetDataArea(dataArea);
+  kout << "Prior: " << '\n';
+  PrintDataArea(dataArea);
+  kout << "Attemping to read Sata Disk sector into data area..." << '\n';
+
+  ahcidriver.ReadSectorPolled(PORT_NUMBER, LIMIT, dataArea);
+  PrintDataArea(dataArea);
+
+  kout << intmode::hex << '\n';
+  kout << "Fis Fields After Read:\n"
+       << "Error: " << rfis.Error() << '\n'
+       << "Lba Low: " << rfis.Low() << '\n'
+       << "Lba Mid: " << rfis.Mid() << '\n'
+       << "Lba High: " << rfis.High() << '\n';
+
+  kout << "mero?" << '\n';
+}
+
 
 void HandleDiskInterrupt(){
   kout << "INTERRUPT Disk Interrupt occured" << '\n';

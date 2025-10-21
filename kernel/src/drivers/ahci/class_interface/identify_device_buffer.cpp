@@ -38,6 +38,10 @@ void IdentifyDeviceBuffer::PrintCHS() const{
   kout << "Capacity In Sectors: " << capacity << '\n';
 }
 
+void IdentifyDeviceBuffer::PrintLogicalCHS() const{
+
+}
+
 std::uint32_t IdentifyDeviceBuffer::NumSectors() const{
   std::uint32_t numsec = buffer[58];
   numsec <<= 16;
@@ -45,10 +49,10 @@ std::uint32_t IdentifyDeviceBuffer::NumSectors() const{
   return numsec;
 }
 
-std::uint16_t IdentifyDeviceBuffer::UserAccessibleSectors() const{
-  std::uint32_t dword = buffer[60];
+std::uint32_t IdentifyDeviceBuffer::UserAccessibleSectors() const{
+  std::uint32_t dword = buffer[61];
   dword <<= 16;
-  return dword | buffer[61];
+  return dword | buffer[60];
 }
 
 }

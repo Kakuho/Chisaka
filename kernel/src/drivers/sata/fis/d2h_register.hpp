@@ -41,8 +41,13 @@ class Frame{
     [[nodiscard]] constexpr std::uint16_t LbaMid() const noexcept;
     [[nodiscard]] constexpr std::uint16_t LbaHigh() const noexcept;
 
-    [[nodiscard]] constexpr std::uint8_t Status() const volatile noexcept{ return  m_statusReg;}
-    [[nodiscard]] constexpr std::uint8_t Device() const volatile noexcept{ return m_deviceReg;}
+    constexpr std::uint8_t Status() const volatile noexcept{ return  m_statusReg;}
+    constexpr std::uint8_t Error() const volatile noexcept{ return  m_errorReg;}
+    constexpr std::uint8_t Device() const volatile noexcept{ return m_deviceReg;}
+
+    constexpr std::uint16_t Low() const volatile noexcept{ return (m_lbaLowReg1 << 8) | m_lbaLowReg0 ;}
+    constexpr std::uint16_t Mid() const volatile noexcept{ return (m_lbaMidReg1 << 8) | m_lbaMidReg0 ;}
+    constexpr std::uint16_t High() const volatile noexcept{ return (m_lbaHighReg1 << 8) | m_lbaHighReg0;}
 
   public:
     // public for now, but i will change its interface later on

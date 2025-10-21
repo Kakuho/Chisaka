@@ -16,10 +16,10 @@ namespace Drivers::Ahci{
     void PrintLogicalCHS() const;
     
     std::uint32_t NumSectors() const;
+    std::uint16_t CommandSetVector() const{ return buffer[82];}
 
-    std::uint16_t UserAccessibleSectors() const;
+    std::uint32_t UserAccessibleSectors() const;
+
     Aii::Array<std::uint16_t, 256> buffer;
-    //std::uint16_t buffer[256];
-
   };
 }

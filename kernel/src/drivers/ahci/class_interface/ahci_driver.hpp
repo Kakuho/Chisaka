@@ -107,6 +107,8 @@ struct AhciDriver{
     void WaitForPortInterrupt(std::uint8_t port);
 
     // Disk Operations
+    void Perform(std::uint8_t port, CommandHeader& cmdheader, CommandTable* cmdtbl);
+
     void IdentifyDevice(std::uint8_t port, std::uint8_t* buffer);
     void IdentifyDevice(std::uint8_t port, IdentifyDeviceBuffer* buffer){
       IdentifyDevice(port, reinterpret_cast<std::uint8_t*>(buffer));

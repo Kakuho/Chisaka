@@ -107,7 +107,7 @@ void IdentifyDevice(){
   payloadBuffer->PrintSerialNumber(); 
   kout << '\n';
   payloadBuffer->PrintCHS();
-
+  kout << "Command Set Vector: " << payloadBuffer->CommandSetVector() << '\n';
 }
 
 void IdentifyDevice_MemFun(){
@@ -138,7 +138,7 @@ void IdentifyDevice_MemFun(){
   payloadBuffer->PrintSerialNumber(); 
   kout << '\n';
   payloadBuffer->PrintCHS();
-
+  kout << "Command Set Vector: " << payloadBuffer->CommandSetVector() << '\n';
 }
 
 }
