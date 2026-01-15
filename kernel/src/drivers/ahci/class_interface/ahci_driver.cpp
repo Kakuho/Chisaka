@@ -380,6 +380,26 @@ void AhciDriver::WaitForPortInterrupt(std::uint8_t port){
 
 // Disk operations
 
+void AhciDriver::Perform(
+    std::uint8_t port, 
+    CommandHeader& cmdheader,
+    CommandTable* cmdtbl
+){
+  // Low level operation, performs the operation as defined in the commandtable
+  // Command table provides the h2d fis
+
+  int freeSlot = Port(port).EmptyCommandSlot();
+  auto cmdlist = Port(port).CommandListPtr();
+  cmdlist->m_headers[freeSlot] = cmdheader;
+  Port(port).IssueCommand(freeSlot);
+
+  // Now we need to wait for the command to finish
+  while(Port(port).CommandSlotSet(freeSlot)){
+    // spin lol
+    ;;
+  }
+}
+
 void AhciDriver::IdentifyDevice(
     std::uint8_t port, 
     std::uint8_t* buffer
@@ -422,7 +442,6 @@ void AhciDriver::WriteSector(
 ){
   auto writeFis = Sata::Fis::H2DRegister::Frame::CreateWriteFrame(sector);
   // create the command table
-  kout << "Size of Command Table: " << sizeof(CommandTable) << '\n';
   auto cmdtable = Mem::Heap::Allocator::New<CommandTable>();
   cmdtable->SetCommandFis(writeFis);
   cmdtable->SetPrdtEntry(0,
@@ -449,7 +468,6 @@ void AhciDriver::WriteSector(
   }
 
   Mem::Heap::Allocator::Delete(cmdtable);
-  kout << "Ahci Driver Written to Sector " << sector << '\n'; 
 }
 
 void AhciDriver::WriteSector(
@@ -483,8 +501,6 @@ void AhciDriver::WriteSector(
     // spin lol
     ;;
   }
-
-  //kout << "Ahci Driver Written to Sector " << sector << '\n'; 
 }
 
 void AhciDriver::ReadSector(
@@ -520,7 +536,6 @@ void AhciDriver::ReadSector(
   }
 
   Mem::Heap::Allocator::Delete(cmdtable);
-  kout << "Ahci Driver Read Sector " << sector << '\n';
 }
 
 void AhciDriver::ReadSector(
@@ -554,10 +569,7 @@ void AhciDriver::ReadSector(
     // spin lol
     ;;
   }
-
-  kout << "Ahci Driver Read Sector " << sector << '\n';
 }
-
 
 void AhciDriver::WriteSectorPolled(
   std::uint8_t port, 
@@ -568,12 +580,32 @@ void AhciDriver::WriteSectorPolled(
   WaitForPortInterrupt(port);
 }
 
+void AhciDriver::WriteSectorPolled(
+  std::uint8_t port, 
+  std::uint64_t sector, 
+  std::uint8_t* buffer,
+  CommandTable* cmdtable
+){
+  WriteSector(port, sector, buffer, cmdtable);
+  WaitForPortInterrupt(port);
+}
+
 void AhciDriver::ReadSectorPolled(
   std::uint8_t port, 
   std::uint64_t sector, 
   std::uint8_t* buffer
 ){
   ReadSector(port, sector, buffer);
+  WaitForPortInterrupt(port);
+}
+
+void AhciDriver::ReadSectorPolled(
+  std::uint8_t port, 
+  std::uint64_t sector, 
+  std::uint8_t* buffer,
+  CommandTable* cmdtable
+){
+  ReadSector(port, sector, buffer, cmdtable);
   WaitForPortInterrupt(port);
 }
 

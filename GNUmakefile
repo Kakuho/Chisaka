@@ -63,7 +63,7 @@ run-io-monitor: $(IMAGE_NAME).iso
 .PHONY: run-int
 run-int: $(IMAGE_NAME).iso
 	clear &&\
-	qemu-system-x86_64 -cpu IvyBridge -M q35 -m 8G -no-reboot \
+	qemu-system-x86_64 -cpu IvyBridge -M q35 -m 8G -no-reboot -no-shutdown\
 										 -d int -M smm=off \
 									   -cdrom $(IMAGE_NAME).iso -hda disk.img \
 										 -boot d 

@@ -16,7 +16,8 @@
 #include "aii/array.hpp"
 
 namespace Fs::Merofs{
-  struct DiskInode{
+
+  struct [[gnu::packed]] DiskInode{
     struct AddressStruct{
       public:
         std::uint64_t& operator[](std::uint8_t index){
@@ -31,13 +32,13 @@ namespace Fs::Merofs{
           }
         }
       public:
-        std::uint64_t direct[4];
+        Aii::Array<std::uint64_t, 4> direct;
         std::uint64_t indirect;
         std::uint64_t doubleIndirect;
     };
     static_assert(sizeof(AddressStruct) <= 48);
 
-    enum class Type{Free, File, Directory};
+    enum class Type: std::uint8_t {Free, File, Directory};
 
     struct Data{
       AddressStruct blockAddr;
@@ -49,12 +50,14 @@ namespace Fs::Merofs{
       std::uint64_t nextFreeInode;
       Data data;
     };
+    Aii::Array<std::uint8_t, 15> rsv;
   };
-  static_assert(sizeof(DiskInode) < 64);
+  static_assert(sizeof(DiskInode) == 64);
 
   struct InodeBlock{
-    static constexpr std::size_t INODES = 9;
+    static constexpr std::size_t INODES = 7;
     Aii::Array<DiskInode, INODES> diskinodes;
+    Aii::Array<std::uint8_t, 512 - sizeof(DiskInode)*INODES> rsv;
   };
-  static_assert(sizeof(InodeBlock) < 512);
+  static_assert(sizeof(InodeBlock) == 512);
 }

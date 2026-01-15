@@ -8,6 +8,8 @@
 
 #include "drivers/ahci/class_interface/samples/identify_device.hpp"
 #include "drivers/ahci/class_interface/samples/write_read.hpp"
+#include "drivers/ahci/class_interface/samples/change_addressable_sectors.hpp"
+
 #include "fs/merofs/samples/init.hpp"
 
 #include "x86_64/timers/samples/hpet_poll.hpp"
@@ -35,11 +37,15 @@ extern "C" void _start() {
 
   //X8664::Timers::Samples::TryHpet::TryOneShot();
   //Drivers::Ahci::Class::Sample::WriteRead_AhciFuncs();
+  //Drivers::Ahci::Class::Sample::WriteRead_AhciFuncsMany();
   //Drivers::Ahci::Class::Sample::WriteInterrupt();
-  //Drivers::Ahci::Class::Sample::IdentifyDevice();
   //Drivers::Ahci::Class::Sample::IdentifyDevice_MemFun();
+  //Drivers::Ahci::Class::Sample::PrintMaxAddress();
   Fs::Merofs::Samples::Initialise();
   //Fs::Merofs::Samples::Hehe();
+  //Drivers::Ahci::Class::Sample::IdentifyDevice();
+  //Drivers::Ahci::Class::Sample::Write_OutOfBounds();
+
   //kout << "Rarity is cute pony" << '\n';
   X8664::HaltCatchFire();
 }

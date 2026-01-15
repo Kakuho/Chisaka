@@ -122,11 +122,16 @@ struct AhciDriver{
     void ReadSector(std::uint8_t port, std::uint64_t address, 
                     std::uint8_t* buffer, CommandTable* cmdtable);
 
-
     void WriteSectorPolled(std::uint8_t port, std::uint64_t sector, 
         std::uint8_t* buffer);
+    void WriteSectorPolled(std::uint8_t port, std::uint64_t sector, 
+        std::uint8_t* buffer, CommandTable* cmdtable);
+
     void ReadSectorPolled(std::uint8_t port, std::uint64_t address, 
         std::uint8_t* buffer);
+    void ReadSectorPolled(std::uint8_t port, std::uint64_t address, 
+        std::uint8_t* buffer, CommandTable* cmdtable);
+
 
     /*
      * todo: read and write to multiple sectors

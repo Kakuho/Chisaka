@@ -50,8 +50,6 @@ class Frame{
     static Frame CreateWriteFrame(std::uint64_t sector_address){
       static constexpr std::uint8_t WRITE_DMA_EXT_CODE = 0x35;
 
-      kout << "Creating Write FIS...\n";
-
       auto addresses = ExtractAddress(sector_address);
       Sata::Fis::H2DRegister::Frame dmaWriteFis{};
       kassert(dmaWriteFis.m_type == 0x27);
@@ -74,8 +72,6 @@ class Frame{
 
     static Frame CreateReadFrame(std::uint64_t sector_address){
       static constexpr std::uint8_t READ_DMA_EXT_CODE = 0x25;
-
-      kout << "Creating Read FIS...\n";
 
       auto addresses = ExtractAddress(sector_address);
       Sata::Fis::H2DRegister::Frame dmaReadFis{};

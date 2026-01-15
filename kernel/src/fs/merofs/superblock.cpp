@@ -4,10 +4,10 @@ namespace Fs::Merofs{
 
 SuperBlock::SuperBlock()
   : 
-    totalFsBlocks{0xd4d4'd4d4'd4d4'd4d4},
+    totalPhysBlocks{0xd4d4'd4d4'd4d4'd4d4},
     totalInodeBlocks{0xdead'beef'dead'beef},
-    totalfreeInodes{0xface'face'face'face},
-    totalfreeDataBlocks{0xeeee'eeee'eeee'eeee},
+    freeInodes{0xface'face'face'face},
+    freeDataBlocks{0xeeee'eeee'eeee'eeee},
     freeInodeHead{0xfafa'fafa'fafa'fafa},
     freeDataBlockHead{0xb2b2'b2b2'b2b2'b2b2}
 {
