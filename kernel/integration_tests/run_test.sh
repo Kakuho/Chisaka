@@ -20,4 +20,4 @@ qemu-system-x86_64  -cpu IvyBridge -M q35 -m 8G -no-reboot \
 									  -cdrom ${TEST_DIR}/dist/${IMAGE_NAME} \
                     -boot d
 
-echo $?
+echo $((($? & ~1) >> 1))

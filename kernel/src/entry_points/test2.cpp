@@ -3,8 +3,8 @@
 #include "x86_64/utilites.hpp"
 #include "kassert.hpp"
 
-static constexpr std::uint8_t QEMU_SUCCESS = 1;
-static constexpr std::uint8_t QEMU_FAIL = 2;
+static constexpr std::uint8_t QEMU_SUCCESS = 0;
+static constexpr std::uint8_t QEMU_FAIL = 1;
 
 // Extern declarations for global constructor array.
 
@@ -24,20 +24,7 @@ void ExitQemu(std::uint8_t code){
 }
 
 static void Test2(){
-  // do your test1.cpp
-  // put whatever tests you want here
-  kout << "Entered Test1!" << '\n';
-  kout << "Entered Test1!" << '\n';
-  kout << "Entered Test1!" << '\n';
-  kout << "Entered Test1!" << '\n';
-  kout << "Entered Test1!" << '\n';
-  kout << "Entered Test1!" << '\n';
-  kout << "Entered Test1!" << '\n';
-  kout << "what!" << '\n';
   ExitQemu(QEMU_SUCCESS);
-  while(true){
-
-  }
 }
 
 extern "C" void _start() {

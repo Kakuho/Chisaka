@@ -3,8 +3,8 @@
 #include "x86_64/utilites.hpp"
 #include "kassert.hpp"
 
-static constexpr std::uint8_t QEMU_SUCCESS = 1;
-static constexpr std::uint8_t QEMU_FAIL = 2;
+static constexpr std::uint8_t QEMU_SUCCESS = 0;
+static constexpr std::uint8_t QEMU_FAIL = 1;
 
 // Extern declarations for global constructor array.
 
