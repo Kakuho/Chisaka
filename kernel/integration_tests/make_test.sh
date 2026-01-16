@@ -8,6 +8,8 @@ SRC_ROOT="${KERNEL_ROOT}/src"
 TEST_NAME=$1
 TEST_DIR="${INTEGRATION_ROOT}/${TEST_NAME}"
 
+IMAGE_NAME=${TEST_NAME}.iso
+
 # basic checks to see if the directories exists
 
 if [ -d ${KERNEL_ROOT} ]; then
@@ -158,9 +160,9 @@ xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
   -no-emul-boot -boot-load-size 4 -boot-info-table \
   --efi-boot boot/limine/limine-uefi-cd.bin \
   -efi-boot-part --efi-boot-image --protective-msdos-label \
-  ${ISOROOT} -o haha.iso
-${PROJECT_ROOT}/limine/limine bios-install ${TEST_DIR}/haha.iso
+  ${ISOROOT} -o ${IMAGE_NAME}
+${PROJECT_ROOT}/limine/limine bios-install ${TEST_DIR}/${IMAGE_NAME}
 rm -rf ${ISOROOT}
 rm -rf ${TEST_DIR}/dist
 mkdir ${TEST_DIR}/dist
-mv ${TEST_DIR}/haha.iso ${TEST_DIR}/dist
+mv ${TEST_DIR}/${IMAGE_NAME} ${TEST_DIR}/dist
