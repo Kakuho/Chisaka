@@ -55,6 +55,39 @@ LD_FLAGS="-m elf_x86_64 -nostdlib -static --no-dynamic-linker \
         -z text -z max-page-size=0x1000
         -T ${KERNEL_ROOT}/scripts/linker.ld"
 
+# get all the cpp and asm source files
+
+SRC_FILES=""
+
+cd ${SRC_ROOT}
+
+array=()
+while IFS=  read -r -d $'\0'; do
+    array+=("$REPLY")
+done < <(find -L * -type f -name '*.cpp' -not -path "entry_points/*" -print0) # cpp
+
+for i in "${array[@]}"
+do
+   i=${SRC_ROOT}/${i}
+   #echo "${i}"
+   SRC_FILES+="${i} "
+done
+
+array=()
+while IFS=  read -r -d $'\0'; do
+    array+=("$REPLY")
+done < <(find -L * -type f -name '*.S' -not -path "entry_points/*" -print0) # asm
+
+for i in "${array[@]}"
+do
+   i=${SRC_ROOT}/${i}
+   #echo "${i}"
+   SRC_FILES+="${i} "
+done
+
+cd ${INTEGRATION_ROOT}
+
+# now we can start test specific
 
 # first set up test directory
 
@@ -67,19 +100,17 @@ else
   exit 1
 fi
 
-if [ ! -d ${TEST_DIR} ]; then
-  mkdir ${TEST_DIR}
+if [  -d ${TEST_DIR} ]; then
+  rm -r ${TEST_DIR}
 fi
 
-if [ ! -d ${TEST_DIR}/kernel_src ]; then
-  cp -r ${INTEGRATION_ROOT}/build_integ ${TEST_DIR}/kernel_src
-fi
+mkdir ${TEST_DIR}
 
 # compile the test entry point executable file
 
 cd ${TEST_DIR}
 
-${CPP_COMPILER} ${CPP_FLAGS} ${SHARED_FLAGS} ${PREPROCESSOR_FLAGS} -c ${ENTRY_POINT} -I${SRC_ROOT} -I${KERNEL_ROOT}/ext
+${CPP_COMPILER} -g ${CPP_FLAGS} ${SHARED_FLAGS} ${PREPROCESSOR_FLAGS} -c ${ENTRY_POINT} ${SRC_FILES} -I${SRC_ROOT} -I${KERNEL_ROOT}/ext
 
 cd ${INTEGRATION_ROOT}
 
@@ -96,27 +127,30 @@ cd ${INTEGRATION_ROOT}
 
 # now we need to repackage the kernel as a iso
 
-#ISOROOT=${TEST_DIR}/iso_root
-#if [ ! -d ${ISOROOT} ]; then
-#  mkdir ${ISOROOT}
-#else
-#  rm -r iso_root
-#  mkdir ${ISOROOT}
-#fi
-#
-#cd ${TEST_DIR}
-#
-#mkdir -p ${ISOROOT}/boot
-#cp -v ${TEST_DIR}/kernel ${ISOROOT}/boot/
-#mkdir -p ${ISOROOT}/boot/limine
-#cp -v ${PROJECT_ROOT}/limine.cfg ${PROJECT_ROOT}/limine/limine-bios.sys ${PROJECT_ROOT}/limine/limine-bios-cd.bin ${PROJECT_ROOT}/limine/limine-uefi-cd.bin ${ISOROOT}/boot/limine/
-#mkdir -p ${ISOROOT}/EFI/BOOT
-#cp -v ${PROJECT_ROOT}/limine/BOOTX64.EFI ${ISOROOT}/EFI/BOOT/
-#cp -v ${PROJECT_ROOT}/limine/BOOTIA32.EFI ${ISOROOT}/EFI/BOOT/
-#xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
-#  -no-emul-boot -boot-load-size 4 -boot-info-table \
-#  --efi-boot boot/limine/limine-uefi-cd.bin \
-#  -efi-boot-part --efi-boot-image --protective-msdos-label \
-#  ${ISOROOT} -o haha.iso
-#${PROJECT_ROOT}/limine/limine bios-install ${TEST_DIR}/haha.iso
-#rm -rf ${ISOROOT}
+ISOROOT=${TEST_DIR}/iso_root
+if [ ! -d ${ISOROOT} ]; then
+  mkdir ${ISOROOT}
+else
+  rm -r iso_root
+  mkdir ${ISOROOT}
+fi
+
+cd ${TEST_DIR}
+
+mkdir -p ${ISOROOT}/boot
+cp -v ${TEST_DIR}/kernel ${ISOROOT}/boot/
+mkdir -p ${ISOROOT}/boot/limine
+cp -v ${PROJECT_ROOT}/limine.cfg ${PROJECT_ROOT}/limine/limine-bios.sys ${PROJECT_ROOT}/limine/limine-bios-cd.bin ${PROJECT_ROOT}/limine/limine-uefi-cd.bin ${ISOROOT}/boot/limine/
+mkdir -p ${ISOROOT}/EFI/BOOT
+cp -v ${PROJECT_ROOT}/limine/BOOTX64.EFI ${ISOROOT}/EFI/BOOT/
+cp -v ${PROJECT_ROOT}/limine/BOOTIA32.EFI ${ISOROOT}/EFI/BOOT/
+xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
+  -no-emul-boot -boot-load-size 4 -boot-info-table \
+  --efi-boot boot/limine/limine-uefi-cd.bin \
+  -efi-boot-part --efi-boot-image --protective-msdos-label \
+  ${ISOROOT} -o haha.iso
+${PROJECT_ROOT}/limine/limine bios-install ${TEST_DIR}/haha.iso
+rm -rf ${ISOROOT}
+rm -rf ${TEST_DIR}/dist
+mkdir ${TEST_DIR}/dist
+mv ${TEST_DIR}/haha.iso ${TEST_DIR}/dist
