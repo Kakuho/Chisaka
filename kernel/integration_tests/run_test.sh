@@ -18,6 +18,7 @@ IMAGE_NAME=${TEST_NAME}.iso
 qemu-system-x86_64  -cpu IvyBridge -M q35 -m 8G -no-reboot \
                     -device isa-debug-exit,iobase=0xf4,iosize=0x04 \
 									  -cdrom ${TEST_DIR}/dist/${IMAGE_NAME} \
+                    -display none \
                     -boot d
 
-echo $((($? & ~1) >> 1))
+#echo $((($? & ~1) >> 1))
