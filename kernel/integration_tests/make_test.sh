@@ -9,7 +9,7 @@ TEST_NAME=$1
 TEST_DIR="${INTEGRATION_ROOT}/test_builds/${TEST_NAME}"
 
 ENTRY_POINT="${SRC_ROOT}/integration_tests/${TEST_NAME}.cpp"
-IMAGE_NAME=${TEST_NAME}.iso
+IMAGE_NAME="TEST.iso"
 
 # basic checks to see if the directories exists
 
@@ -42,6 +42,14 @@ else
   echo "entry point doesnt exist"
   exit 1
 fi
+
+# reset its test directory
+
+if [  -d ${TEST_DIR} ]; then
+  rm -r ${TEST_DIR}
+fi
+
+mkdir -p ${TEST_DIR}
 
 # setting up compiler and linker
 
@@ -99,14 +107,6 @@ done
 
 cd ${INTEGRATION_ROOT}
 
-# reset its test directory
-
-if [  -d ${TEST_DIR} ]; then
-  rm -r ${TEST_DIR}
-fi
-
-mkdir ${TEST_DIR}
-
 # compile the test entry point executable file
 
 cd ${TEST_DIR}
@@ -128,7 +128,10 @@ cd ${INTEGRATION_ROOT}
 
 # now we need to repackage the kernel as a iso
 
-ISOROOT=${TEST_DIR}/iso_root
+cd ${TEST_DIR}
+echo $PWD
+
+ISOROOT=./iso_root
 if [ ! -d ${ISOROOT} ]; then
   mkdir ${ISOROOT}
 else
@@ -136,22 +139,28 @@ else
   mkdir ${ISOROOT}
 fi
 
-cd ${TEST_DIR}
+echo ${ISOROOT}
 
 mkdir -p ${ISOROOT}/boot
 cp -v ${TEST_DIR}/kernel ${ISOROOT}/boot/
+
 mkdir -p ${ISOROOT}/boot/limine
 cp -v ${PROJECT_ROOT}/limine.cfg ${PROJECT_ROOT}/limine/limine-bios.sys ${PROJECT_ROOT}/limine/limine-bios-cd.bin ${PROJECT_ROOT}/limine/limine-uefi-cd.bin ${ISOROOT}/boot/limine/
+
 mkdir -p ${ISOROOT}/EFI/BOOT
 cp -v ${PROJECT_ROOT}/limine/BOOTX64.EFI ${ISOROOT}/EFI/BOOT/
 cp -v ${PROJECT_ROOT}/limine/BOOTIA32.EFI ${ISOROOT}/EFI/BOOT/
+
 xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
   -no-emul-boot -boot-load-size 4 -boot-info-table \
   --efi-boot boot/limine/limine-uefi-cd.bin \
   -efi-boot-part --efi-boot-image --protective-msdos-label \
   ${ISOROOT} -o ${IMAGE_NAME}
+
 ${PROJECT_ROOT}/limine/limine bios-install ${TEST_DIR}/${IMAGE_NAME}
 rm -rf ${ISOROOT}
 rm -rf ${TEST_DIR}/bin
 mkdir ${TEST_DIR}/bin
 mv ${TEST_DIR}/${IMAGE_NAME} ${TEST_DIR}/bin
+
+exit 0

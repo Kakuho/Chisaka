@@ -24,10 +24,7 @@ void ExitQemu(std::uint8_t code){
 }
 
 static void Hanging(){
-  while(true){
-    kout << "in hanging\n";
-  }
-  ExitQemu(QEMU_SUCCESS);
+  ExitQemu(QEMU_FAIL);
 }
 
 extern "C" void _start() {

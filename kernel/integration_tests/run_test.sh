@@ -20,10 +20,11 @@ else
   echo "Test Directory for test '${TEST_NAME}' exists"
 fi
 
-IMAGE_NAME=${TEST_NAME}.iso
-IMAGE_PATH=${TEST_DIR}/bin/${IMAGE_NAME}
+# Setting up the image file
 
-if [ ! -f ${IMAGE_PATH} ]; then
+IMAGE_FILE=${TEST_DIR}/bin/TEST.iso
+
+if [ ! -f ${IMAGE_FILE} ]; then
   echo "The kernel image for test '${TEST_NAME}' does not exist"
   exit -1
 else
@@ -32,31 +33,36 @@ fi
 
 # set up logging for the test
 
-LOG_PATH=logs/${TEST_NAME}.log
+LOG_DIR=logs/${TEST_NAME}
 
-if [ -f ${LOG_PATH} ]; then
-  rm ${LOG_PATH}
+if [ ! -d ${LOG_DIR} ]; then
+  echo "Log dir does not exist"
+  echo "Creating Log directory..."
+  mkdir -p ${LOG_DIR}
 fi
+
+LOG_FILE=${LOG_DIR}/LOGS
+
+if [ -f ${LOG_FILE} ]; then
+  rm ${LOG_FILE}
+fi
+
+touch ${LOG_FILE}
 
 # now we can invoke qemu
 
-#qemu-system-x86_64 -cpu IvyBridge -M q35 -m 8G -no-reboot \
-#                   -device isa-debug-exit,iobase=0xf4,iosize=0x04 \
-#									  -cdrom ${TEST_DIR}/dist/${IMAGE_NAME} \
-#									  -boot d 
+#timeout --foreground 10s qemu-system-x86_64 -cpu IvyBridge -M q35 -m 8G -no-reboot \
+#                    -device isa-debug-exit,iobase=0xf4,iosize=0x04 \
+#									  -cdrom ${IMAGE_FILE} \
+#                    -serial file:${LOG_FILE} \
+#                    -nographic \
+#                    -boot d
 
 timeout --foreground 10s qemu-system-x86_64 -cpu IvyBridge -M q35 -m 8G -no-reboot \
                     -device isa-debug-exit,iobase=0xf4,iosize=0x04 \
-									  -cdrom ${IMAGE_PATH} \
-                    -serial file:${LOG_PATH} \
-                    -nographic \
+									  -cdrom ${IMAGE_FILE} \
+                    -serial file:${LOG_FILE} \
                     -boot d
-
-#qemu-system-x86_64  -cpu IvyBridge -M q35 -m 8G -no-reboot \
-#                    -device isa-debug-exit,iobase=0xf4,iosize=0x04 \
-#									  -cdrom ${TEST_DIR}/dist/${IMAGE_NAME} \
-#                    -serial stdio \
-#                    -boot d
 
 # print the return value of the test
 
