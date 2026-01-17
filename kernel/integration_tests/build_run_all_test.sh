@@ -1,8 +1,22 @@
 #!/bin/bash
 
-# still needs to add timeout for kernels that hang
+# setting the tests
 
-TESTS=("test2" "test1" "hanging")
+# comment out if you run to run specific tests
+#TESTS=("test2" "test1" "hanging") 
+
+# comment out if you want to run all integration tests
+TESTS=()
+
+readarray -t TESTS < ./INTEGRATION_LIST.txt
+
+for i in "${TESTS[@]}"
+do
+  echo ${i}
+done
+
+# useful counters and trackers to see failed and hanging tests easier 
+
 COUNT=0
 
 SUCCESS_TESTS=()
