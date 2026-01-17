@@ -1,13 +1,14 @@
 #/bin/bash
 
 PROJECT_ROOT="/home/ka/C++/projects/os/Chisaka/git/refactoring"
-KERNEL_ROOT="/home/ka/C++/projects/os/Chisaka/git/refactoring/kernel"
+KERNEL_ROOT="${PROJECT_ROOT}/kernel"
 INTEGRATION_ROOT="${KERNEL_ROOT}/integration_tests"
 SRC_ROOT="${KERNEL_ROOT}/src"
 
 TEST_NAME=$1
-TEST_DIR="${INTEGRATION_ROOT}/${TEST_NAME}"
+TEST_DIR="${INTEGRATION_ROOT}/test_builds/${TEST_NAME}"
 
+ENTRY_POINT="${SRC_ROOT}/integration_tests/${TEST_NAME}.cpp"
 IMAGE_NAME=${TEST_NAME}.iso
 
 # basic checks to see if the directories exists
@@ -36,7 +37,7 @@ fi
 # check to see if the test entry point exists
 
 if [ -f ${ENTRY_POINT} ]; then
-  echo "entry points ${TEST_NAME}.cpp exists"
+  echo "entry point ${ENTRY_POINT} exists"
 else
   echo "entry point doesnt exist"
   exit 1
@@ -75,7 +76,7 @@ cd ${SRC_ROOT}
 array=()
 while IFS=  read -r -d $'\0'; do
     array+=("$REPLY")
-done < <(find -L * -type f -name '*.cpp' -not -path "entry_points/*" -print0) # cpp
+done < <(find -L * -type f -name '*.cpp' -not -path "integration_tests/*" -not -path "main.cpp" -print0) # cpp
 
 for i in "${array[@]}"
 do
@@ -87,7 +88,7 @@ done
 array=()
 while IFS=  read -r -d $'\0'; do
     array+=("$REPLY")
-done < <(find -L * -type f -name '*.S' -not -path "entry_points/*" -print0) # asm
+done < <(find -L * -type f -name '*.S' -not -path "integration_tests/*" -not -path "main.cpp" -print0) # asm
 
 for i in "${array[@]}"
 do
@@ -98,19 +99,7 @@ done
 
 cd ${INTEGRATION_ROOT}
 
-# now we can start test specific
-
-# first set up test directory
-
-ENTRY_POINT="${SRC_ROOT}/entry_points/${TEST_NAME}.cpp"
-
-if [ -f ${ENTRY_POINT} ]; then
-  echo "entry points ${TEST_NAME}.cpp exists"
-else
-  echo "entry point doesnt exist"
-  exit 1
-fi
-
+# reset its test directory
 
 if [  -d ${TEST_DIR} ]; then
   rm -r ${TEST_DIR}
@@ -163,6 +152,6 @@ xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
   ${ISOROOT} -o ${IMAGE_NAME}
 ${PROJECT_ROOT}/limine/limine bios-install ${TEST_DIR}/${IMAGE_NAME}
 rm -rf ${ISOROOT}
-rm -rf ${TEST_DIR}/dist
-mkdir ${TEST_DIR}/dist
-mv ${TEST_DIR}/${IMAGE_NAME} ${TEST_DIR}/dist
+rm -rf ${TEST_DIR}/bin
+mkdir ${TEST_DIR}/bin
+mv ${TEST_DIR}/${IMAGE_NAME} ${TEST_DIR}/bin

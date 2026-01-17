@@ -18,7 +18,7 @@ for i in "${TESTS[@]}"
 do
   COUNT=$((COUNT+1))
   ./make_test.sh ${i}
-  timeout 10s ./run_test.sh ${i}
+  ./run_test.sh ${i}
   RET=$?
   if [ $RET -eq 124 ]; then
     HANGED_COUNT=$((${HANGED_COUNT} + 1))
@@ -35,8 +35,10 @@ do
   fi
 done
 
+# printing output to the screen
+
 echo "${SUCCESS_COUNT} / ${COUNT} Tests Succeded"
-echo "${HANGED_COUNT} / ${COUNT} Tests Failed"
+echo "${HANGED_COUNT} / ${COUNT} Tests Hanged"
 echo "${FAILED_COUNT} / ${COUNT} Tests Failed"
 
 echo "Failed Tests:"

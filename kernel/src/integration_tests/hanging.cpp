@@ -25,7 +25,7 @@ void ExitQemu(std::uint8_t code){
 
 static void Hanging(){
   while(true){
-
+    kout << "in hanging\n";
   }
   ExitQemu(QEMU_SUCCESS);
 }
@@ -33,6 +33,9 @@ static void Hanging(){
 extern "C" void _start() {
   if(limine::is_limine_supported()){
     X8664::HaltCatchFire();
+  }
+  for (std::size_t i = 0; &__init_array[i] != __init_array_end; i++) {
+      __init_array[i]();
   }
   Hanging();
 }
