@@ -48,12 +48,6 @@ namespace Mem{
   PageIndices ExtractPageIndicies(kvirtaddr_t vaddr);
   void  PrintPageIndicies(kvirtaddr_t vaddr);
 
-  //-------------------------------------------------------------
-  //  Page Frame Related
-  //-------------------------------------------------------------
-
-  void PrintPageFrames();
-
 } // namespace Mem
 
 #endif

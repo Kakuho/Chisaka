@@ -53,29 +53,4 @@ void PrintPageIndicies(kvirtaddr_t vaddr){
        << "pm4l index :: "                    << indices.pm4le << '\n';
 }
 
-//-------------------------------------------------------------
-//  Page Frame Related
-//-------------------------------------------------------------
-
-void PrintPageFrames(){
-  // Prints in the format (index, page, length)
-  std::uint64_t mem_entries_t = Limine::memorymap_request.response->entry_count;
-  limine_memmap_entry** entries = Limine::memorymap_request.response->entries;
-  std::size_t index = 0;
-  for(std::uint64_t i = 0; i < mem_entries_t; i++){
-    // only count memory mapping regions which are availabe
-    if(entries[i]->type == LIMINE_MEMMAP_USABLE){
-      std::uint64_t base = entries[i]->base;
-      std::uint64_t length = entries[i]->length;
-      for(physaddr_t paddr = base; paddr < base + length; paddr += 0x1000){
-        // n.b 0x1000 = 4096 = page size
-        kout << "(" << index++  << ", " 
-                    << paddr    << ", " 
-                    << (paddr + 0x1000) - 1 
-                    << ")" << '\n';
-      }
-    }
-  }
-}
-
 } // namespace Mem
