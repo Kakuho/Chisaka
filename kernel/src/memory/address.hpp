@@ -10,24 +10,7 @@
 
 namespace Mem{
 
-  // Sensible type declarations
-  //  kvirtaddr_t is the kernel's virtual address
-  //  (different processes may have different virtual address mappings)
-
-  //using physaddr64_t = std::uint64_t;
-  //using physaddr32_t = std::uint32_t;
-  using physaddr_t = std::uint64_t;     // catch all
-
   using kvirtaddr_t = std::uint64_t;
-
-  template<typename T>
-  concept IsAddressType = (
-                            std::same_as<T, physaddr_t> || 
-                            std::same_as<T, kvirtaddr_t>
-                          );
-
-  template<typename T>
-  concept NotIntegralAddressType = ( !IsAddressType<T> );
 
   //-------------------------------------------------------------
   //  Paging Address Related

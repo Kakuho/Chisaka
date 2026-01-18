@@ -18,6 +18,7 @@
 #include "drivers/serial/kostream.hpp"
 
 #include "kcontext.hpp"
+#include "types.hpp"
 
 namespace Mem{
 
@@ -44,9 +45,9 @@ class MemoryMapDescriptor{
       return m_totalUseableBytes / PageSize;
     }
 
-    [[nodiscard]] physaddr_t HighestUseableAddress() const noexcept;
-    [[nodiscard]] physaddr_t LowestUseableAddress() const noexcept;
-    [[nodiscard]] physaddr_t LongestUseableBase() const noexcept;
+    [[nodiscard]] Chisaka::PhysAddr HighestUseableAddress() const noexcept;
+    [[nodiscard]] Chisaka::PhysAddr LowestUseableAddress() const noexcept;
+    [[nodiscard]] Chisaka::PhysAddr LongestUseableBase() const noexcept;
     [[nodiscard]] std::size_t UseableEntries() const noexcept;
 
     [[nodiscard]] constexpr std::size_t Entries() const noexcept{ return MAX_ENTRIES;};

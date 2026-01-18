@@ -1,16 +1,21 @@
-#ifndef MEMORY_ALIGNMENT_HPP 
-#define MEMORY_ALIGNMENT_HPP
+#pragma once
 
 // Functions to perform memory address alignment.
 
 #include <cstdint>
 #include <concepts>
 #include <type_traits>
-
-#include "address.hpp"
-
+#include "types.hpp"
 
 namespace Mem{
+
+  template<typename T>
+  concept IsAddressType =
+    std::same_as<T, Chisaka::PhysAddr> || std::same_as<T, Chisaka::VirtAddr>;
+
+  template<typename T>
+  concept NotIntegralAddressType = !IsAddressType<T>;
+
 
   template<typename T>
   concept IsPointerType = std::is_pointer_v<T>;
@@ -64,7 +69,7 @@ namespace Mem{
   template<typename T, std::size_t AlignAddress>
     requires NotIntegralAddressType<T>
   constexpr auto NearestAlign(T addr){
-    kvirtaddr_t aligned = reinterpret_cast<kvirtaddr_t>(addr) % 
+    Chisaka::VirtAddr aligned = reinterpret_cast<Chisaka::VirtAddr>(addr) % 
                           AlignAddress;
     if(aligned == 0){
       return addr;
@@ -72,5 +77,3 @@ namespace Mem{
   }
 
 } // namespace Mem
-  
-#endif

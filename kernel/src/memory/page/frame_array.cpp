@@ -36,7 +36,7 @@ std::size_t FrameArray::MemoryRequired(const MemoryMapDescriptor& memmap) noexce
   std::size_t pageIndex = 0;
   for(std::uint8_t i = 0; i < memmap.Entries(); i++){
     const MemoryMapEntry& entry = memmap.Entry(i);
-    Mem::physaddr_t current = entry.base;
+    Chisaka::PhysAddr current = entry.base;
     while(current < entry.base + entry.length){
       pageIndex++;
       current += PAGE_SIZE;
@@ -49,7 +49,7 @@ void FrameArray::InitFrameDescriptors(const MemoryMapDescriptor& memmap) noexcep
   std::size_t pageIndex = 0;
   for(std::uint8_t i = 0; i < memmap.Entries(); i++){
     const MemoryMapEntry& entry = memmap.Entry(i);
-    Mem::physaddr_t current = entry.base;
+    Chisaka::PhysAddr current = entry.base;
     while(current < entry.base + entry.length){
       m_buffer[pageIndex] = FrameDescriptor{current, entry.type};
       current += PAGE_SIZE;
@@ -57,12 +57,12 @@ void FrameArray::InitFrameDescriptors(const MemoryMapDescriptor& memmap) noexcep
   }
 }
 
-std::size_t FrameArray::IndexOf(Mem::physaddr_t paddr) const noexcept{
+std::size_t FrameArray::IndexOf(Chisaka::PhysAddr paddr) const noexcept{
   kassert(paddr < 0x240000000);
   return paddr/PAGE_SIZE;
 }
 
-Mem::physaddr_t FrameArray::BaseOf(std::size_t index) const noexcept{ 
+Chisaka::PhysAddr FrameArray::BaseOf(std::size_t index) const noexcept{ 
   kassert(index < m_pages);
   return m_buffer[index].Base();
 }

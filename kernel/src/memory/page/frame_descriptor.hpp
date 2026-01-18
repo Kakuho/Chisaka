@@ -6,7 +6,6 @@
 
 #include "memory/address.hpp"
 #include "memory/memory_map/memory_map_entry.hpp"
-
 #include "types.hpp"
 
 namespace Mem::Page{

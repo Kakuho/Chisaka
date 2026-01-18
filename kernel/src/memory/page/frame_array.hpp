@@ -10,6 +10,7 @@
 
 #include "frame_descriptor.hpp"
 #include "constants.hpp"
+#include "types.hpp"
 
 namespace Mem::Page{
 
@@ -22,8 +23,8 @@ class FrameArray{
     constexpr std::size_t Size() noexcept {return m_pages;}
     constexpr std::size_t Bytes() noexcept {return Size() * PAGE_SIZE;}
 
-    std::size_t IndexOf(Mem::physaddr_t paddr) const noexcept;
-    Mem::physaddr_t BaseOf(std::size_t index) const noexcept;
+    std::size_t IndexOf(Chisaka::PhysAddr paddr) const noexcept;
+    Chisaka::PhysAddr BaseOf(std::size_t index) const noexcept;
 
     void PrintBases() const noexcept;
       

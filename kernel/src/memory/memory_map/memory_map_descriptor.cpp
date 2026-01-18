@@ -1,5 +1,6 @@
 #include "memory_map_descriptor.hpp"
 #include "kcontext.hpp"
+#include "types.hpp"
 
 namespace Mem{
 
@@ -74,10 +75,10 @@ void MemoryMapDescriptor::InitialiseUseableData() noexcept{
 //  Queries
 //-------------------------------------------------------------
   
-[[nodiscard]] physaddr_t 
+[[nodiscard]] Chisaka::PhysAddr
 MemoryMapDescriptor::HighestUseableAddress() const noexcept{
   using enum MemoryMapEntry::Type;
-  physaddr_t top = 0;
+  Chisaka::PhysAddr top = 0;
   for(std::uint64_t i = 0; i < m_entries.Size(); i++){
     if(m_entries[i].type != Empty){
       continue;
@@ -90,12 +91,12 @@ MemoryMapDescriptor::HighestUseableAddress() const noexcept{
   return top;
 }
 
-[[nodiscard]] physaddr_t 
+[[nodiscard]] Chisaka::PhysAddr
 MemoryMapDescriptor::LowestUseableAddress() const noexcept{
   return m_entries[0].base;
 }
 
-[[nodiscard]] physaddr_t 
+[[nodiscard]] Chisaka::PhysAddr
 MemoryMapDescriptor::LongestUseableBase() const noexcept{
   using enum MemoryMapEntry::Type;
   std::uint8_t longest = 0;
@@ -149,7 +150,7 @@ void MemoryMapDescriptor::PrintPageFrames() const noexcept{
     if(m_entries[i].type == Useable){
       std::uint64_t base = m_entries[i].base;
       std::uint64_t length = m_entries[i].length;
-      for(physaddr_t paddr = base; paddr < base + length; paddr += 0x1000){
+      for(Chisaka::PhysAddr paddr = base; paddr < base + length; paddr += 0x1000){
         kout << "(" << pindex++  << ", "
                     << paddr    << ", "
                     << (paddr + 0x1000) - 1
