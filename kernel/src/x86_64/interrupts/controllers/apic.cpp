@@ -1,6 +1,8 @@
 #include "apic.hpp"
-#include "memory/address.hpp"
+//#include "memory/address.hpp"
 #include "x86_64/features/features.hpp"
+
+#include "types.hpp"
 
 namespace X8664::Interrupts{
 
@@ -111,7 +113,7 @@ void ApicController::SetSpuriousVector(std::uint8_t val){
 
 // Registers 
 
-Mem::physaddr64_t ApicController::GetBaseAddress() const{
+Chisaka::PhysAddr64 ApicController::GetBaseAddress() const{
   return m_base;
 }
 

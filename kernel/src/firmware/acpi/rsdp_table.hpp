@@ -7,6 +7,7 @@
 
 #include "memory/address.hpp"
 #include "table_header.hpp"
+#include "types.hpp"
 
 namespace Firmware::Acpi{
 
@@ -24,9 +25,10 @@ namespace Firmware::Acpi{
       std::uint8_t checksum;
       char oemId[6];
       std::uint8_t revision;
-      Mem::physaddr32_t rsdtAddr;
+      Chisaka::PhysAddr32 rsdtAddr;
       std::uint32_t length;
-      Mem::physaddr64_t xsdtAddr;
+      Chisaka::PhysAddr64 xsdtAddr;
+
       std::uint32_t extChecksum_reserved;
   };
 

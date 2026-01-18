@@ -66,7 +66,7 @@ bool SupportsAPIC(){
   return (edx >> 9) & 1;
 }
 
-Mem::physaddr64_t GetApicBase(){
+Chisaka::PhysAddr64 GetApicBase(){
   std::uint64_t ia32_base = read_ia32_apic_base();
   std::uint64_t apicBase = (ia32_base >> 12) << 12;
   return apicBase;

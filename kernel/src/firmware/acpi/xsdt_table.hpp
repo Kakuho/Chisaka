@@ -7,7 +7,7 @@
 #include "table_header.hpp"
 
 #include "aii/array.hpp"
-#include "memory/address.hpp"
+#include "types.hpp"
 
 namespace Firmware::Acpi{
   class [[gnu::packed]] XsdtTable{
@@ -15,10 +15,10 @@ namespace Firmware::Acpi{
 
     public:
       constexpr bool IsSignatureCorrect(){ return header.signature == SIG;}
-      [[nodiscard]] const Mem::physaddr64_t* operator[](std::size_t index) const;
+      [[nodiscard]] const Chisaka::PhysAddr64* operator[](std::size_t index) const;
 
     private:
       TableHeader header;
-      Mem::physaddr64_t* tablePointers;
+      Chisaka::PhysAddr64* tablePointers;
   };
 }

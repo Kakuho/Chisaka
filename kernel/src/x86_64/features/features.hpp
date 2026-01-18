@@ -9,7 +9,7 @@
 #include "msr.hpp"
 #include "drivers/serial/kostream.hpp"
 #include "aii/array.hpp"
-#include "memory/address.hpp"
+#include "types.hpp"
 
 namespace X8664::Features{
   
@@ -22,7 +22,8 @@ void PrintManufacturerId();
 // APIC
 
 bool SupportsAPIC();
-Mem::physaddr64_t GetApicBase();
+Chisaka::PhysAddr64 GetApicBase();
+
 void EnableApic();
 void DisableApic();
 

@@ -1,5 +1,4 @@
-#ifndef  X86_64_INTERRUPTS_CONTROLLERS_APIC_HPP
-#define  X86_64_INTERRUPTS_CONTROLLERS_APIC_HPP
+#pragma once
 
 // Class abstraction for the Local APIC Controller
 //
@@ -11,8 +10,9 @@
 
 #include "x86_64/features/features.hpp"
 #include "x86_64/features/msr.hpp"
-#include "memory/address.hpp"
+//#include "memory/address.hpp"
 #include "kassert.hpp"
+#include "types.hpp"
 
 namespace X8664::Interrupts{
 
@@ -56,7 +56,7 @@ static constexpr std::uint8_t SPURIOUS_INTERRUPT_VECTOR = 0xff;
 
     // Registers
     
-    Mem::physaddr64_t GetBaseAddress() const;
+    Chisaka::PhysAddr64 GetBaseAddress() const;
 
     std::uint32_t ReadId() const;
 
@@ -97,12 +97,10 @@ static constexpr std::uint8_t SPURIOUS_INTERRUPT_VECTOR = 0xff;
     void EnumerateTimer() const;
 
   private:
-    Mem::physaddr64_t m_base;
+    Chisaka::PhysAddr64 m_base;
     bool m_enabled;
     bool m_present;
     bool m_x2apicSupport;
 };
 
 }
-
-#endif
