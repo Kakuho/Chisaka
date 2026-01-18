@@ -6,7 +6,7 @@ namespace Limine{
 // base revision described by the Limine boot protocol specification.
 // See specification for further info
 
-inline bool Supported(){
+bool Supported(){
   // checks to see if the bootloader supports our standard
   LIMINE_BASE_REVISION(2);
   if(LIMINE_BASE_REVISION_SUPPORTED == false){

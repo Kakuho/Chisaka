@@ -1,5 +1,4 @@
 #include "features.hpp"
-#include "firmware/limine/requests.hpp"
 
 namespace Mem{
 
@@ -7,12 +6,11 @@ void PrintMemoryMap(){
   // Procedure to print the memory map at boot.
   //    prints in the format:
   //    paddr \t vaddr \t length \t type
-  using namespace limine; // limine::requests
-  if(requests::memorymap_request.response == nullptr){
+  if(Limine::memorymap_request.response == nullptr){
     kout << "MEM FAIL\n";
   }
-  std::uint64_t mem_entries_t = requests::memorymap_request.response->entry_count;
-  limine_memmap_entry** entries = requests::memorymap_request.response->entries;
+  std::uint64_t mem_entries_t = Limine::memorymap_request.response->entry_count;
+  limine_memmap_entry** entries = Limine::memorymap_request.response->entries;
   for(std::uint64_t i = 0; i < mem_entries_t; i++){
     // now set the responses
     physaddr_t base = entries[i]->base;
@@ -24,11 +22,10 @@ void PrintMemoryMap(){
 }
 
 std::size_t TotalUseableMemory(){
-  using namespace limine;
-  kassert(requests::memorymap_request.response != nullptr && "MEM FAIL\n");
+  kassert(Limine::memorymap_request.response != nullptr && "MEM FAIL\n");
   std::uint64_t available_memory = 0;
-  std::uint64_t mem_entries_t = requests::memorymap_request.response->entry_count;
-  limine_memmap_entry** entries = requests::memorymap_request.response->entries;
+  std::uint64_t mem_entries_t = Limine::memorymap_request.response->entry_count;
+  limine_memmap_entry** entries = Limine::memorymap_request.response->entries;
   for(std::uint64_t i = 0; i < mem_entries_t; i++){
     if(entries[i]->type == LIMINE_MEMMAP_USABLE){
       // only count memory mapping regions which are availabe
@@ -46,8 +43,7 @@ std::size_t TotalUseableMemory(){
 
 void ProbeMemory(std::size_t memIndex){
   // probe a single entry, entries[index]
-  using namespace limine;
-  limine_memmap_entry** entries = requests::memorymap_request.response->entries;
+  limine_memmap_entry** entries = Limine::memorymap_request.response->entries;
   limine_memmap_entry* region = entries[memIndex];
   kassert(region != nullptr && "ENTRY INDEX IS NULL");
   std::uint64_t type = region->type;
@@ -72,8 +68,7 @@ void ProbeMemory(std::size_t memIndex){
 
 void ProbeUpperLimit(){
   // procedure to probe the upper limit of usable ram
-  using namespace limine;
-  limine_memmap_response* memMaps = requests::memorymap_request.response;
+  limine_memmap_response* memMaps = Limine::memorymap_request.response;
   limine_memmap_entry* topRegion = memMaps->entries[memMaps->entry_count - 1];
   // now we can start probing
   std::uint64_t length = topRegion->length;
@@ -90,8 +85,7 @@ void ProbeUpperLimit(){
 
 void ProbeLowerLimit(){
   // procedure to probe the lower limit of usable ram
-  using namespace limine;
-  limine_memmap_entry* entry = requests::memorymap_request.response->entries[0];
+  limine_memmap_entry* entry = Limine::memorymap_request.response->entries[0];
   // now we can start to probe
   std::uint64_t length = entry->length;
   physaddr_t base = entry->base;
@@ -111,9 +105,8 @@ void ProbeLowerLimit(){
 
 [[noreturn]] void CorruptMemory(){
   // procedure to completely corrupt the ram >:)
-  using namespace limine;
   // first find the last memmap entry
-  limine_memmap_response* memMaps = requests::memorymap_request.response;
+  limine_memmap_response* memMaps = Limine::memorymap_request.response;
   std::uint64_t entries = memMaps->entry_count;
   limine_memmap_entry* finalEntry = memMaps->entries[entries -1];
   physaddr_t base_final = finalEntry->base;

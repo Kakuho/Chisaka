@@ -1,5 +1,4 @@
 #include "acpi_manager.hpp"
-#include "firmware/limine/requests.hpp"
 
 namespace Firmware::Acpi{
 
@@ -7,7 +6,7 @@ AcpiManager::AcpiManager()
 {
   m_rsdp = static_cast<RsdpTable*>
     (
-      limine::requests::rsdp_request.response->address
+      Limine::rsdp_request.response->address
     );
   if(m_rsdp && m_rsdp->IsSignatureCorrect()){
     if(m_rsdp->xsdtAddr){

@@ -1,7 +1,7 @@
 #include <cstdint>
 
 
-#include "firmware/limine/requests.hpp"
+#include "limine/utility.hpp"
 #include "x86_64/timers/hpet_controller.hpp"
 
 #include "x86_64/utilites.hpp"
@@ -28,7 +28,7 @@ extern "C"{
 
 extern "C" void _start() {
   // if limine is not supported, then kill the system
-  if(limine::is_limine_supported()){
+  if(Limine::Supported()){
     X8664::HaltCatchFire();
   }
 

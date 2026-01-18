@@ -40,13 +40,12 @@ MemoryMapDescriptor::MemoryMapDescriptor(
 
 void MemoryMapDescriptor::LimineInitialise() noexcept{
   // Procedure to initialise the entry array at boot, using the Limine Protocol
-  using namespace limine::requests;
-  kassert(memorymap_request.response != nullptr);
+  kassert(Limine::memorymap_request.response != nullptr);
 
-  std::uint64_t mem_entries_t = memorymap_request.response->entry_count;
+  std::uint64_t mem_entries_t = Limine::memorymap_request.response->entry_count;
   kassert(mem_entries_t < MAX_ENTRIES);
 
-  limine_memmap_entry** entries = memorymap_request.response->entries;
+  limine_memmap_entry** entries = Limine::memorymap_request.response->entries;
   for(std::uint64_t i = 0; i < mem_entries_t; i++){
     MemoryMapEntry::Type type = ConvertLimineType(entries[i]->type);
     kassert(type != MemoryMapEntry::Type::Unknown);

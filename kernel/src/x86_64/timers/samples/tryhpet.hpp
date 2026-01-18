@@ -8,7 +8,7 @@
 #include "firmware/acpi/hpet_table.hpp"
 #include "firmware/acpi/table_manager.hpp"
 
-#include "firmware/limine/requests.hpp"
+#include "limine/utility.hpp"
 
 extern "C"{
   void enable_interrupts();
@@ -66,7 +66,7 @@ namespace X8664::Timers::Samples::TryHpet{
     //Interrupts::PicController picController{0x20};
     //-------------------------------------------------------------
     Firmware::Acpi::TableManager acpiTables{};
-    acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(limine::requests::rsdp_request.response->address));
+    acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(Limine::rsdp_request.response->address));
     auto pHpetTable = acpiTables.HpetPtr();
     kout << "Hpet Base Address = " << pHpetTable->BaseAddress() << '\n';
     //-------------------------------------------------------------
@@ -110,7 +110,7 @@ namespace X8664::Timers::Samples::TryHpet{
     intManager.InstallISR(32, InterruptHandler_OneShot);
     //Interrupts::PicController picController{32};
     Firmware::Acpi::TableManager acpiTables{};
-    acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(limine::requests::rsdp_request.response->address));
+    acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(Limine::rsdp_request.response->address));
     auto pHpetTable = acpiTables.HpetPtr();
     //-------------------------------------------------------------
     kout << "Hpet Base Address = " << pHpetTable->BaseAddress() << '\n';

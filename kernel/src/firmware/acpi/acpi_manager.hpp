@@ -5,7 +5,7 @@
 #include "rsdt_table.hpp"
 #include "xsdt_table.hpp"
 
-#include "firmware/limine/requests.hpp"
+#include "limine/utility.hpp"
 #include "memory/address.hpp"
 
 namespace Firmware::Acpi{

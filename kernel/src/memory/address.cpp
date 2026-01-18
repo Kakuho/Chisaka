@@ -7,13 +7,11 @@ namespace Mem{
 //-------------------------------------------------------------
 
 kvirtaddr_t PhysToKVirtAddr(physaddr_t paddr){
-  using namespace limine;
-  return paddr + requests::hhdm_request.response->offset;
+  return paddr + Limine::hhdm_request.response->offset;
 }
 
 physaddr_t KVirtToPhysAddr(kvirtaddr_t vaddr){
-  using namespace limine;
-  return vaddr - requests::hhdm_request.response->offset;
+  return vaddr - Limine::hhdm_request.response->offset;
 }
 
 //-------------------------------------------------------------
@@ -21,13 +19,11 @@ physaddr_t KVirtToPhysAddr(kvirtaddr_t vaddr){
 //-------------------------------------------------------------
 
 kvirtaddr_t KernelVirtBase(){
-  using namespace limine;
-  return requests::kernel_addr_req.response->virtual_base;
+  return Limine::kernel_addr_req.response->virtual_base;
 }
 
 kvirtaddr_t KernelPhysBase(){
-  using namespace limine;
-  return requests::kernel_addr_req.response->physical_base;
+  return Limine::kernel_addr_req.response->physical_base;
 }
 
 //-------------------------------------------------------------
@@ -36,8 +32,7 @@ kvirtaddr_t KernelPhysBase(){
 
 physaddr_t TopUseableAddress(){
   // procedure to get the top limit of usable ram
-  using namespace limine;
-  limine_memmap_response* memMaps = requests::memorymap_request.response;
+  limine_memmap_response* memMaps = Limine::memorymap_request.response;
   // find the top most usable memory region
   std::uint16_t count = 0;
   auto topEntry = memMaps->entries[memMaps->entry_count - count];
@@ -52,8 +47,7 @@ physaddr_t TopUseableAddress(){
 
 physaddr_t BottomUseableAddress(){
   // procedure to get the bottom limit of usable ram
-  using namespace limine;
-  limine_memmap_response* memMaps = requests::memorymap_request.response;
+  limine_memmap_response* memMaps = Limine::memorymap_request.response;
   // find the bottom most usable memory region
   std::uint16_t count = 0;
   auto bottomEntry = memMaps->entries[count];
@@ -66,12 +60,11 @@ physaddr_t BottomUseableAddress(){
 }
 
 BaseLength LongestBaseLength(){
-  using namespace limine::requests;
   // setting up
-  if(memorymap_request.response == nullptr){
+  if(Limine::memorymap_request.response == nullptr){
     kout << "MEM FAIL\n";
   }
-  limine_memmap_response* response = memorymap_request.response;
+  limine_memmap_response* response = Limine::memorymap_request.response;
   std::uint64_t totalEntries = response->entry_count;
   limine_memmap_entry** entries = response->entries;
   // now we can begin looping through to get largest available
@@ -148,9 +141,8 @@ void PrintPageIndicies(kvirtaddr_t vaddr){
 
 void PrintPageFrames(){
   // Prints in the format (index, page, length)
-  using namespace limine;
-  std::uint64_t mem_entries_t = requests::memorymap_request.response->entry_count;
-  limine_memmap_entry** entries = requests::memorymap_request.response->entries;
+  std::uint64_t mem_entries_t = Limine::memorymap_request.response->entry_count;
+  limine_memmap_entry** entries = Limine::memorymap_request.response->entries;
   std::size_t index = 0;
   for(std::uint64_t i = 0; i < mem_entries_t; i++){
     // only count memory mapping regions which are availabe

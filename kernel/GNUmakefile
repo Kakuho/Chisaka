@@ -117,7 +117,7 @@ override NASMFLAGS += \
 
 # Use "find" to glob all *.cpp, *.c, *.S, and *.asm files in the tree and obtain the
 # object and header dependency file names.
-override CXXFILES := $(shell cd src && find -L * -type f -name '*.cpp' -not -path "integration_tests/*")
+override CXXFILES := $(shell cd src && find -L * -type f -name '*.cpp' -not -path "integration_tests/*" -not -path "grains/*" -not -path "*/samples/*")
 override CFILES := $(shell cd src && find -L * -type f -name '*.c')
 override ASFILES := $(shell cd src && find -L * -type f -name '*.S')
 override NASMFILES := $(shell cd src && find -L * -type f -name '*.asm')
@@ -128,7 +128,7 @@ override HEADER_DEPS := $(addprefix build/obj/,$(CXXFILES:.cpp=.cpp.d) $(CFILES:
 .PHONY: all
 all: build/bin/$(KERNEL)
 
-src/firmware/limine/limine.h:
+src/limine/limine.h:
 	curl -Lo $@ https://github.com/limine-bootloader/limine/raw/trunk/limine.h
 
 # Link rules for the final kernel executable.
@@ -140,12 +140,12 @@ build/bin/$(KERNEL): GNUmakefile scripts/linker.ld $(OBJ)
 -include $(HEADER_DEPS)
 
 # Compilation rules for *.cpp files.
-build/obj/%.cpp.o: src/%.cpp GNUmakefile src/firmware/limine/limine.h
+build/obj/%.cpp.o: src/%.cpp GNUmakefile src/limine/limine.h
 	mkdir -p "$$(dirname $@)"
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $< -o $@
 
 # Compilation rules for *.c files.
-build/obj/%.c.o: src/%.c GNUmakefile src/firmware/limine/limine.h
+build/obj/%.c.o: src/%.c GNUmakefile src/limine/limine.h
 	mkdir -p "$$(dirname $@)"
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
@@ -166,4 +166,4 @@ clean:
 
 .PHONY: distclean
 distclean: clean
-	rm -f src/firmware/limine/limine.h
+	rm -f src/limine/limine.h

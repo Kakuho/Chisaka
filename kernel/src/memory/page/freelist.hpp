@@ -11,8 +11,6 @@
 #include "./../alignment.hpp"
 #include "./../memory_map/memory_map_descriptor.hpp"
 
-#include "firmware/limine/limine.h"
-#include "firmware/limine/requests.hpp"
 #include "drivers/serial/kostream.hpp"
 
 namespace Mem::Page::Freelist{

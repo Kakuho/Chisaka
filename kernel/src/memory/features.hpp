@@ -8,7 +8,7 @@
 #include "address.hpp"
 #include "kassert.hpp"
 #include "drivers/serial/kostream.hpp"
-#include "firmware/limine/requests.hpp"
+#include "limine/utility.hpp"
 
 namespace Mem{
 

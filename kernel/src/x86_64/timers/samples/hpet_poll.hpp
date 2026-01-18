@@ -18,7 +18,7 @@ namespace X8664::Timers::Samples::HpetPoll{
     inline void PollPeriodic(){
       // Polling the value of a periodic comparator
       Firmware::Acpi::TableManager acpiTables{};
-      acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(limine::requests::rsdp_request.response->address));
+      acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(Limine::rsdp_request.response->address));
       auto pHpetTable = acpiTables.HpetPtr();
       kout << "Hpet Base Address = " << pHpetTable->BaseAddress() << '\n';
 
@@ -51,7 +51,7 @@ namespace X8664::Timers::Samples::HpetPoll{
 
   inline void PollMainCounter(){
     Firmware::Acpi::TableManager acpiTables{};
-    acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(limine::requests::rsdp_request.response->address));
+    acpiTables.Initialise(static_cast<Firmware::Acpi::RsdpTable*>(Limine::rsdp_request.response->address));
     auto pHpetTable = acpiTables.HpetPtr();
     kout << "Hpet Base Address = " << pHpetTable->BaseAddress() << '\n';
     Timers::HpetController hpetController{pHpetTable->BaseAddress()};

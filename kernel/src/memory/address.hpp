@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <concepts>
 
-#include "firmware/limine/requests.hpp"
+#include "limine/utility.hpp"
 
 namespace Mem{
 
