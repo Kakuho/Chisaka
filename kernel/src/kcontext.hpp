@@ -2,6 +2,7 @@
 
 // namespace to store and configure your global kernel managers
 
+#include <cstddef>
 #include "limine/utility.hpp"
 #include "types.hpp"
 
