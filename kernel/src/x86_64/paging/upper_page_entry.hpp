@@ -8,9 +8,9 @@
 #include <cstdint>
 #include <cassert>
 
-#include "memory/alignment.hpp"
-#include "memory/address.hpp"
 #include "drivers/serial/kostream.hpp"
+
+#include "kcontext.hpp"
 
 namespace X8664{
 
@@ -96,7 +96,7 @@ X8664::UpperPageEntry::InitialiseBuffer(VirtAddr_t address, std::uint8_t flags) 
   // assumption: address is a kernel virtual address
   m_buffer = 0;
   m_buffer |= flags;
-  m_buffer |= (Mem::KVirtToPhysAddr(address) << 12);
+  m_buffer |= (Chisaka::KContext::Get().VirtToPhysAddr(address) << 12);
 }
 
 constexpr const X8664::UpperPageEntry& 

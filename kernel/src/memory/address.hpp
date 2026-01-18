@@ -33,8 +33,6 @@ namespace Mem{
   //  Conversions between address types
   //-------------------------------------------------------------
 
-  physaddr_t KVirtToPhysAddr(kvirtaddr_t vaddr);
-
   template<typename T>
     requires IsAddressType<T>
   constexpr void* PVAddrToPtr(T addr){

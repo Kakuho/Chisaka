@@ -6,10 +6,6 @@ namespace Mem{
 //  Conversions between the physical and virtual addresses
 //-------------------------------------------------------------
 
-physaddr_t KVirtToPhysAddr(kvirtaddr_t vaddr){
-  return vaddr - Limine::hhdm_request.response->offset;
-}
-
 //-------------------------------------------------------------
 //  Kernel's virtual base address
 //-------------------------------------------------------------
