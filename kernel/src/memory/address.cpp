@@ -3,22 +3,6 @@
 namespace Mem{
 
 //-------------------------------------------------------------
-//  Conversions between the physical and virtual addresses
-//-------------------------------------------------------------
-
-//-------------------------------------------------------------
-//  Kernel's virtual base address
-//-------------------------------------------------------------
-
-kvirtaddr_t KernelVirtBase(){
-  return Limine::kernel_addr_req.response->virtual_base;
-}
-
-kvirtaddr_t KernelPhysBase(){
-  return Limine::kernel_addr_req.response->physical_base;
-}
-
-//-------------------------------------------------------------
 //  Useful Queries
 //-------------------------------------------------------------
 
