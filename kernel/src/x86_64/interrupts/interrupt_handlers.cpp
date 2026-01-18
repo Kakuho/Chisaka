@@ -49,15 +49,6 @@ void contextSwitchISR(void* stackaddr){
 }
 
 void PageFaultISR(){
-  //kassert("Pagefault isr not implemented" && false);
-  /*
-  Mem::physaddr_t faultingAddr = readcr2();
-  kout << intmode::hex;
-  kout << "PAGEFAULTING" << '\n'
-       << "faulting address: " << faultingAddr << '\n';
-  // now we need to resolve faulting address
-  Mem::ExtractPagingIndices(faultingAddr);
-  */
 }
 
 } // extern "C"

@@ -3,18 +3,19 @@
 #include "upper_page_table.hpp"
 
 #include "../registers/control_registers.hpp"
-#include "memory/address.hpp"
 #include "kassert.hpp"
+
+#include "types.hpp"
 
 namespace X8664{
 
-Mem::physaddr_t GetBaseTable();
+Chisaka::PhysAddr GetBaseTable();
 
 void ParsePageTableCommon();
 
 void Map( UpperPageTable& uptbl, 
-          Mem::kvirtaddr_t vbase, 
-          Mem::physaddr_t pbase, 
+          Chisaka::VirtAddr vbase, 
+          Chisaka::PhysAddr pbase, 
           std::size_t gigabytes
         );
 

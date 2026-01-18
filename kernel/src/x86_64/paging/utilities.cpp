@@ -1,8 +1,9 @@
 #include "utilities.hpp"
+#include "types.hpp"
 
 namespace X8664{
 
-Mem::physaddr_t GetBaseTable(){
+Chisaka::PhysAddr GetBaseTable(){
   // intel vol3a.4.5.4
   static constexpr std::uint64_t MASK = (0xFFFFFFFul << 12);
   std::uint64_t cr3 = get_cr3();
@@ -10,8 +11,8 @@ Mem::physaddr_t GetBaseTable(){
 }
 
 void Map( UpperPageTable& uptbl, 
-          Mem::kvirtaddr_t vbase, 
-          Mem::physaddr_t pbase, 
+          Chisaka::VirtAddr vbase, 
+          Chisaka::PhysAddr pbase, 
           std::size_t gigabytes
         )
 {
