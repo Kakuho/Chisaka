@@ -6,7 +6,7 @@
 
 #include "drivers/serial/kostream.hpp"
 #include "kassert.hpp"
-#include "memory/address.hpp"
+#include "types.hpp"
 
 //  the handlers are linked using C linkage, making it easier to call from assembly.
 

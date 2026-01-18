@@ -7,15 +7,16 @@
 #include "kassert.hpp"
 #include "aii/string.h"
 
-#include "./../address.hpp"
 #include "./../alignment.hpp"
 #include "./../memory_map/memory_map_descriptor.hpp"
 
 #include "drivers/serial/kostream.hpp"
 
+#include "types.hpp"
+
 namespace Mem::Page::Freelist{
 
-using AddrType = kvirtaddr_t;
+using AddrType = Chisaka::PhysAddr;
 static constexpr std::uint16_t PAGESIZE = 0x1000;
 
 struct ListEntry{

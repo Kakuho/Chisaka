@@ -11,8 +11,8 @@
 #include "attributes.hpp"
 #include "kassert.hpp"
 
-#include "memory/address.hpp"
 #include "drivers/serial/kostream.hpp"
+#include "types.hpp"
 
 namespace X8664{
 
