@@ -4,7 +4,6 @@
 // the system
 
 #include <cstdint>
-#include "memory/address.hpp"
 #include "memory/memory_map/memory_map_descriptor.hpp"
 #include "drivers/serial/kostream.hpp"
 

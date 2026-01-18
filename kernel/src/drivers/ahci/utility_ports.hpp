@@ -7,7 +7,6 @@
 #include "drivers/pci/constants.hpp"
 #include "drivers/pci/pci.hpp"
 #include "drivers/serial/kostream.hpp"
-#include "memory/address.hpp"
 
 #include "kassert.hpp"
 #include "aii/string.h"

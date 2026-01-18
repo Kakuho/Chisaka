@@ -10,7 +10,6 @@
 #include <initializer_list>
 
 #include "memory_map_entry.hpp"
-#include "./../address.hpp"
 
 #include "aii/array.hpp"
 #include "kassert.hpp"

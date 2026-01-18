@@ -20,7 +20,6 @@
 #include "kmalloc.hpp"
 #include "kassert.hpp"
 
-#include "memory/address.hpp"
 #include "memory/heap/allocator.hpp"
 
 #include "aii/array.hpp"

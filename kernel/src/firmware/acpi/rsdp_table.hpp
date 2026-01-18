@@ -5,7 +5,6 @@
 //  This is the entry point to acpi services, and it contains a physical pointer to the XSDT Table
 //  
 
-#include "memory/address.hpp"
 #include "table_header.hpp"
 #include "types.hpp"
 

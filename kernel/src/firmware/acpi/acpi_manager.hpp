@@ -6,7 +6,6 @@
 #include "xsdt_table.hpp"
 
 #include "limine/utility.hpp"
-#include "memory/address.hpp"
 
 namespace Firmware::Acpi{
 

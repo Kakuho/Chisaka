@@ -1,3 +1,4 @@
+/*
 // this file contains global replacement functions for the usual allocation and 
 // deallocation functions.
 
@@ -23,3 +24,4 @@ void operator delete(void* vaddr, std::size_t size) noexcept{
   kout << "operator new(void*, std::size_t) is not implemented" << '\n';
   X8664::HaltCatchFire();
 }
+*/

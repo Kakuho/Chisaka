@@ -1,5 +1,4 @@
 #include "table_manager.hpp"
-#include "memory/address.hpp"
 
 namespace Firmware::Acpi{
 

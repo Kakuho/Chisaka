@@ -16,7 +16,6 @@ namespace Mem{
   template<typename T>
   concept NotIntegralAddressType = !IsAddressType<T>;
 
-
   template<typename T>
   concept IsPointerType = std::is_pointer_v<T>;
 

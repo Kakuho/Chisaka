@@ -1,5 +1,4 @@
-#ifndef  X86_64_INTERRUPTS_CONTROLLERS_APIC_UTIL_HPP
-#define  X86_64_INTERRUPTS_CONTROLLERS_APIC_UTIL_HPP
+#pragma once
 
 // Just some example procedures to use
 
@@ -9,7 +8,6 @@
 
 #include "x86_64/features/features.hpp"
 #include "x86_64/features/msr.hpp"
-#include "memory/address.hpp"
 #include "drivers/serial/kostream.hpp"
 
 namespace X8664::Interrupts{
@@ -31,5 +29,3 @@ void TryApic(){
 }
 
 }
-
-#endif

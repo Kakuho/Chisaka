@@ -7,7 +7,6 @@
 #include <cassert>
 
 #include "table_header.hpp"
-#include "memory/address.hpp"
 
 #include "aii/array.hpp"
 #include "drivers/serial/kostream.hpp"

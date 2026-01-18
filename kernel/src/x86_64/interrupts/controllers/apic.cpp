@@ -1,5 +1,4 @@
 #include "apic.hpp"
-//#include "memory/address.hpp"
 #include "x86_64/features/features.hpp"
 
 #include "types.hpp"

@@ -1,5 +1,4 @@
 #include "frame_array.hpp"
-#include "memory/address.hpp"
 #include "memory/page/constants.hpp"
 #include "palloc.hpp"
 #include "debug.hpp"
