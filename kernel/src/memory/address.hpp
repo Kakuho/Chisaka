@@ -30,22 +30,6 @@ namespace Mem{
   concept NotIntegralAddressType = ( !IsAddressType<T> );
 
   //-------------------------------------------------------------
-  //  Conversions between address types
-  //-------------------------------------------------------------
-
-  template<typename T>
-    requires IsAddressType<T>
-  constexpr void* PVAddrToPtr(T addr){
-    return reinterpret_cast<void*>(addr);
-  }
-
-  template<typename T>
-    requires IsAddressType<T>
-  constexpr T PtrToAddr(void* ptr){
-    return reinterpret_cast<T>(ptr);
-  }
-
-  //-------------------------------------------------------------
   //  Paging Address Related
   //-------------------------------------------------------------
 
