@@ -6,35 +6,6 @@ namespace Mem{
 //  Useful Queries
 //-------------------------------------------------------------
 
-physaddr_t TopUseableAddress(){
-  // procedure to get the top limit of usable ram
-  limine_memmap_response* memMaps = Limine::memorymap_request.response;
-  // find the top most usable memory region
-  std::uint16_t count = 0;
-  auto topEntry = memMaps->entries[memMaps->entry_count - count];
-  while(topEntry -> type != LIMINE_MEMMAP_USABLE){
-    count++;
-    topEntry = memMaps->entries[memMaps->entry_count - count];
-  }
-  std::uint64_t length = topEntry->length;
-  physaddr_t base = topEntry->base;
-  return base + length;
-}
-
-physaddr_t BottomUseableAddress(){
-  // procedure to get the bottom limit of usable ram
-  limine_memmap_response* memMaps = Limine::memorymap_request.response;
-  // find the bottom most usable memory region
-  std::uint16_t count = 0;
-  auto bottomEntry = memMaps->entries[count];
-  while(bottomEntry -> type != LIMINE_MEMMAP_USABLE){
-    count++;
-    bottomEntry = memMaps->entries[count];
-  }
-  physaddr_t base = bottomEntry->base;
-  return base;
-}
-
 BaseLength LongestBaseLength(){
   // setting up
   if(Limine::memorymap_request.response == nullptr){

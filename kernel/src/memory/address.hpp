@@ -49,9 +49,6 @@ namespace Mem{
   //  Useful Queries
   //-------------------------------------------------------------
   
-  physaddr_t TopUseableAddress();
-  physaddr_t BottomUseableAddress();
-
   struct BaseLength{
     physaddr_t base;
     std::size_t length;
