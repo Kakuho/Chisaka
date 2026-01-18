@@ -8,7 +8,7 @@
 #include "table_header.hpp"
 #include "aii/array.hpp"
 
-#include "memory/address.hpp"
+#include "types.hpp"
 
 namespace Firmware::Acpi{
   struct FadtTable{
@@ -18,8 +18,8 @@ namespace Firmware::Acpi{
 
     public:
       TableHeader header;
-      Mem::physaddr32_t firmwareCtrl; // ptr to FACS
-      Mem::physaddr32_t dsdt;         // ptr to DSDT
+      Chisaka::PhysAddr32 firmwareCtrl; // ptr to FACS
+      Chisaka::PhysAddr32 dsdt;         // ptr to DSDT
       std::uint8_t reserved = 0;
       std::uint8_t preferredProfile;
       std::uint16_t sciInt;

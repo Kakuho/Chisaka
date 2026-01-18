@@ -7,10 +7,11 @@
 #include <cassert>
 
 #include "table_header.hpp"
-
 #include "memory/address.hpp"
+
 #include "aii/array.hpp"
 #include "drivers/serial/kostream.hpp"
+#include "types.hpp"
 
 namespace Firmware::Acpi{
   struct [[gnu::packed]] RsdtTable{
@@ -25,8 +26,8 @@ namespace Firmware::Acpi{
       }
 
       TableHeader* VirtEntryHeader(std::size_t index) const noexcept{
-        Mem::physaddr32_t paddr = tablePointers[index];
-        Mem::kvirtaddr_t vaddr = Mem::PhysToKVirtAddr(paddr);
+        Chisaka::PhysAddr32 paddr = tablePointers[index];
+        Chisaka::VirtAddr vaddr = Mem::PhysToKVirtAddr(paddr);
         return reinterpret_cast<TableHeader*>(vaddr);
       }
 
@@ -53,7 +54,7 @@ namespace Firmware::Acpi{
 
     public:
       TableHeader header;
-      Mem::physaddr32_t tablePointers[1];
+      Chisaka::PhysAddr32 tablePointers[1];
   };
   static_assert(sizeof(RsdtTable) == 40);
 }

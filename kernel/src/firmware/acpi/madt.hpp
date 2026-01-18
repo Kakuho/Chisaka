@@ -1,5 +1,4 @@
-#ifndef FIRMWARE_ACPI_FADT_HPP
-#define FIRMWARE_ACPI_FADT_HPP
+#pragma once
 
 //  Reference - 5.2.12
 //
@@ -8,7 +7,7 @@
 
 #include "table_header.hpp"
 
-#include "memory/address.hpp"
+#include "types.hpp"
 
 namespace Firmware::Acpi{
 
@@ -30,7 +29,7 @@ namespace Firmware::Acpi{
 
     public:
       TableHeader header;
-      Mem::physaddr32_t lapicAddr;
+      Chisaka::PhysAddr32 lapicAddr;
       std::uint32_t flags;
       MadtEntry* entries;
   };
@@ -58,9 +57,7 @@ namespace Firmware::Acpi{
     std::uint8_t length;
     std::uint8_t ioapicId;
     std::uint8_t reserved;
-    Mem::physaddr32_t ioapicAddr;
+    Chisaka::PhysAddr32 ioapicAddr;
     std::uint32_t globalSystemInterruptBase;
   };
 }
-
-#endif
