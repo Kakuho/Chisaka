@@ -17,6 +17,8 @@
 #include "limine/utility.hpp"
 #include "drivers/serial/kostream.hpp"
 
+#include "kcontext.hpp"
+
 namespace Mem{
 
 class MemoryMapDescriptor{

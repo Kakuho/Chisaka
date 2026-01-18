@@ -13,6 +13,8 @@
 #include "drivers/serial/kostream.hpp"
 #include "types.hpp"
 
+#include "kcontext.hpp"
+
 namespace Firmware::Acpi{
   struct [[gnu::packed]] RsdtTable{
     static constexpr Aii::Array<char, 4> SIG ={'R', 'S', 'D', 'T'};
@@ -27,14 +29,14 @@ namespace Firmware::Acpi{
 
       TableHeader* VirtEntryHeader(std::size_t index) const noexcept{
         Chisaka::PhysAddr32 paddr = tablePointers[index];
-        Chisaka::VirtAddr vaddr = Mem::PhysToKVirtAddr(paddr);
+        Chisaka::VirtAddr vaddr = Chisaka::KContext::Get().PhysToVirtAddr(paddr);
         return reinterpret_cast<TableHeader*>(vaddr);
       }
 
       void PrintTableLocations() const noexcept{
         for(std::size_t i = 0; i < header.length; i++){
           kout << "i = : " << i << '\n';
-          kout << "Table Base: " << Mem::PhysToKVirtAddr(tablePointers[0]) << '\n';
+          kout << "Table Base: " << Chisaka::KContext::Get().PhysToVirtAddr(tablePointers[0]) << '\n';
         }
         kout << "fin" << '\n';
       }

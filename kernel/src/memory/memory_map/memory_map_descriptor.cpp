@@ -1,4 +1,5 @@
 #include "memory_map_descriptor.hpp"
+#include "kcontext.hpp"
 
 namespace Mem{
 
@@ -133,7 +134,7 @@ void MemoryMapDescriptor::Print() const noexcept{
     MemoryMapEntry entry = m_entries[i];
     kout << intmode::hex 
          << entry.base << '\t' 
-         << PhysToKVirtAddr(entry.base) << '\t'
+         << Chisaka::KContext::Get().PhysToVirtAddr(entry.base) << '\t'
          << entry.length << '\t' 
          << MemTypeToString(entry.type) << '\n';
   }

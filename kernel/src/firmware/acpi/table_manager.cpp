@@ -17,7 +17,7 @@ void TableManager::InitialiseRoot(RsdpTable* addr){
     kout << "Xsdt Table found: " << intmode::hex << m_rsdp->xsdtAddr;
   }
   else{
-    m_rsdt = reinterpret_cast<RsdtTable*>(Mem::PhysToKVirtAddr(m_rsdp->rsdtAddr));
+    m_rsdt = reinterpret_cast<RsdtTable*>(Chisaka::KContext::Get().PhysToVirtAddr(m_rsdp->rsdtAddr));
     kassert(m_rsdt->IsSignatureCorrect());
     kassert(m_rsdt->header.length == 0x38);
     kout << "rsdt Table found: " << intmode::hex << m_rsdp->rsdtAddr << '\n';

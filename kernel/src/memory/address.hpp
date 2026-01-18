@@ -33,7 +33,6 @@ namespace Mem{
   //  Conversions between address types
   //-------------------------------------------------------------
 
-  kvirtaddr_t PhysToKVirtAddr(physaddr_t paddr);
   physaddr_t KVirtToPhysAddr(kvirtaddr_t vaddr);
 
   template<typename T>

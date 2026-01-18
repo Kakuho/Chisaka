@@ -11,6 +11,7 @@
 #include "table_header.hpp"
 
 #include "kassert.hpp"
+#include "kcontext.hpp"
 
 namespace Firmware::Acpi{
   class TableManager{
