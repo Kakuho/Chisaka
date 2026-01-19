@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "options.hpp"
+#include "ram/options.hpp"
 
 #include "kassert.hpp"
 #include "aii/string.h"
@@ -13,7 +13,7 @@
 
 #include "types.hpp"
 
-namespace Chisaka::RamAllocators{
+namespace Chisaka::PageAllocators{
 
 namespace Freelist{
 
