@@ -15,7 +15,7 @@ namespace Chisaka{
     public:
       // set up of the global kernel objects
       using PageAllocator = PageAllocators::Freelist<MemoryMap>;
-      using gRam = Chisaka::Ram<PageAllocator>;
+      using Ram = Chisaka::Ram<PageAllocator>;
 
     public:
       static KContext& Get(){ static KContext g; return g;}

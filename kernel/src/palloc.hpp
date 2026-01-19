@@ -4,15 +4,15 @@
 
 namespace Kernel{
   inline void* palloc(){
-    return Chisaka::KContext::gRam::Get().Allocate();
+    return Chisaka::KContext::Ram::Get().Allocate();
   }
 
   inline void* palloc(unsigned pages){
-    return Chisaka::KContext::gRam::Get().Allocate(pages);
+    return Chisaka::KContext::Ram::Get().Allocate(pages);
   }
 
   inline void pfree(void* pagebase){
-    return Chisaka::KContext::gRam::Get().Deallocate(pagebase);
+    return Chisaka::KContext::Ram::Get().Deallocate(pagebase);
   }
 
 } // namespace Kernel
