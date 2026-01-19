@@ -1,6 +1,5 @@
 #include "mfs_manager.hpp"
 #include "drivers/ahci/class_interface/ahci_driver.hpp"
-#include "memory/heap/allocator.hpp"
 #include <concepts>
 #include <cstddef>
 
@@ -59,10 +58,10 @@ void MfsManager::FlushSuperBlock()
 }
 
 void MfsManager::InitialiseKernelBuffers(){
-  m_cmdTable = Mem::Heap::Allocator::New<Drivers::Ahci::CommandTable>();
-  m_sbBuffer = Mem::Heap::Allocator::New<SuperBlock>();
-  m_dbBuffer = Mem::Heap::Allocator::New<DataBlock>();
-  m_inodeBuffer = Mem::Heap::Allocator::New<InodeBlock>();
+  m_cmdTable = KContext::KHeap::Get().New<Drivers::Ahci::CommandTable>();
+  m_sbBuffer = KContext::KHeap::Get().New<SuperBlock>();
+  m_dbBuffer = KContext::KHeap::Get().New<DataBlock>();
+  m_inodeBuffer = KContext::KHeap::Get().New<InodeBlock>();
 }
 
 std::uint64_t MfsManager::InitialiseInodes(std::size_t maxInodes){
@@ -89,7 +88,7 @@ std::uint64_t MfsManager::InitialiseInodes(std::size_t maxInodes){
     );
     Drivers::Ahci::AhciDriver::Get().WaitForPortInterrupt(0);
   }
-  Mem::Heap::Allocator::Delete(m_inodeBuffer);
+  KContext::KHeap::Get().Delete(m_inodeBuffer);
   return inodeSectors;
 }
 

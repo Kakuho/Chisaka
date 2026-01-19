@@ -39,10 +39,7 @@ void CheckAhciMode(){
   ioaddr32_t abarOffset = Pci::FormConfigAddress(1, 0, 31, 2, 0x24);
   outl(Pci::CONFIG_ADDRESS, abarOffset);
   const std::uint32_t abar = inl(Pci::CONFIG_DATA);
-  //const std::uint32_t base = abar >> 13;
-  //const std::uint32_t base = Mem::PhysToKVirtAddr(abar >> 13);
   const std::uint32_t base = (abar >> 8) << 8;
-  //const std::uint32_t base = Mem::PhysToKVirtAddr(abar >> 4);
 
   kout << intmode::hex 
        << "Abar: " << abar << '\n'

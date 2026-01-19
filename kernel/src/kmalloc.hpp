@@ -2,13 +2,11 @@
 
 #include <cstdint>
 
-#include "memory/heap/allocator.hpp"
+#include "kcontext.hpp"
 
 namespace Kernel{
-
+  using namespace Chisaka;
   inline void* kmalloc(std::size_t bytes){
-    namespace HeapAllocator = Mem::Heap::Allocator;
-    return HeapAllocator::Allocate(bytes);
+    return KContext::KHeap::Get().Allocate(bytes);
   }
-
 }

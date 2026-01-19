@@ -10,6 +10,7 @@
 #include "drivers/ahci/structs/command_table.hpp"
 #include "drivers/ahci/structs/command_list.hpp"
 #include "drivers/ahci/structs/command_header.hpp"
+#include "drivers/sata/fis/h2d_register.hpp"
 
 #include "drivers/sata/fis/h2d_register.hpp"
 
@@ -20,12 +21,12 @@
 #include "kmalloc.hpp"
 #include "kassert.hpp"
 
-#include "memory/heap/allocator.hpp"
+#include "kcontext.hpp"
 
 #include "aii/array.hpp"
 
 namespace Drivers::Ahci{
-
+  using namespace Chisaka;
 struct AhciDiskPolled;
 
 struct AhciDriver{

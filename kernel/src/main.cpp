@@ -2,6 +2,7 @@
 
 #include "limine/utility.hpp"
 #include "x86_64/utilites.hpp"
+#include "drivers/serial/kostream.hpp"
 
 // Extern declarations for global constructor array.
 

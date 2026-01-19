@@ -10,12 +10,18 @@
 #include "ram/page_allocators/freelist_class.hpp"
 #include "ram/ram.hpp"
 
+#include "kheap/slab/allocator_class_interface.hpp"
+#include "kheap/kheap.hpp"
+
 namespace Chisaka{
   class KContext{
     public:
       // set up of the global kernel objects
       using PageAllocator = PageAllocators::Freelist<MemoryMap>;
       using Ram = Chisaka::Ram<PageAllocator>;
+
+      using HeapAllocator = Slab::Allocator;
+      using KHeap = KHeap<HeapAllocator>;
 
     public:
       static KContext& Get(){ static KContext g; return g;}

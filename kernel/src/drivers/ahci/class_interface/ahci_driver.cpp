@@ -1,7 +1,4 @@
 #include "ahci_driver.hpp"
-#include "drivers/sata/fis/h2d_register.hpp"
-#include "memory/heap/allocator.hpp"
-#include <cstdint>
 
 namespace Drivers::Ahci{
 
@@ -158,7 +155,7 @@ void AhciDriver::InitDisks(){
 void AhciDriver::SetupDisk(std::uint8_t port){
   m_disks[port] = AhciDisk{port};
   // perform identify device, and then set its total sectors
-  auto* identbuffer = Mem::Heap::Allocator::New<IdentifyDeviceBuffer>();
+  auto* identbuffer = KContext::KHeap::Get().New<IdentifyDeviceBuffer>();
   IdentifyDevice(port, identbuffer);
   m_disks[port].SetTotalSectors(identbuffer->NumSectors());
   kout << "Port " << port << " has " << m_disks[port].TotalSectors() << '\n';
@@ -406,7 +403,7 @@ void AhciDriver::IdentifyDevice(
 ){
   auto identFis = Sata::Fis::H2DRegister::Frame::CreateIdentifyDeviceFrame();
   // create the command table
-  auto* cmdtable = Mem::Heap::Allocator::New<CommandTable>();
+  auto* cmdtable = KContext::KHeap::Get().New<CommandTable>();
   cmdtable->SetCommandFis(identFis);
   cmdtable->SetPrdtEntry(0,
       PrdtEntry{reinterpret_cast<void*>(buffer), true, 511}
@@ -432,7 +429,7 @@ void AhciDriver::IdentifyDevice(
     ;;
   }
 
-  Mem::Heap::Allocator::Delete(cmdtable);
+  KContext::KHeap::Get().Delete(cmdtable);
 }
 
 void AhciDriver::WriteSector(
@@ -442,7 +439,7 @@ void AhciDriver::WriteSector(
 ){
   auto writeFis = Sata::Fis::H2DRegister::Frame::CreateWriteFrame(sector);
   // create the command table
-  auto cmdtable = Mem::Heap::Allocator::New<CommandTable>();
+  auto cmdtable = KContext::KHeap::Get().New<CommandTable>();
   cmdtable->SetCommandFis(writeFis);
   cmdtable->SetPrdtEntry(0,
       PrdtEntry{reinterpret_cast<void*>(ibuffer), true, 511}
@@ -467,7 +464,7 @@ void AhciDriver::WriteSector(
     ;;
   }
 
-  Mem::Heap::Allocator::Delete(cmdtable);
+  KContext::KHeap::Get().Delete(cmdtable);
 }
 
 void AhciDriver::WriteSector(
@@ -510,7 +507,7 @@ void AhciDriver::ReadSector(
 ){
   auto readFis = Sata::Fis::H2DRegister::Frame::CreateReadFrame(sector);
   // create the command table
-  auto cmdtable = Mem::Heap::Allocator::New<CommandTable>();
+  auto cmdtable = KContext::KHeap::Get().New<CommandTable>();
   cmdtable->SetCommandFis(readFis);
   cmdtable->SetPrdtEntry(0,
       PrdtEntry{reinterpret_cast<void*>(ibuffer), true, 511}
@@ -535,7 +532,7 @@ void AhciDriver::ReadSector(
     ;;
   }
 
-  Mem::Heap::Allocator::Delete(cmdtable);
+  KContext::KHeap::Get().Delete(cmdtable);
 }
 
 void AhciDriver::ReadSector(

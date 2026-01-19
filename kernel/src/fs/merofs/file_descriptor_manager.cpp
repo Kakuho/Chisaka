@@ -35,7 +35,7 @@ std::uint8_t FileDescriptorTable::TableChunk::NextFree() const{
 
 FileDescriptorTable::FileDescriptorTable()
   :
-    m_root{Mem::Heap::Allocator::New<TableChunk>()},
+    m_root{KContext::KHeap::Get().New<TableChunk>()},
     m_maxEntries{TableChunk::entries},
     m_full{false}
 {
@@ -46,13 +46,13 @@ FileDescriptorTable::~FileDescriptorTable(){
   TableChunk* indexer = m_root;
   while(indexer->next){
     TableChunk* next = indexer->next;
-    Mem::Heap::Allocator::Delete(indexer);
+    KContext::KHeap::Get().Delete(indexer);
     indexer = next;
   }
 }
 
 auto FileDescriptorTable::AllocateChunk() -> TableChunk*{
-  auto allocchunk = Mem::Heap::Allocator::New<TableChunk>();
+  auto allocchunk = KContext::KHeap::Get().New<TableChunk>();
   TableChunk* parent = m_root;
   while(parent){
     if(parent->next){

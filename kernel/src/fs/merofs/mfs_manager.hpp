@@ -14,9 +14,10 @@
 #include "drivers/serial/kostream.hpp"
 #include "aii/string.h"
 
-#include "memory/heap/allocator.hpp"
+#include "kcontext.hpp"
 
 namespace Fs::Merofs{
+  using namespace Chisaka;
 
 struct MfsManager{
   // the main interface to the mero file system
