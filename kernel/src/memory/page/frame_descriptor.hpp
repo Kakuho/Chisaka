@@ -3,13 +3,12 @@
 // Frame Descriptor keeps information regarding a singular page frames
 
 #include <cstdint>
-
-#include "memory/memory_map/memory_map_entry.hpp"
 #include "types.hpp"
+#include "memmap/memory_map_entry.hpp"
 
 namespace Mem::Page{
 
-using PageType = Mem::MemoryMapEntry::Type;
+using PageType = Chisaka::MemoryMapEntry::Type;
 
 class FrameDescriptor{
   enum Flags: std::uint32_t{

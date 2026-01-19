@@ -14,13 +14,13 @@ FrameArray& FrameArray::Get() noexcept{
   return g_frameArray;
 }
 
-void FrameArray::Init(const MemoryMapDescriptor& memmap) noexcept{
+void FrameArray::Init(const MemoryMap& memmap) noexcept{
   Debug::Print("Initialising Page Frame Array...");
   InitMemory(memmap);
   InitFrameDescriptors(memmap);
 }
 
-void FrameArray::InitMemory(const MemoryMapDescriptor& memmap) noexcept{
+void FrameArray::InitMemory(const MemoryMap& memmap) noexcept{
   std::size_t bytes = MemoryRequired(memmap);
   std::size_t pages = bytes / 0x1000;
   if(bytes % 0x1000 != 0){
@@ -31,10 +31,10 @@ void FrameArray::InitMemory(const MemoryMapDescriptor& memmap) noexcept{
   Debug::Print("Frame Array Pages Required: ", pages);
 }
 
-std::size_t FrameArray::MemoryRequired(const MemoryMapDescriptor& memmap) noexcept{
+std::size_t FrameArray::MemoryRequired(const MemoryMap& memmap) noexcept{
   std::size_t pageIndex = 0;
   for(std::uint8_t i = 0; i < memmap.Entries(); i++){
-    const MemoryMapEntry& entry = memmap.Entry(i);
+    const Chisaka::MemoryMapEntry& entry = memmap.Entry(i);
     Chisaka::PhysAddr current = entry.base;
     while(current < entry.base + entry.length){
       pageIndex++;
@@ -44,10 +44,10 @@ std::size_t FrameArray::MemoryRequired(const MemoryMapDescriptor& memmap) noexce
   return pageIndex * PAGE_SIZE;
 }
 
-void FrameArray::InitFrameDescriptors(const MemoryMapDescriptor& memmap) noexcept{
+void FrameArray::InitFrameDescriptors(const MemoryMap& memmap) noexcept{
   std::size_t pageIndex = 0;
   for(std::uint8_t i = 0; i < memmap.Entries(); i++){
-    const MemoryMapEntry& entry = memmap.Entry(i);
+    const Chisaka::MemoryMapEntry& entry = memmap.Entry(i);
     Chisaka::PhysAddr current = entry.base;
     while(current < entry.base + entry.length){
       m_buffer[pageIndex] = FrameDescriptor{current, entry.type};

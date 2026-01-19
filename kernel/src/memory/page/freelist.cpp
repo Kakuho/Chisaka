@@ -18,25 +18,25 @@ std::size_t& FreePages(){ return freePages;}
 
 // Initialisation Routine 
 
-void InitialiseList(const MemoryMapDescriptor& memMap) noexcept;
-void InitialiseLowList(const MemoryMapDescriptor& memMap) noexcept;
+void InitialiseList(const MemoryMap& memMap) noexcept;
+void InitialiseLowList(const MemoryMap& memMap) noexcept;
 AddrType SetupRegion(AddrType base, std::size_t length, AddrType lastAddr);
 
-void Initialise(const MemoryMapDescriptor& memMap) noexcept{
+void Initialise(const MemoryMap& memMap) noexcept{
   FreePages() = 0;
   InitialiseList(memMap);
   InitialiseLowList(memMap);
 }
 
-void InitialiseList(const MemoryMapDescriptor& memMap) noexcept{
+void InitialiseList(const MemoryMap& memMap) noexcept{
   // Initialisation Routine, sets up the free list entries
   bool firstIteration = true;
   bool crossedEntry = false;
   AddrType lastAddr = 0;
   for(std::uint8_t i = 0; i < memMap.Entries(); i++){
-    const MemoryMapEntry& entry = memMap.Entry(i);
+    const Chisaka::MemoryMapEntry& entry = memMap.Entry(i);
     if(entry.base > 0xFFFF'FFFF){
-      if(entry.type == MemoryMapEntry::Type::Useable){
+      if(entry.type == Chisaka::MemoryMapEntry::Type::Useable){
         if(firstIteration){
           Head().next = reinterpret_cast<ListEntry*>(entry.base);
           firstIteration = false;
@@ -52,16 +52,16 @@ void InitialiseList(const MemoryMapDescriptor& memMap) noexcept{
   lastEntry->next = nullptr;
 }
 
-void InitialiseLowList(const MemoryMapDescriptor& memMap) noexcept{
+void InitialiseLowList(const MemoryMap& memMap) noexcept{
   // initialise the low 32-bit physical memories
   bool firstIteration = true;
   bool crossedEntry = false;
   AddrType lastAddr = 0;
   for(std::uint8_t i = 0; i < memMap.Entries(); i++){
-    const MemoryMapEntry& entry = memMap.Entry(i);
+    const Chisaka::MemoryMapEntry& entry = memMap.Entry(i);
     // assuming entries are physical
     if(entry.base + entry.length <= 0xFFFF'FFFF){
-      if(entry.type == MemoryMapEntry::Type::Useable){
+      if(entry.type == Chisaka::MemoryMapEntry::Type::Useable){
         if(firstIteration){
           LowHead().next = reinterpret_cast<ListEntry*>(entry.base);
           firstIteration = false;

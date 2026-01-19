@@ -8,13 +8,16 @@
 #include "aii/string.h"
 
 #include "./../alignment.hpp"
-#include "./../memory_map/memory_map_descriptor.hpp"
+
+#include "memmap/memory_map.hpp"
 
 #include "drivers/serial/kostream.hpp"
 
 #include "types.hpp"
 
 namespace Mem::Page::Freelist{
+
+using namespace Chisaka;
 
 using AddrType = Chisaka::PhysAddr;
 static constexpr std::uint16_t PAGESIZE = 0x1000;
@@ -30,7 +33,7 @@ ListEntry& Head();
 ListEntry& LowHead();
 std::size_t& FreePages();
 
-void Initialise(const MemoryMapDescriptor& memMap) noexcept;
+void Initialise(const MemoryMap memMap) noexcept;
 
 void PrintFreeBases() noexcept;
 void PrintFreeBasesLow() noexcept;

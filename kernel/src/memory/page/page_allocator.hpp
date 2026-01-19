@@ -1,18 +1,19 @@
 #pragma once
 
 #include "freelist.hpp"
-#include "./../memory_map/memory_map_descriptor.hpp"
+
+#include "memmap/memory_map.hpp"
 
 namespace Mem::PageAllocator{
+  using namespace Chisaka;
   namespace Policy = Mem::Page::Freelist;
 
   inline void Initialise(){
-    MemoryMapDescriptor memmap{};
-    Policy::Initialise(memmap);
+    Policy::Initialise(MemoryMap::Get());
   }
 
-  inline void Initialise(const MemoryMapDescriptor& memmap){
-    Policy::Initialise(memmap);
+  inline void Initialise(const MemoryMap& memmap){
+    Policy::Initialise(MemoryMap::Get());
   }
   
   inline void* Allocate(){

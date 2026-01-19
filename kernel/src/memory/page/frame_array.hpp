@@ -4,20 +4,22 @@
 // the system
 
 #include <cstdint>
-#include "memory/memory_map/memory_map_descriptor.hpp"
 #include "drivers/serial/kostream.hpp"
+
+#include "memmap/memory_map.hpp"
 
 #include "frame_descriptor.hpp"
 #include "constants.hpp"
 #include "types.hpp"
 
 namespace Mem::Page{
+  using namespace Chisaka;
 
 class FrameArray{
   public:
     FrameArray() = default;
     FrameArray& Get() noexcept;
-    void Init(const MemoryMapDescriptor& memmap) noexcept;
+    void Init(const MemoryMap& memmap) noexcept;
 
     constexpr std::size_t Size() noexcept {return m_pages;}
     constexpr std::size_t Bytes() noexcept {return Size() * PAGE_SIZE;}
@@ -31,9 +33,9 @@ class FrameArray{
     const FrameDescriptor& operator[](std::size_t index) const noexcept;
 
   private:
-    std::size_t MemoryRequired(const MemoryMapDescriptor& memmap) noexcept;
-    void InitMemory(const MemoryMapDescriptor& memmap) noexcept;
-    void InitFrameDescriptors(const MemoryMapDescriptor& memmap) noexcept;
+    std::size_t MemoryRequired(const MemoryMap& memmap) noexcept;
+    void InitMemory(const MemoryMap& memmap) noexcept;
+    void InitFrameDescriptors(const MemoryMap& memmap) noexcept;
 
   private:
     FrameDescriptor* m_buffer;
