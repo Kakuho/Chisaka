@@ -1,8 +1,5 @@
 #include "frame_array.hpp"
-#include "memory/page/constants.hpp"
 #include "palloc.hpp"
-#include "debug.hpp"
-#include <cstddef>
 
 namespace Chisaka{
 
@@ -30,10 +27,10 @@ std::size_t FrameArray::MemoryRequired(const MemoryMap& memmap) noexcept{
     Chisaka::PhysAddr current = entry.base;
     while(current < entry.base + entry.length){
       pageIndex++;
-      current += KContext::PAGE_SIZE;
+      current += Config::PAGE_SIZE;
     }
   }
-  return pageIndex * KContext::PAGE_SIZE;
+  return pageIndex * Config::PAGE_SIZE;
 }
 
 void FrameArray::InitFrameDescriptors(const MemoryMap& memmap) noexcept{
@@ -43,14 +40,14 @@ void FrameArray::InitFrameDescriptors(const MemoryMap& memmap) noexcept{
     Chisaka::PhysAddr current = entry.base;
     while(current < entry.base + entry.length){
       m_buffer[pageIndex] = FrameDescriptor{current, entry.type};
-      current += KContext::PAGE_SIZE;
+      current += Config::PAGE_SIZE;
     }
   }
 }
 
 std::size_t FrameArray::IndexOf(Chisaka::PhysAddr paddr) const noexcept{
   kassert(paddr < 0x240000000);
-  return paddr/KContext::PAGE_SIZE;
+  return paddr/Config::PAGE_SIZE;
 }
 
 Chisaka::PhysAddr FrameArray::BaseOf(std::size_t index) const noexcept{ 

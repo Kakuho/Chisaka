@@ -1,19 +1,18 @@
 #pragma once
 
-#include "memory/page/freelist.hpp"
-#include "memory/page/page_allocator.hpp"
+#include "kcontext.hpp"
 
 namespace Kernel{
   inline void* palloc(){
-    return Mem::PageAllocator::Allocate();
+    return Chisaka::KContext::gRam::Get().Allocate();
   }
 
   inline void* palloc(unsigned pages){
-    return Mem::PageAllocator::Allocate(pages);
+    return Chisaka::KContext::gRam::Get().Allocate(pages);
   }
 
   inline void pfree(void* pagebase){
-    return Mem::PageAllocator::Deallocate(pagebase);
+    return Chisaka::KContext::gRam::Get().Deallocate(pagebase);
   }
 
 } // namespace Kernel

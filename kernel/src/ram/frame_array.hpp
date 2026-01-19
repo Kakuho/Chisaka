@@ -7,8 +7,11 @@
 
 #include "frame_descriptor.hpp"
 
+#include "config.hpp"
 #include "types.hpp"
-#include "kcontext.hpp"
+
+#include "debug.hpp"
+
 #include "memmap/memory_map.hpp"
 #include "drivers/serial/kostream.hpp"
 

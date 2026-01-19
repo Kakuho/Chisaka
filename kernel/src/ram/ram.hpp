@@ -16,9 +16,9 @@ namespace Chisaka{
     public:
       static Ram& Get(){static Ram g_ram; return g_ram;}
 
-      void* Allocate(){ A::Get().Allocate();}
-      void* Allocate(unsigned npages){ A::Get().Allocate(npages);}
-      void Deallocate(void* base){ A::Get().Deallocate(base);}
+      void* Allocate(){ A::Get().AllocatePage();}
+      void* Allocate(unsigned npages){ A::Get().AllocatePages(npages);}
+      void Deallocate(void* base){ A::Get().DeallocPage(base);}
 
     private:
       FrameArray m_frames;

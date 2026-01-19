@@ -6,10 +6,18 @@
 #include "limine/utility.hpp"
 #include "types.hpp"
 
+#include "memmap/memory_map.hpp"
+#include "ram/page_allocators/freelist_class.hpp"
+#include "ram/ram.hpp"
+
 namespace Chisaka{
   class KContext{
     public:
-      static constexpr std::uint16_t PAGE_SIZE = 0x1000;
+      // set up of the global kernel objects
+      using PageAllocator = PageAllocators::Freelist<MemoryMap>;
+      using gRam = Chisaka::Ram<PageAllocator>;
+
+    public:
       static KContext& Get(){ static KContext g; return g;}
 
       void InitKContext(){

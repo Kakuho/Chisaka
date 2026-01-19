@@ -11,7 +11,6 @@
 
 #include "memory_map_entry.hpp"
 
-#include "kcontext.hpp"
 #include "types.hpp"
 #include "kassert.hpp"
 
