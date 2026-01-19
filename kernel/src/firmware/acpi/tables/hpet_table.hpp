@@ -1,7 +1,7 @@
 #pragma once
 
 #include "table_header.hpp"
-#include "gas.hpp"
+#include "firmware/acpi/gas.hpp"
 
 #include "types.hpp"
 

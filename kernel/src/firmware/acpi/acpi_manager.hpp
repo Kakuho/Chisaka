@@ -1,9 +1,9 @@
 #pragma once
 
-#include "rsdp_table.hpp"
-#include "fadt_table.hpp"
-#include "rsdt_table.hpp"
-#include "xsdt_table.hpp"
+#include "tables/rsdp_table.hpp"
+#include "tables/fadt_table.hpp"
+#include "tables/rsdt_table.hpp"
+#include "tables/xsdt_table.hpp"
 
 #include "limine/utility.hpp"
 

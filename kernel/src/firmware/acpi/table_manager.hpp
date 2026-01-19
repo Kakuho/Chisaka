@@ -3,12 +3,12 @@
 // A container to store pointers acpi tables.
 // The pointers are all virtual pointers.
 
-#include "rsdp_table.hpp"
-#include "rsdt_table.hpp"
-#include "xsdt_table.hpp"
-#include "fadt_table.hpp"
-#include "hpet_table.hpp"
-#include "table_header.hpp"
+#include "tables/rsdp_table.hpp"
+#include "tables/rsdt_table.hpp"
+#include "tables/xsdt_table.hpp"
+#include "tables/fadt_table.hpp"
+#include "tables/hpet_table.hpp"
+#include "tables/table_header.hpp"
 
 #include "kassert.hpp"
 #include "kcontext.hpp"
