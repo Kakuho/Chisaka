@@ -10,7 +10,7 @@
 #include "aii/array.hpp"
 #include "palloc.hpp"
 
-namespace Mem::Heap::Allocator{
+namespace Chisaka::Slab::Allocator{
   void Initialise();
   void Initialise(void* baseAddr);
 
@@ -18,21 +18,21 @@ namespace Mem::Heap::Allocator{
   void InitialiseLists(void* initialAddr);
   void InitialiseLowBuffer();
 
-  Mem::Heap::Buffer& Buffer64();
-  Mem::Heap::Buffer*& LowBuffer();
+  Buffer& Buffer64();
+  Buffer*& LowBuffer();
 
-  void AddBuffer(Mem::Heap::Buffer* buffer);             
-  void AddListDescriptor(Mem::Heap::ListDescriptor* ld); 
-  void RemoveBuffer(Mem::Heap::Buffer* buffer);               // still requires impl
+  void AddBuffer(Buffer* buffer);             
+  void AddListDescriptor(ListDescriptor* ld); 
+  void RemoveBuffer(Buffer* buffer);               // still requires impl
 
   // would be nice to have std::optional<Buffer*> as return type
-  Mem::Heap::Buffer* GetBuffer(std::uint16_t size);
+  Buffer* GetBuffer(std::uint16_t size);
   bool BufferExists(std::uint16_t size);
 
-  Mem::Heap::Buffer* NewBuffer(std::uint16_t bufferSize);
-  Mem::Heap::ListDescriptor* NewListDescriptor( std::uint16_t bufferSize, 
+  Buffer* NewBuffer(std::uint16_t bufferSize);
+  ListDescriptor* NewListDescriptor( std::uint16_t bufferSize, 
                                                 std::uint8_t pages);
-  Mem::Heap::ListDescriptor* NewListDescriptor(void* baseaddr, std::uint8_t bufferSize, 
+  ListDescriptor* NewListDescriptor(void* baseaddr, std::uint8_t bufferSize, 
                                                std::uint8_t pages);
 
   void* Allocate(std::size_t bytes);

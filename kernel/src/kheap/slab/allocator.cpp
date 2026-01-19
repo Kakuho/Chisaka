@@ -1,13 +1,12 @@
 #include "allocator.hpp"
-#include <cstdint>
 
 namespace{
-  using namespace Mem::Heap;
+  using namespace Chisaka::Slab;
   Buffer   buffer64;
   Buffer*  lowAddrBuffer;  
 }
 
-namespace Mem::Heap::Allocator{
+namespace Chisaka::Slab::Allocator{
 
 using namespace Mem::Heap;
 

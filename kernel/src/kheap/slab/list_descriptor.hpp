@@ -12,7 +12,7 @@
 #include "drivers/serial/kostream.hpp"
 #include "aii/array.hpp"
 
-namespace Mem::Heap{
+namespace Chisaka::Slab{
 
 class ListDescriptor{
   static constexpr std::uint16_t PAGE_SIZE = 0x1000;

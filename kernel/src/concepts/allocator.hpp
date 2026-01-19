@@ -10,4 +10,7 @@ namespace Chisaka::Concepts{
     {a.AllocatePages(pages)} -> std::same_as<void*>;
     a.DeallocPage(base);
   };
+
+  template<typename A>
+  concept Allocator = PageAllocator<A>;
 }

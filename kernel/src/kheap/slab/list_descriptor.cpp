@@ -1,6 +1,6 @@
 #include "list_descriptor.hpp"
 
-namespace Mem::Heap{
+namespace Chisaka::Slab{
 
 ListDescriptor::ListDescriptor(
     void* baseAddr, 

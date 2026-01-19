@@ -1,7 +1,7 @@
 #include "buffer.hpp"
 #include "allocator.hpp"
 
-namespace Mem::Heap{
+namespace Chisaka::Slab{
     
 Buffer::Buffer():
   m_freeLists{nullptr},

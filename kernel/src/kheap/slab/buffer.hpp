@@ -9,7 +9,7 @@
 // Buffers has unique ownership of their List of List Descriptors.
 // When buffers deallocate, all of their list descriptors must also deallocate.
 
-namespace Mem::Heap{
+namespace Chisaka::Slab{
 
 class Buffer{
   static constexpr std::uint8_t OP_LIMIT = 255; // used for gc
