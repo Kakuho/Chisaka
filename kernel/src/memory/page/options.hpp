@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Mem::Page{
+namespace Mem::Page::Freelist{
   
 enum class OPT: std::uint8_t{
   Z = 1,

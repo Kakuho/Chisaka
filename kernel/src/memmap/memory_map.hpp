@@ -24,6 +24,7 @@ namespace Chisaka{
 class MemoryMap{
   static constexpr std::size_t MAX_ENTRIES = 20;
   public:
+    using Entry_t = MemoryMapEntry;
     static MemoryMap& Get(){ static MemoryMap memmap; return memmap;}
     void Init() noexcept;
     void Init(std::initializer_list<MemoryMapEntry> src) noexcept;
