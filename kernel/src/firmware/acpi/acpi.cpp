@@ -1,13 +1,13 @@
-#include "table_manager.hpp"
+#include "acpi.hpp"
 
-namespace Firmware::Acpi{
+namespace Chisaka{
 
-void TableManager::Initialise(RsdpTable* addr){
+void Acpi::Initialise(RsdpTable* addr){
   InitialiseRoot(addr);
   InitialiseTablePtrs();
 }
 
-void TableManager::InitialiseRoot(RsdpTable* addr){
+void Acpi::InitialiseRoot(RsdpTable* addr){
   m_rsdp = addr;
   kassert(m_rsdp->IsSignatureCorrect());
   if(m_rsdp->XsdtPresent()){
@@ -23,7 +23,7 @@ void TableManager::InitialiseRoot(RsdpTable* addr){
   }
 }
 
-void TableManager::InitialiseTablePtrs(){
+void Acpi::InitialiseTablePtrs(){
   for(std::size_t i = 0; i < m_rsdt->header.length; i++){
     TableHeader* nextheader = m_rsdt->VirtEntryHeader(i);
     if(nextheader->signature == FadtTable::SIG){

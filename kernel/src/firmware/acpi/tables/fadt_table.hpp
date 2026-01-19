@@ -10,7 +10,7 @@
 
 #include "types.hpp"
 
-namespace Firmware::Acpi{
+namespace Chisaka{
   struct FadtTable{
     static constexpr Aii::Array<char, 4> SIG = {'F', 'A', 'C', 'P'};
     public:

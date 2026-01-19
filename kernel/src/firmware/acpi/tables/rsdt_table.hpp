@@ -14,7 +14,7 @@
 
 #include "kcontext.hpp"
 
-namespace Firmware::Acpi{
+namespace Chisaka{
   struct [[gnu::packed]] RsdtTable{
     static constexpr Aii::Array<char, 4> SIG ={'R', 'S', 'D', 'T'};
 

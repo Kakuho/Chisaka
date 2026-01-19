@@ -7,7 +7,7 @@
 #include "drivers/serial/kostream.hpp"
 #include "kassert.hpp"
 
-namespace Firmware::Acpi{
+namespace Chisaka{
 
   struct [[gnu::packed]] Gas{
     public:

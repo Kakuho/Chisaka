@@ -8,7 +8,7 @@
 #include "table_header.hpp"
 #include "types.hpp"
 
-namespace Firmware::Acpi{
+namespace Chisaka{
 
   struct [[gnu::packed]] RsdpTable{
       static constexpr Aii::Array<char, 8> SIG ={

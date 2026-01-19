@@ -9,7 +9,7 @@
 #include "aii/array.hpp"
 #include "types.hpp"
 
-namespace Firmware::Acpi{
+namespace Chisaka{
   class [[gnu::packed]] XsdtTable{
     static constexpr Aii::Array<char, 4> SIG ={'X', 'S', 'D', 'T'};
 

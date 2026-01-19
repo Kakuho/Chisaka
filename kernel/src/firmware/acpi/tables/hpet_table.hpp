@@ -7,7 +7,7 @@
 
 #include "aii/array.hpp"
 
-namespace Firmware::Acpi{
+namespace Chisaka{
   struct [[gnu::packed]] HpetTable{
     constexpr static Aii::Array<char, 4> SIG = {'H', 'P', 'E', 'T'};
 

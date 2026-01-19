@@ -13,19 +13,20 @@
 #include "kassert.hpp"
 #include "kcontext.hpp"
 
-namespace Firmware::Acpi{
-  class TableManager{
+namespace Chisaka{
+  class Acpi{
     public:
-      TableManager() = default;
+      static Acpi& Get(){ static Acpi a; return a;}
+      void Init(RsdpTable* addr){ Initialise(addr);}
 
       RsdtTable* RsdtPtr(){ return m_rsdt;}
       HpetTable* HpetPtr(){ return m_hpet;}
 
+    private:
       void Initialise(RsdpTable* addr);
       void InitialiseRoot(RsdpTable* addr);
       void InitialiseTablePtrs();
 
-    private:
       RsdpTable* m_rsdp; 
       union{
         RsdtTable* m_rsdt;

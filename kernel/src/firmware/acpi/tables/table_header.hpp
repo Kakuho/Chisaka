@@ -8,7 +8,7 @@
 #include "aii/array.hpp"
 #include "drivers/serial/kostream.hpp"
 
-namespace Firmware::Acpi{
+namespace Chisaka{
 
   struct [[gnu::packed]] TableHeader{
     public:

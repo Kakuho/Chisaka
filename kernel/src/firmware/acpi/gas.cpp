@@ -1,6 +1,6 @@
 #include "gas.hpp"
 
-namespace Firmware::Acpi{
+namespace Chisaka{
 
 const char* Gas::AddressSpaceIdString(std::uint8_t id){
   switch(id){

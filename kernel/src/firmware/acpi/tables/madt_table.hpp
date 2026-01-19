@@ -9,7 +9,7 @@
 
 #include "types.hpp"
 
-namespace Firmware::Acpi{
+namespace Chisaka{
 
   // Reference ACPI: 5.2.12
   //  - Multiple APIC Definition Table
