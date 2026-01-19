@@ -10,7 +10,7 @@
 #include "ram/page_allocators/freelist.hpp"
 #include "ram/ram.hpp"
 
-#include "kheap/slab/allocator_class_interface.hpp"
+#include "kheap/slab/allocator.hpp"
 #include "kheap/kheap.hpp"
 
 namespace Chisaka{

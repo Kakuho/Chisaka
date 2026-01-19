@@ -1,17 +1,9 @@
 #include "allocator.hpp"
+#include "palloc.hpp"
 
-namespace{
-  using namespace Chisaka::Slab;
-  Buffer   buffer64;
-  Buffer*  lowAddrBuffer;  
-}
+namespace Chisaka::Slab{
 
-namespace Chisaka::Slab::Ns::Allocator{
-
-Buffer& Buffer64(){ return buffer64;}
-Buffer*& LowBuffer(){ return lowAddrBuffer;}
-
-void Initialise(){
+void Allocator::Init(){
   Buffer64().SetBufferSize(64);
   InitialiseLists();
   InitialiseLowBuffer();
@@ -28,19 +20,19 @@ void Initialise(){
   kassert(Buffer64().PrevBuffer() == &Buffer64());
 }
 
-void Initialise(void* baseAddr){
-  Buffer64().SetBufferSize(64);
+void Allocator::Init(void* baseAddr){
+  m_buffer64.SetBufferSize(64);
   InitialiseLists(baseAddr);
   InitialiseLowBuffer();
 }
 
-void InitialiseLists(){
+void Allocator::InitialiseLists(){
   void* baseAddr = Kernel::palloc();
   kout << "BaseAddr:" << reinterpret_cast<std::uintptr_t>(baseAddr) << '\n';
   InitialiseLists(baseAddr);
 }
 
-void InitialiseLists(void* initialAddr){
+void Allocator::InitialiseLists(void* initialAddr){
   ListDescriptor firstList64{initialAddr, 64, 1};
   firstList64.SetupLinkage();
   ListDescriptor* onList64 = 
@@ -50,17 +42,17 @@ void InitialiseLists(void* initialAddr){
   Buffer64().AddList(onList64);
 }
 
-void InitialiseLowBuffer(){
+void Allocator::InitialiseLowBuffer(){
   LowBuffer() = new(Buffer64().Allocate()) Buffer{64, 1};
 }
 
 //-------------------------------------------------------------
 
-void AddBuffer(Buffer* buffer){
+void Allocator::AddBuffer(Buffer* buffer){
   Buffer64().AddBuffer(buffer);
 }
 
-void AddListDescriptor(ListDescriptor* ld){
+void Allocator::AddListDescriptor(ListDescriptor* ld){
   Buffer* buf = GetBuffer(ld->BufferSize());
   if(!buf){ 
     return;
@@ -70,13 +62,13 @@ void AddListDescriptor(ListDescriptor* ld){
   }
 }
 
-void RemoveBuffer(Buffer* buffer){
+void Allocator::RemoveBuffer(Buffer* buffer){
   buffer->~Buffer();
 }
 
 //-------------------------------------------------------------
 
-Buffer* GetBuffer(std::uint16_t size){
+Buffer* Allocator::GetBuffer(std::uint16_t size){
   // very slow loop
   auto it = Buffer64().begin();
   do{
@@ -88,7 +80,7 @@ Buffer* GetBuffer(std::uint16_t size){
   return nullptr;
 }
 
-bool BufferExists(std::uint16_t size){
+bool Allocator::BufferExists(std::uint16_t size){
   if(GetBuffer(size)){
     return true;
   }
@@ -97,7 +89,7 @@ bool BufferExists(std::uint16_t size){
   }
 }
 
-Buffer* NewBuffer(std::uint16_t bufferSize){
+Buffer* Allocator::NewBuffer(std::uint16_t bufferSize){
   if(BufferExists(bufferSize)){
     return nullptr;
   }
@@ -107,9 +99,7 @@ Buffer* NewBuffer(std::uint16_t bufferSize){
   return pbuffer;
 }
 
-ListDescriptor* NewListDescriptor(std::uint16_t bufferSize, 
-                                  std::uint8_t pages
-){
+ListDescriptor* Allocator::NewListDescriptor(std::uint16_t bufferSize, std::uint8_t pages){
   // get the next pow of 2 for the buffer size
   void* baseAddr = Kernel::palloc();
   ListDescriptor* list = 
@@ -119,10 +109,7 @@ ListDescriptor* NewListDescriptor(std::uint16_t bufferSize,
   return list;
 }
 
-ListDescriptor* NewListDescriptor(void* baseAddr, 
-                                  std::uint16_t bufferSize, 
-                                  std::uint8_t pages
-){
+ListDescriptor* Allocator::NewListDescriptor(void* baseAddr, std::uint16_t bufferSize, std::uint8_t pages){
   // get the next pow of 2 for the buffer size
   ListDescriptor* list = 
     new(Buffer64().Allocate()) ListDescriptor{baseAddr, bufferSize, pages};
@@ -131,7 +118,7 @@ ListDescriptor* NewListDescriptor(void* baseAddr,
   return list;
 }
 
-void* Allocate(std::size_t bytes){
+void* Allocator::AllocateObject(std::size_t bytes){
   Buffer* buf = GetBuffer(bytes);
   if(buf){
     return buf->Allocate();
@@ -142,7 +129,7 @@ void* Allocate(std::size_t bytes){
   }
 }
 
-void Deallocate(void* pobj){
+void Allocator::DeallocateObject(void* pobj){
   // would be much better performance with a page map so list descriptor lookup
   // is Theta(1) instead of Theta(N*M) where N = #buffer and M = #listdescriptors...
   for(Buffer& buf: Buffer64()){
@@ -159,4 +146,4 @@ void Deallocate(void* pobj){
   }
 }
 
-} // namespace Mem::Heap::Allocator
+}

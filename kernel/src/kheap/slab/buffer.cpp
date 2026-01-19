@@ -1,5 +1,5 @@
 #include "buffer.hpp"
-#include "allocator_class_interface.hpp"
+#include "allocator.hpp"
 
 namespace Chisaka::Slab{
     
