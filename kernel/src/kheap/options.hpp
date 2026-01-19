@@ -1,8 +1,8 @@
 #pragma once
 
-namespace Mem::Heap{
+namespace Chisaka{
 
-  enum OPT{
+  enum HeapOptions{
     LOW =  1<<1
   };
 

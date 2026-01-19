@@ -1,5 +1,5 @@
 #include "buffer.hpp"
-#include "allocator.hpp"
+#include "allocator_class_interface.hpp"
 
 namespace Chisaka::Slab{
     
@@ -272,7 +272,7 @@ Buffer::DeStatus Buffer::DeallocFull(void* objaddr){
 
 void Buffer::Grow(){
   // Grow create a new list descriptor
-  ListDescriptor* list = Allocator::NewListDescriptor(m_bufferSize, 1);
+  ListDescriptor* list = Allocator::Get().NewListDescriptor(m_bufferSize, 1);
   if(m_freeLists){
     m_freeLists->AddList(list);
   }

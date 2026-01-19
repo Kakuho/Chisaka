@@ -10,7 +10,7 @@
 #include "aii/array.hpp"
 #include "palloc.hpp"
 
-namespace Chisaka::Slab::Allocator{
+namespace Chisaka::Slab::Ns::Allocator{
   void Initialise();
   void Initialise(void* baseAddr);
 
