@@ -7,7 +7,6 @@
 
 #include "frame_descriptor.hpp"
 
-#include "config.hpp"
 #include "types.hpp"
 
 #include "debug.hpp"

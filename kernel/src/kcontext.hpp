@@ -15,8 +15,11 @@
 
 namespace Chisaka{
   class KContext{
-    public:
+    public: 
+      static constexpr std::uint16_t PAGE_SIZE = 0x1000;
+
       // set up of the global kernel objects
+
       using PageAllocator = PageAllocators::Freelist<MemoryMap>;
       using Ram = Chisaka::Ram<PageAllocator>;
 
