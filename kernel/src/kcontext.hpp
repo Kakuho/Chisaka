@@ -7,7 +7,7 @@
 #include "types.hpp"
 
 #include "memmap/memory_map.hpp"
-#include "ram/page_allocators/freelist_class.hpp"
+#include "ram/page_allocators/freelist.hpp"
 #include "ram/ram.hpp"
 
 #include "kheap/slab/allocator_class_interface.hpp"
