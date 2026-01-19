@@ -75,7 +75,7 @@ override SHARED_FLAGS := \
 
 # Internal C++ flags that should not be changed by the user.
 override CXXFLAGS += \
-    -std=gnu++20 \
+    -std=c++20 \
     -fno-rtti \
     -fno-exceptions \
     $(SHARED_FLAGS)
