@@ -5,7 +5,7 @@
 
 
 #include "kassert.hpp"
-#include "firmware/acpi/hpet_table.hpp"
+#include "firmware/acpi/tables/hpet_table.hpp"
 
 #include "aii/array.hpp"
 
