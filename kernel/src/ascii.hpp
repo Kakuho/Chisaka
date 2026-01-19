@@ -1,6 +1,8 @@
 #pragma once
 #include "drivers/serial/kostream.hpp"
 
+namespace Chisaka{
+
 inline const char* rarity = R"(
                 %%#####%%%%%%%
          =--=%########%%###%%#####%@
@@ -69,4 +71,6 @@ inline const char* meroron = R"(
 
 inline void PrintRarity(){
   kout << rarity << '\n';
+}
+
 }

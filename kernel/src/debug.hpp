@@ -2,7 +2,7 @@
 
 #include "drivers/serial/kostream.hpp"
 
-namespace Debug{
+namespace Chisaka::Debug{
   namespace{
     inline constexpr bool DEBUG_PRINT_ON = false;
   }
