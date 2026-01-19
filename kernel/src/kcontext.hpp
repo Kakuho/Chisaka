@@ -9,6 +9,7 @@
 namespace Chisaka{
   class KContext{
     public:
+      static constexpr std::uint16_t PAGE_SIZE = 0x1000;
       static KContext& Get(){ static KContext g; return g;}
 
       void InitKContext(){
