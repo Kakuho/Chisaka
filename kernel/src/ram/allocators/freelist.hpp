@@ -13,7 +13,7 @@
 
 #include "types.hpp"
 
-namespace Chisaka::PageAllocators{
+namespace Chisaka::PageAllocators::Ns{
 
 namespace Freelist{
 

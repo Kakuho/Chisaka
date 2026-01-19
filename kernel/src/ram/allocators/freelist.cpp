@@ -2,13 +2,13 @@
 #include "aii/string.h"
 
 namespace{
-  using namespace Chisaka::RamAllocators::Freelist;
+  using namespace Chisaka::PageAllocators::Ns::Freelist;
   ListEntry head;   
   ListEntry lowHead;
   std::size_t freePages;
 }
 
-namespace Chisaka::RamAllocators::Freelist{
+namespace Chisaka::PageAllocators::Ns::Freelist{
 
 ListEntry& Head(){ return head;}
 
