@@ -4,7 +4,7 @@
 #include <new>
 
 #include "list_descriptor.hpp"
-#include "options.hpp"
+#include "kheap/options.hpp"
 
 // Buffers has unique ownership of their List of List Descriptors.
 // When buffers deallocate, all of their list descriptors must also deallocate.

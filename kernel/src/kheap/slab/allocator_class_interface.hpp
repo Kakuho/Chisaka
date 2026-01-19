@@ -10,10 +10,9 @@
 
 #include "list_descriptor.hpp"
 #include "buffer.hpp"
-#include "options.hpp"
+#include "kheap/options.hpp"
 
 #include "aii/array.hpp"
-#include "palloc.hpp"
 
 namespace Chisaka::Slab{
 
@@ -38,21 +37,21 @@ class Allocator{
     ListDescriptor* NewListDescriptor(std::uint16_t bufferSize, std::uint8_t pages);
     ListDescriptor* NewListDescriptor(void* baseaddr, std::uint16_t bufferSize, std::uint8_t pages);
 
-    void* Allocate(std::size_t bytes);
-    void Deallocate(void* pobj);
+    void* AllocateObject(std::size_t bytes);
+    void DeallocateObject(void* pobj);
 
     // heap management w.r.t types
 
     template<typename T>  
     T* New(){ 
-      T* alloc = static_cast<T*>(Allocate(sizeof(T)));
+      T* alloc = static_cast<T*>(AllocateObject(sizeof(T)));
       alloc = new(alloc) T;
       return alloc;
     }
 
     template<typename T>  
     void Delete(T* pobj){ 
-      Deallocate(pobj);
+      DeallocateObject(pobj);
     }
 
   private:

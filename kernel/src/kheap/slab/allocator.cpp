@@ -8,8 +8,6 @@ namespace{
 
 namespace Chisaka::Slab::Ns::Allocator{
 
-using namespace Mem::Heap;
-
 Buffer& Buffer64(){ return buffer64;}
 Buffer*& LowBuffer(){ return lowAddrBuffer;}
 

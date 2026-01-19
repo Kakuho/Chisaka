@@ -1,4 +1,5 @@
 #include "allocator_class_interface.hpp"
+#include "palloc.hpp"
 
 namespace Chisaka::Slab{
 
@@ -117,7 +118,7 @@ ListDescriptor* Allocator::NewListDescriptor(void* baseAddr, std::uint16_t buffe
   return list;
 }
 
-void* Allocator::Allocate(std::size_t bytes){
+void* Allocator::AllocateObject(std::size_t bytes){
   Buffer* buf = GetBuffer(bytes);
   if(buf){
     return buf->Allocate();
@@ -128,7 +129,7 @@ void* Allocator::Allocate(std::size_t bytes){
   }
 }
 
-void Allocator::Deallocate(void* pobj){
+void Allocator::DeallocateObject(void* pobj){
   // would be much better performance with a page map so list descriptor lookup
   // is Theta(1) instead of Theta(N*M) where N = #buffer and M = #listdescriptors...
   for(Buffer& buf: Buffer64()){
