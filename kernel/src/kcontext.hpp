@@ -29,26 +29,13 @@ namespace Chisaka{
     public:
       static KContext& Get(){ static KContext g; return g;}
 
-      void InitKContext(){
-        kernelBase = Limine::kernel_addr_req.response->virtual_base;
-        hhdmOffset = Limine::hhdm_request.response->offset;
-      }
+      void InitKContext();
 
-      PhysAddr KernelPhysAddr(){
-        return kernelBase - hhdmOffset;
-      }
+      PhysAddr KernelPhysAddr();
+      VirtAddr KernelVirtAddr();
 
-      VirtAddr KernelVirtAddr(){
-        return kernelBase;
-      }
-
-      VirtAddr PhysToVirtAddr(PhysAddr paddr){
-        return paddr + hhdmOffset;
-      }
-
-      PhysAddr VirtToPhysAddr(VirtAddr vaddr){
-        return vaddr - hhdmOffset;
-      }
+      VirtAddr PhysToVirtAddr(PhysAddr paddr);
+      PhysAddr VirtToPhysAddr(VirtAddr vaddr);
 
     private:
       VirtAddr kernelBase;
