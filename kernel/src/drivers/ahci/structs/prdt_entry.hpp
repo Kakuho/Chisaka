@@ -8,7 +8,7 @@
 
 #include "kassert.hpp"
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
 
 class PrdtEntry{
   public:

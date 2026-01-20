@@ -1,5 +1,4 @@
-#ifndef DRIVERS_SATA_FIS_SET_DEVICE_BITS_HPP
-#define DRIVERS_SATA_FIS_SET_DEVICE_BITS_HPP
+#pragma once
 
 //  Encapsulates Set Device Bits - Device to Host FISes
 //
@@ -13,9 +12,9 @@
 #include "fis_types.hpp"
 #include "args.hpp"
 
-namespace Drivers::Sata::Fis::SetDeviceBits{
+namespace Chisaka::Ahci{
 
-struct Initialiser{
+struct SetDeviceBitsInitialiser{
   Args::PortMultiplier portMultiplier;
   Args::Interrupt interrupt;
   Args::Notification notification;
@@ -23,30 +22,23 @@ struct Initialiser{
   Args::Error error;
 };
 
-class Frame{
+class SetDeviceBitsFis{
   static constexpr std::uint8_t TYPE_VALUE = 
     GetUnderlying(FisType::SetDeviceBits);
 
   public:
-    constexpr Frame() = default;
-    constexpr Frame(Initialiser&& src) noexcept;
+    constexpr SetDeviceBitsFis() = default;
+    constexpr SetDeviceBitsFis(SetDeviceBitsInitialiser&& src) noexcept;
 
-    //-------------------------------------------------------------
-    // Attribute Querying
-    //-------------------------------------------------------------
-
-    [[nodiscard]] constexpr std::uint8_t Type() const noexcept
-    { return m_type;}
-    [[nodiscard]] constexpr std::uint8_t StatusByte() const noexcept
-    { return m_statusByte;}
-    [[nodiscard]] constexpr std::uint8_t Error() const noexcept
-    { return m_errorReg;}
+    constexpr std::uint8_t Type() const noexcept { return m_type;}
+    constexpr std::uint8_t StatusByte() const noexcept { return m_statusByte;}
+    constexpr std::uint8_t Error() const noexcept { return m_errorReg;}
 
     // Status Querying
-    [[nodiscard]] constexpr bool BSY() const noexcept;
-    [[nodiscard]] constexpr bool DRDY() const noexcept;
-    [[nodiscard]] constexpr bool DRQ() const noexcept;
-    [[nodiscard]] constexpr bool ERR() const noexcept;
+    constexpr bool BSY() const noexcept;
+    constexpr bool DRDY() const noexcept;
+    constexpr bool DRQ() const noexcept;
+    constexpr bool ERR() const noexcept;
 
   private:
     constexpr void
@@ -64,13 +56,9 @@ class Frame{
     std::uint32_t m_rsv = 0;
 };
 
-static_assert(sizeof(Frame) == 8);
+static_assert(sizeof(SetDeviceBitsFis) == 8);
 
-//-------------------------------------------------------------
-//  Impl
-//-------------------------------------------------------------
-
-constexpr Frame::Frame(Initialiser&& src) noexcept
+constexpr SetDeviceBitsFis::SetDeviceBitsFis(SetDeviceBitsInitialiser&& src) noexcept
   : m_n_i_portMultiplier{0},
     m_statusByte{src.status.data},
     m_errorReg{src.error.data}
@@ -78,14 +66,11 @@ constexpr Frame::Frame(Initialiser&& src) noexcept
   FormPack(src.notification, src.interrupt, src.portMultiplier);
 }
 
-constexpr void
-Frame::FormPack(Args::Notification n, Args::Interrupt i, Args::PortMultiplier pm) 
+constexpr void SetDeviceBitsFis::FormPack(Args::Notification n, Args::Interrupt i, Args::PortMultiplier pm) 
 noexcept{
   m_n_i_portMultiplier |= n ? 0x80 : 0x00;
   m_n_i_portMultiplier |= i ? 0x40 : 0x00;
   m_n_i_portMultiplier |= pm.data & 0xf;
 }
 
-} // namespace Drivers::Sata::Fis::SetDeviceBits
-  
-#endif
+}

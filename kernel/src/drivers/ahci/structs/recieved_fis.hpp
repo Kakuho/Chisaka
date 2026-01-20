@@ -4,30 +4,30 @@
 
 #include <cstdint>
 
-#include "drivers/sata/fis/dma_setup.hpp"
-#include "drivers/sata/fis/pio_setup.hpp"
-#include "drivers/sata/fis/d2h_register.hpp"
-#include "drivers/sata/fis/set_device_bits.hpp"
+#include "../fis/dma_setup.hpp"
+#include "../fis/pio_setup.hpp"
+#include "../fis/d2h_register.hpp"
+#include "../fis/set_device_bits.hpp"
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
 
 struct RecievedFis{
   public:
-    volatile Sata::Fis::D2HRegister::Frame& Rfis(){
+    volatile D2HRegisterFis& Rfis(){
       return m_rfis;
     }
 
   public:
-    Sata::Fis::DmaSetup::Frame m_dsfis;
+    DmaSetupFis m_dsfis;
     [[maybe_unused]] std::uint8_t padding0[4];
 
-    Sata::Fis::PioSetup::Frame m_psfis;
+    PioSetupFis m_psfis;
     [[maybe_unused]] std::uint8_t padding1[12];
 
-    Sata::Fis::D2HRegister::Frame m_rfis;
+    D2HRegisterFis m_rfis;
     [[maybe_unused]] std::uint8_t padding2[4];
 
-    Sata::Fis::SetDeviceBits::Frame m_sdbfis;
+    SetDeviceBitsFis m_sdbfis;
     std::uint8_t m_ufis[64];
 
     std::uint8_t m_rsv[0x100 - 0xa0];

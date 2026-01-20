@@ -1,5 +1,5 @@
 #include "mfs_manager.hpp"
-#include "drivers/ahci/class_interface/ahci_driver.hpp"
+#include "drivers/ahci/ahci_driver.hpp"
 #include <concepts>
 #include <cstddef>
 
@@ -58,7 +58,7 @@ void MfsManager::FlushSuperBlock()
 }
 
 void MfsManager::InitialiseKernelBuffers(){
-  m_cmdTable = KContext::KHeap::Get().New<Drivers::Ahci::CommandTable>();
+  m_cmdTable = KContext::KHeap::Get().New<Ahci::CommandTable>();
   m_sbBuffer = KContext::KHeap::Get().New<SuperBlock>();
   m_dbBuffer = KContext::KHeap::Get().New<DataBlock>();
   m_inodeBuffer = KContext::KHeap::Get().New<InodeBlock>();
@@ -80,13 +80,13 @@ std::uint64_t MfsManager::InitialiseInodes(std::size_t maxInodes){
       InitialiseFreeInode(m_inodeBuffer->diskinodes[j], currentInode +1);
       currentInode++;
     }
-    Drivers::Ahci::AhciDriver::Get().WriteSector(
+    Ahci::AhciDriver::Get().WriteSector(
         0, 
         m_inodeBase + currSector, 
         reinterpret_cast<std::uint8_t*>(m_inodeBuffer), 
         m_cmdTable
     );
-    Drivers::Ahci::AhciDriver::Get().WaitForPortInterrupt(0);
+    Ahci::AhciDriver::Get().WaitForPortInterrupt(0);
   }
   KContext::KHeap::Get().Delete(m_inodeBuffer);
   return inodeSectors;
@@ -114,13 +114,13 @@ void MfsManager::InitialiseDataBlocks(std::size_t maxDataBlocks){
     std::uint64_t address = m_dataBlockBase + currSector;
     //kout << "Initialising Sector " << address << '\n';
     InitialiseFreeDataBlock(m_dbBuffer, currSector, maxDataBlocks);
-    Drivers::Ahci::AhciDriver::Get().WriteSector(
+    Ahci::AhciDriver::Get().WriteSector(
         0, 
         address, 
         reinterpret_cast<std::uint8_t*>(m_dbBuffer), 
         m_cmdTable
     );
-    Drivers::Ahci::AhciDriver::Get().WaitForPortInterrupt(0);
+    Ahci::AhciDriver::Get().WaitForPortInterrupt(0);
   }
   std::uint64_t lastDataBlock = m_dataBlockBase + maxDataBlocks-1;
   kout << "Last DataBlock: " << lastDataBlock << '\n';
@@ -148,7 +148,7 @@ void MfsManager::InitialiseFreeDataBlock(
 }
 
 std::uint64_t MfsManager::NextFreeInode(){
-  Drivers::Ahci::AhciDriver::Get().ReadSectorPolled(
+  Ahci::AhciDriver::Get().ReadSectorPolled(
     0, 
     SUPER_BLOCK_ADDRESS, 
     reinterpret_cast<std::uint8_t*>(m_sbBuffer), 
@@ -158,7 +158,7 @@ std::uint64_t MfsManager::NextFreeInode(){
 }
 
 std::uint64_t MfsManager::NextFreeDataBlock(){
-  Drivers::Ahci::AhciDriver::Get().ReadSectorPolled(
+  Ahci::AhciDriver::Get().ReadSectorPolled(
     0, 
     SUPER_BLOCK_ADDRESS, 
     reinterpret_cast<std::uint8_t*>(m_sbBuffer), 
@@ -190,7 +190,7 @@ void MfsManager::AllocateInode(){
   auto nextInode = NextFreeInode();
   std::uint64_t blockAddress = InodeBlockAddress(nextInode);
   std::uint8_t offset = nextInode % 7;
-  Drivers::Ahci::AhciDriver::Get().ReadSectorPolled(
+  Ahci::AhciDriver::Get().ReadSectorPolled(
     0, 
     blockAddress, 
     reinterpret_cast<std::uint8_t*>(m_inodeBuffer), 

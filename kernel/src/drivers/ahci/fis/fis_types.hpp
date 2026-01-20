@@ -1,11 +1,10 @@
-#ifndef DRIVERS_SATA_FIS_FIS_TYPES_HPP
-#define DRIVERS_SATA_FIS_FIS_TYPES_HPP
+#pragma once
 
 // Common place to store FIS Type Values
 
 #include <cstdint>
 
-namespace Drivers::Sata{
+namespace Chisaka::Ahci{
 
 // Reference Serial Ata 10.3
 
@@ -25,5 +24,3 @@ constexpr std::uint8_t GetUnderlying(FisType type){
 }
 
 }
-
-#endif

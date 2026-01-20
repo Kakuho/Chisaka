@@ -8,8 +8,7 @@
 #include "superblock.hpp"
 #include "inode.hpp"
 
-#include "drivers/ahci/class_interface/ahci_driver.hpp"
-#include "drivers/ahci/class_interface/ahci_disk.hpp"
+#include "drivers/ahci/ahci_driver.hpp"
 #include "drivers/ahci/structs/command_table.hpp"
 #include "drivers/serial/kostream.hpp"
 #include "aii/string.h"
@@ -21,7 +20,7 @@ namespace Fs::Merofs{
 
 struct MfsManager{
   // the main interface to the mero file system
-  using AhciDriverType = Drivers::Ahci::AhciDriver;
+  using AhciDriverType = Ahci::AhciDriver;
   static constexpr std::uint64_t SUPER_BLOCK_ADDRESS = 0x00;
   static constexpr std::uint64_t INODE_BASE          = 0x01;
   static constexpr std::uint64_t ALLOC_SIZE          = 1024;
@@ -32,7 +31,7 @@ struct MfsManager{
     void Close(FileDescriptor fd);
     void ChDir();
 
-    Drivers::Ahci::AhciDisk& Disk(){ return m_disk;}
+    Ahci::AhciDisk& Disk(){ return m_disk;}
 
     std::uint64_t InodeBlockAddress(std::size_t index);
     std::uint64_t DataBlockAddress(std::size_t index);
@@ -68,8 +67,8 @@ struct MfsManager{
     std::uint64_t m_inodeBase;
     std::uint64_t m_dataBlockBase;
     // kernel data structures
-    Drivers::Ahci::AhciDisk& m_disk;
-    Drivers::Ahci::CommandTable* m_cmdTable;
+    Ahci::AhciDisk& m_disk;
+    Ahci::CommandTable* m_cmdTable;
     SuperBlock* m_sbBuffer;
     DataBlock* m_dbBuffer;
     InodeBlock* m_inodeBuffer;

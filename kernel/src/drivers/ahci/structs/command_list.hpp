@@ -10,7 +10,7 @@
 
 #include "aii/string.h"
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
 
 class CommandList{
   public:
@@ -21,7 +21,5 @@ class CommandList{
 };
 
 static_assert(sizeof(CommandList) == 0x400);
-
-//-------------------------------------------------------------
 
 }

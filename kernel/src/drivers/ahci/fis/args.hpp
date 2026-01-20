@@ -22,7 +22,7 @@
 
 #include "kassert.hpp"
 
-namespace Drivers::Sata::Args{
+namespace Chisaka::Ahci::Args{
 
 // Common Args
 
@@ -202,4 +202,4 @@ struct Error{
   std::uint8_t data; 
 };
 
-} // namespace Drivers::Sata::Args
+}

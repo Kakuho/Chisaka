@@ -1,7 +1,7 @@
 #include "ahci_disk.hpp"
 #include "ahci_driver.hpp"
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
 
 AhciDisk::AhciDisk(std::uint8_t port)
   :

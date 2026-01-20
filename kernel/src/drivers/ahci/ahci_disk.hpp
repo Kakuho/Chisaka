@@ -5,7 +5,7 @@
 
 #include <cstdint>
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
   struct AhciDisk{
     static constexpr std::size_t SECTOR_BYTES = 512;
     public:

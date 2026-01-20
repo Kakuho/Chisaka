@@ -1,6 +1,6 @@
 #include "identify_device_buffer.hpp"
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
 
 IdentifyDeviceBuffer::IdentifyDeviceBuffer(){
   for(auto& i: buffer){

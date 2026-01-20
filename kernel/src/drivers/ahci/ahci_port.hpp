@@ -4,10 +4,9 @@
 
 #include "drivers/serial/kostream.hpp"
 #include "drivers/ahci/structs/command_list.hpp"
-#include "drivers/ahci/structs/recieved_fis.hpp"
+#include "structs/recieved_fis.hpp"
 
-
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
 
 struct AhciPort{
   struct PortRegisters{

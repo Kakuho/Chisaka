@@ -1,20 +1,18 @@
-#ifndef DRIVERS_SATA_FIS_DATA_HPP
-#define DRIVERS_SATA_FIS_DATA_HPP
+#pragma once
 
 #include <cstdint>
 #include <cassert>
 
 #include "fis_types.hpp"
 
-namespace Drivers::Sata::Fis::Data{
+namespace Chisaka::Ahci{
 
-class Frame{
+class DataFis{
   static constexpr std::uint8_t TYPE_VALUE = 
     GetUnderlying(FisType::DMAActivate);
 
   public:
-    
-    constexpr Frame() noexcept;
+    constexpr DataFis() noexcept;
   
   public:
     // Dword 0
@@ -25,13 +23,13 @@ class Frame{
     std::uint32_t payload[1];
 };
 
-constexpr Frame::Frame() noexcept
+//-----------------------------------------------------------------------------------------
+
+constexpr DataFis::DataFis() noexcept
   : 
     m_rsv_pmport{0}
 {
 
 }
 
-} // namespace Drivers::Sata::Fis::Data
-
-#endif
+}

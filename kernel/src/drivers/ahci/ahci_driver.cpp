@@ -1,6 +1,6 @@
 #include "ahci_driver.hpp"
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
 
 namespace{
   AhciDriver ahciDriver;
@@ -43,9 +43,9 @@ void AhciDriver::Initialise(){
 }
 
 void AhciDriver::InitPresent(){
-  Pci::ioaddr32_t subBaseClassOffset = Pci::FormConfigAddress(1, 0, 31, 2, 0x08);
-  outl(Pci::CONFIG_ADDRESS, subBaseClassOffset);
-  const std::uint32_t classCode = inl(Pci::CONFIG_DATA) >> 8;
+  Drivers::Pci::ioaddr32_t subBaseClassOffset = Drivers::Pci::FormConfigAddress(1, 0, 31, 2, 0x08);
+  outl(Drivers::Pci::CONFIG_ADDRESS, subBaseClassOffset);
+  const std::uint32_t classCode = inl(Drivers::Pci::CONFIG_DATA) >> 8;
   const std::uint8_t baseClass = (classCode >> 16) & 0xFF;
   const std::uint8_t subClass = (classCode >> 8) & 0xFF;
   const std::uint8_t programmingInterface = classCode & 0xFF;
@@ -63,18 +63,18 @@ void AhciDriver::InitPresent(){
 
 void AhciDriver::InitAbar(){
   kassert(Present());
-  Pci::ioaddr32_t abarOffset = Pci::FormConfigAddress(1, 0, 31, 2, 0x24);
-  outl(Pci::CONFIG_ADDRESS, abarOffset);
-  const std::uint32_t abar = inl(Pci::CONFIG_DATA);
+  Drivers::Pci::ioaddr32_t abarOffset = Drivers::Pci::FormConfigAddress(1, 0, 31, 2, 0x24);
+  outl(Drivers::Pci::CONFIG_ADDRESS, abarOffset);
+  const std::uint32_t abar = inl(Drivers::Pci::CONFIG_DATA);
   kout << intmode::hex << "abar: " << abar << '\n';
   m_abar = abar;
 }
 
 void AhciDriver::InitMMIOBase(){
   kassert(Present());
-  Pci::ioaddr32_t abarOffset = Pci::FormConfigAddress(1, 0, 31, 2, 0x24);
-  outl(Pci::CONFIG_ADDRESS, abarOffset);
-  const std::uint32_t abar = inl(Pci::CONFIG_DATA);
+  Drivers::Pci::ioaddr32_t abarOffset = Drivers::Pci::FormConfigAddress(1, 0, 31, 2, 0x24);
+  outl(Drivers::Pci::CONFIG_ADDRESS, abarOffset);
+  const std::uint32_t abar = inl(Drivers::Pci::CONFIG_DATA);
   const std::uint32_t base = (abar >> 8) << 8;
   kout << intmode::hex << "hba mmio base: " << base << '\n';
   m_mmioBase = base;
@@ -401,7 +401,7 @@ void AhciDriver::IdentifyDevice(
     std::uint8_t port, 
     std::uint8_t* buffer
 ){
-  auto identFis = Sata::Fis::H2DRegister::Frame::CreateIdentifyDeviceFrame();
+  auto identFis = H2dRegisterFis::CreateIdentifyDevice();
   // create the command table
   auto* cmdtable = KContext::KHeap::Get().New<CommandTable>();
   cmdtable->SetCommandFis(identFis);
@@ -437,7 +437,7 @@ void AhciDriver::WriteSector(
     std::uint64_t sector, 
     std::uint8_t* ibuffer
 ){
-  auto writeFis = Sata::Fis::H2DRegister::Frame::CreateWriteFrame(sector);
+  auto writeFis = H2dRegisterFis::CreateWrite(sector);
   // create the command table
   auto cmdtable = KContext::KHeap::Get().New<CommandTable>();
   cmdtable->SetCommandFis(writeFis);
@@ -473,7 +473,7 @@ void AhciDriver::WriteSector(
     std::uint8_t* ibuffer,
     CommandTable* cmdtable
 ){
-  auto writeFis = Sata::Fis::H2DRegister::Frame::CreateWriteFrame(sector);
+  auto writeFis = H2dRegisterFis::CreateWrite(sector);
   // create the command table
   cmdtable->SetCommandFis(writeFis);
   cmdtable->SetPrdtEntry(0,
@@ -505,7 +505,7 @@ void AhciDriver::ReadSector(
     std::uint64_t sector, 
     std::uint8_t* ibuffer
 ){
-  auto readFis = Sata::Fis::H2DRegister::Frame::CreateReadFrame(sector);
+  auto readFis = H2dRegisterFis::CreateRead(sector);
   // create the command table
   auto cmdtable = KContext::KHeap::Get().New<CommandTable>();
   cmdtable->SetCommandFis(readFis);
@@ -541,7 +541,7 @@ void AhciDriver::ReadSector(
     std::uint8_t* ibuffer,
     CommandTable* cmdtable
 ){
-  auto readFis = Sata::Fis::H2DRegister::Frame::CreateReadFrame(sector);
+  auto readFis = H2dRegisterFis::CreateRead(sector);
   // create the command table
   cmdtable->SetCommandFis(readFis);
   cmdtable->SetPrdtEntry(0,

@@ -1,5 +1,4 @@
-#ifndef DRIVERS_SATA_FIS_DMA_SETUP_HPP
-#define DRIVERS_SATA_FIS_DMA_SETUP_HPP
+#pragma once
 
 //  Encapsulates DMA Setup - Bidirectional FISes
 //
@@ -13,30 +12,18 @@
 #include <cstdint>
 #include <cassert>
 
-#include "drivers/sata/fis/args.hpp"
 #include "fis_types.hpp"
 
-namespace Drivers::Sata::Fis::DmaSetup{
+namespace Chisaka::Ahci{
 
-struct Initialiser{
-  Args::PortMultiplier portMultiplier;
-};
-
-class Frame{
-  static constexpr std::uint8_t TYPE_VALUE = 
-    GetUnderlying(FisType::DMASetup);
+class DmaSetupFis{
+  static constexpr std::uint8_t TYPE_VALUE = GetUnderlying(FisType::DMASetup);
 
   public:
-    constexpr Frame() noexcept;
-    constexpr Frame(Initialiser&& src) noexcept;
+    constexpr DmaSetupFis() noexcept;
 
-    [[nodiscard]] constexpr std::uint8_t Type() const noexcept{
-      return m_type;
-    }
-
-    [[nodiscard]] constexpr std::uint8_t PortMultiplier() const noexcept{
-      return m_a_i_d_portMultiplier & 0xF;
-    }
+    constexpr std::uint8_t Type() const noexcept{ return m_type;}
+    constexpr std::uint8_t PortMultiplier() const noexcept{ return m_a_i_d_portMultiplier & 0xF;}
 
   public:
     // For now a public interface, but later would change to private...
@@ -58,13 +45,11 @@ class Frame{
     [[maybe_unused]] std::uint32_t m_rsv2 = 0;
 };
 
-static_assert(sizeof(Frame) == 28);
+static_assert(sizeof(DmaSetupFis) == 28);
 
 //-------------------------------------------------------------
-//  Impl
-//-------------------------------------------------------------
 
-constexpr Frame::Frame() noexcept
+constexpr DmaSetupFis::DmaSetupFis() noexcept
   :
     // Dword 0
     m_a_i_d_portMultiplier{0},
@@ -82,5 +67,3 @@ constexpr Frame::Frame() noexcept
 }
 
 }
-
-#endif

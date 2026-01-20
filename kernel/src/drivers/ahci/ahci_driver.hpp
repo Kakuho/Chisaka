@@ -4,15 +4,14 @@
 
 #include "ahci_port.hpp"
 #include "ahci_disk.hpp"
-#include "identify_device_buffer.hpp"
+#include "buffers/identify_device_buffer.hpp"
 
 #include "drivers/ahci/structs/recieved_fis.hpp"
 #include "drivers/ahci/structs/command_table.hpp"
 #include "drivers/ahci/structs/command_list.hpp"
 #include "drivers/ahci/structs/command_header.hpp"
-#include "drivers/sata/fis/h2d_register.hpp"
-
-#include "drivers/sata/fis/h2d_register.hpp"
+#include "fis/h2d_register.hpp"
+#include "fis/h2d_register.hpp"
 
 #include "drivers/pci/constants.hpp"
 #include "drivers/pci/pci.hpp"
@@ -25,7 +24,7 @@
 
 #include "aii/array.hpp"
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
   using namespace Chisaka;
 struct AhciDiskPolled;
 

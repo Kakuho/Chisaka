@@ -1,6 +1,6 @@
 #include "ahci_port.hpp"
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
 
 AhciPort::AhciPort()
   :

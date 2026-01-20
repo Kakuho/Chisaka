@@ -8,7 +8,7 @@
 
 #include "aii/array.hpp"
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
   struct IdentifyDeviceBuffer{
     IdentifyDeviceBuffer();
     void PrintSerialNumber() const;

@@ -6,12 +6,12 @@
 #include <cassert>
 
 #include "prdt_entry.hpp"
-#include "drivers/sata/fis/h2d_register.hpp"
+#include "drivers/ahci/fis/h2d_register.hpp"
 #include "aii/string.h"
 #include "kassert.hpp"
 #include "aii/array.hpp"
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
 
 static constexpr std::size_t PRDT_SLOTS = 1;
 
@@ -19,7 +19,7 @@ class CommandTable{
   public:
     CommandTable();
 
-    void SetCommandFis(Sata::Fis::H2DRegister::Frame& d2hrFis);
+    void SetCommandFis(H2dRegisterFis& d2hrFis);
     void SetPrdtEntry(std::uint16_t entry, PrdtEntry prdt);
 
     std::uint8_t* CfisBase(){return &m_cfis[0];};
@@ -55,8 +55,8 @@ inline CommandTable::CommandTable(){
   }
 }
 
-inline void CommandTable::SetCommandFis(Sata::Fis::H2DRegister::Frame& d2hrFis){
-  memcpy(&m_cfis, &d2hrFis, sizeof(Sata::Fis::H2DRegister::Frame));
+inline void CommandTable::SetCommandFis(H2dRegisterFis& d2hrFis){
+  memcpy(&m_cfis, &d2hrFis, sizeof(H2dRegisterFis));
 }
 
 inline void CommandTable::SetPrdtEntry(std::uint16_t entry, PrdtEntry prdt){

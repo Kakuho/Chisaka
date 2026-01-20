@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace Drivers::Ahci{
+namespace Chisaka::Ahci{
   struct AhciBuffer{
     public:
       AhciBuffer(std::uint8_t sectors);
