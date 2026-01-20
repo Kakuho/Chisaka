@@ -8,7 +8,7 @@
 
 #include <cstdint>
 
-namespace Proc{
+namespace Chisaka{
 
 struct X8664Pcb{
   std::uint64_t rax;      // General Purpose Registers

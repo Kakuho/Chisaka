@@ -11,7 +11,7 @@
 #include "x86_64/paging/upper_page_entry.hpp"
 #include "x86_64/paging/utilities.hpp"
 
-namespace Proc{
+namespace Chisaka{
 
 class ProcessManager{
   public:

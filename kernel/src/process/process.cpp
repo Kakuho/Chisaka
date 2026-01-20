@@ -1,7 +1,7 @@
 #include "process.hpp"
 #include "kassert.hpp"
 
-namespace Proc{
+namespace Chisaka{
 
   void Process::SetParent(Process* proc){
     if(proc->child){

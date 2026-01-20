@@ -3,10 +3,10 @@
 #include "x86_64/paging/utilities.hpp"
 
 namespace{
-  Proc::ProcessManager manager;
+  Chisaka::ProcessManager manager;
 }
 
-namespace Proc{
+namespace Chisaka{
 
 void ProcessManager::Init(){
   m_kernelTable = reinterpret_cast<X8664::UpperPageTable*>(X8664::GetBaseTable());

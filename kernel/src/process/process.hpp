@@ -13,7 +13,7 @@
 #include "x8664pcb.hpp"
 #include "x86_64/paging/upper_page_table.hpp"
 
-namespace Proc{
+namespace Chisaka{
 
 enum class Status{
   Running,
