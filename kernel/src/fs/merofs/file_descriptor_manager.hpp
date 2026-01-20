@@ -5,7 +5,7 @@
 #include "aii/array.hpp"
 #include "kcontext.hpp"
 
-namespace Fs::Merofs{
+namespace Chisaka::Merofs{
   using namespace Chisaka;
 
 struct FileDescriptor{

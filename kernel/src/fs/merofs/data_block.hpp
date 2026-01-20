@@ -5,7 +5,7 @@
 
 #include "aii/array.hpp"
 
-namespace Fs::Merofs{
+namespace Chisaka::Merofs{
   struct [[gnu::packed]] DataBlock{
     public:
       struct ListEntry{

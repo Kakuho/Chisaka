@@ -1,6 +1,6 @@
 #include "superblock.hpp"
 
-namespace Fs::Merofs{
+namespace Chisaka::Merofs{
 
 SuperBlock::SuperBlock()
   : 

@@ -4,7 +4,7 @@
 
 #include "inode.hpp"
 
-namespace Fs::Merofs{
+namespace Chisaka::Merofs{
 
 struct FileSession{
   public:

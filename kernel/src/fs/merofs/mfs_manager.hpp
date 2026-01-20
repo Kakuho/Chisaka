@@ -15,8 +15,7 @@
 
 #include "kcontext.hpp"
 
-namespace Fs::Merofs{
-  using namespace Chisaka;
+namespace Chisaka::Merofs{
 
 struct MfsManager{
   // the main interface to the mero file system

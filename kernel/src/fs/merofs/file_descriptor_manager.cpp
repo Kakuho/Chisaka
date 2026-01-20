@@ -4,7 +4,7 @@
 
 #include "aii/array.hpp"
 
-namespace Fs::Merofs{
+namespace Chisaka::Merofs{
 
 // File Descriptor Table Chunks
 

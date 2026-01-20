@@ -15,7 +15,7 @@
 
 #include "aii/array.hpp"
 
-namespace Fs::Merofs{
+namespace Chisaka::Merofs{
 
   struct [[gnu::packed]] DiskInode{
     struct AddressStruct{

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Fs::Merofs{
+namespace Chisaka::Merofs{
   struct Inode{
 
   };

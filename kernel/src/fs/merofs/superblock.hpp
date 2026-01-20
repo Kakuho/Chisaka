@@ -7,7 +7,7 @@
 
 #include "aii/array.hpp"
 
-namespace Fs::Merofs{
+namespace Chisaka::Merofs{
   struct SuperBlock{
     SuperBlock();
     std::uint64_t totalPhysBlocks;

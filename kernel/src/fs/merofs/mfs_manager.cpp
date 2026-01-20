@@ -3,7 +3,7 @@
 #include <concepts>
 #include <cstddef>
 
-namespace Fs::Merofs{
+namespace Chisaka::Merofs{
 
 MfsManager::MfsManager(AhciDriverType& ahcidriver, std::uint8_t disk)
   :
