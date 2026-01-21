@@ -2,9 +2,10 @@
 
 SRC_DIR="/home/ka/C++/projects/os/Chisaka/git/slab_tests/kernel/src"
 CPPSRC="${SRC_DIR}/kheap/slab/list_descriptor.cpp"
+TEST_SRC="./list_descriptor/linkage.cpp ./list_descriptor/init.cpp"
 
-g++ -std=c++20 -D USERMODE_TESTING -o tests ./list_descriptor/linkage.cpp\
-      ${CPPSRC} \
+g++ -std=c++20 -D USERMODE_TESTING -g -o tests \
+      ${TEST_SRC} ${CPPSRC} \
       -I..  -I../../ext  -I../../src\
       ./../test_main.cpp 
 

@@ -14,6 +14,16 @@ TEST_CASE("List Descriptors of size one will link to itself") {
   CHECK(desc.NextList() == &desc);
 }
 
+TEST_CASE("List Descriptors cannot add themselves"){
+  auto page1 = std::make_unique<Mocks::Page>();
+  Slab::ListDescriptor desc1{reinterpret_cast<void*>(page1.get()), 8, 1};
+
+  desc1.AddList(&desc1);
+
+  CHECK(desc1.PrevList() == &desc1);
+  CHECK(desc1.PrevList() == &desc1);
+}
+
 TEST_CASE("List Descriptors will maintain the correct linkages when size is 2") {
   auto page1 = std::make_unique<Mocks::Page>();
   auto page2 = std::make_unique<Mocks::Page>();
@@ -117,14 +127,14 @@ TEST_CASE("ListDescriptors::Remove will remove linkages from the list descriptor
   // just checking if the premise is correct:
   // desc1 <-> desc2 <-> desc3 <-> desc1 
 
-  kassert(desc1.PrevList() == &desc3);
-  kassert(desc1.NextList() == &desc2);
+  REQUIRE(desc1.PrevList() == &desc3);
+  REQUIRE(desc1.NextList() == &desc2);
 
-  kassert(desc2.PrevList() == &desc1);
-  kassert(desc2.NextList() == &desc3);
+  REQUIRE(desc2.PrevList() == &desc1);
+  REQUIRE(desc2.NextList() == &desc3);
 
-  kassert(desc3.PrevList() == &desc2);
-  kassert(desc3.NextList() == &desc1);
+  REQUIRE(desc3.PrevList() == &desc2);
+  REQUIRE(desc3.NextList() == &desc1);
 
   // Actual Testing Code
 
@@ -140,6 +150,15 @@ TEST_CASE("ListDescriptors::Remove will remove linkages from the list descriptor
 
   CHECK(desc1.PrevList() == &desc1);
   CHECK(desc1.NextList() == &desc1);
+}
+
+
+TEST_CASE("List Descriptors cannot remove themselves"){
+  auto page1 = std::make_unique<Mocks::Page>();
+  Slab::ListDescriptor desc1{reinterpret_cast<void*>(page1.get()), 8, 1};
 
   desc1.Remove(&desc1);
+
+  CHECK(desc1.PrevList() == &desc1);
+  CHECK(desc1.PrevList() == &desc1);
 }
