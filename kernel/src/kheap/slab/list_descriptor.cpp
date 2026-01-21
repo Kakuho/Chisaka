@@ -107,14 +107,9 @@ void ListDescriptor::Deallocate(void* address){
     return;
   }
   if(m_nextFree == nullptr){ 
+    // the list descriptor is empty
     m_nextFree = address; 
     *reinterpret_cast<std::uintptr_t*>(m_nextFree) = 0;
-    m_buffersUsed--;
-    return;
-  }
-  if(address > m_nextFree){
-    *reinterpret_cast<std::uintptr_t*>(m_nextFree) 
-      = reinterpret_cast<std::uintptr_t>(address);
     m_buffersUsed--;
     return;
   }
@@ -125,12 +120,18 @@ void ListDescriptor::Deallocate(void* address){
   while(operandCell > currentCell){
     prevCell = currentCell;
     currentCell = reinterpret_cast<std::uintptr_t*>(*currentCell);
+    if(currentCell == 0){
+      break;
+    }
   }
   if(!prevCell){
+    // operand cell is <= current cell, so address <= m_nextfree, we do not need to alter the value in 
+    // m_nextfree
     *operandCell = reinterpret_cast<std::uintptr_t>(currentCell);
     m_nextFree = operandCell;
   }
   else{
+    // address slots in between prevCell and currentCell
     *prevCell = reinterpret_cast<std::uintptr_t>(operandCell);
     *operandCell = reinterpret_cast<std::uintptr_t>(currentCell);
   }

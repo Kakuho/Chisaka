@@ -16,7 +16,6 @@ namespace Chisaka::Slab{
 
 class ListDescriptor{
   static constexpr std::uint16_t PAGE_SIZE = 0x1000;
-
   public:
     ListDescriptor() = delete;
     ListDescriptor(void* baseAddr, std::uint16_t bufferSize, std::uint8_t pages);
