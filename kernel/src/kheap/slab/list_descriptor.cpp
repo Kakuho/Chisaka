@@ -1,4 +1,5 @@
 #include "list_descriptor.hpp"
+#include <cstdint>
 
 namespace Chisaka::Slab{
 
@@ -11,7 +12,7 @@ ListDescriptor::ListDescriptor(
   m_nextFree{nullptr},
   m_nextList{this},
   m_prevList{this},
-  m_bufferSize{bufferSize},
+  m_bufferSize{bufferSize < 8 ? static_cast<std::uint16_t>(8) : bufferSize},
   m_buffersUsed{0},
   m_pages{pages}
 {

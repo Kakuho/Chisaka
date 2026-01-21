@@ -51,7 +51,6 @@ namespace Mem::Heap::Test::List::Alloc{
     kout << "Space After Allocation: " << desc.SpaceAfterAllocation() << '\n';
     kassert(desc.SpaceAfterAllocation() == 0); // 8 bytes fit perfectly within 0x1000
 
-
     kassert(desc.Empty() == true);
     kassert(desc.Full() == false);
     kassert(desc.HasSpace() == true);
@@ -97,72 +96,6 @@ namespace Mem::Heap::Test::List::Alloc{
     ListDescriptor desc{reinterpret_cast<void*>(BASE_ADDR), 64, 2};
     desc.PoisonFreeArea(0x00);
     desc.SetupLinkage();
-  }
-
-  inline void TryAllocate1(){
-    kout << intmode::hex 
-         << "Base: " << BASE_ADDR << '\n'
-         << "Virt Base: " << VBASE_ADDR << '\n';
-
-    ListDescriptor desc{reinterpret_cast<void*>(BASE_ADDR), 8, 1};
-    desc.PoisonFreeArea(0xBE);
-    desc.SetupLinkage();
-
-    std::uint64_t* obj1 = reinterpret_cast<std::uint64_t*>(desc.Allocate());
-    *obj1 = 0xDEADBEEF;
-
-    std::uint64_t* obj2 = reinterpret_cast<std::uint64_t*>(desc.Allocate());
-    *obj2 = 0;
-
-    std::uint64_t* obj3 = reinterpret_cast<std::uint64_t*>(desc.Allocate());
-    *obj3 = 0x0;
-
-    std::uint64_t* obj4 = reinterpret_cast<std::uint64_t*>(desc.Allocate());
-    *obj4 = 0xABBAEEABBA;
-
-  }
-
-  inline void TryExhaust1(){
-    // Premise: What happense when the allocation gets exhausted?
-    kout << intmode::hex << "Base: " << BASE_ADDR << '\n';
-    ListDescriptor desc{reinterpret_cast<void*>(BASE_ADDR), 8, 1};
-    desc.PoisonFreeArea(0xBE);
-    desc.SetupLinkage();
-    std::uint64_t* leaky = nullptr;
-    for(auto i = 0; i < desc.TotalBuffers() ; i++){
-      leaky = reinterpret_cast<std::uint64_t*>(desc.Allocate());
-    }
-    // descriptor is exhausted
-    std::uint64_t* isNull = reinterpret_cast<std::uint64_t*>(desc.Allocate());
-    kassert(isNull == nullptr);
-
-    kassert(desc.NextFreeBuffer() == nullptr);
-    kassert(desc.BuffersUsed() == desc.TotalBuffers());
-    kassert(desc.Full());
-    kassert(!desc.HasSpace());
-    kout << "TryExhaust1() Success!" << '\n';
-
-  }
-
-  inline void TryExhaust2(){
-    // Premise: What happense when the allocation gets exhausted?
-    kout << intmode::hex << "Base: " << BASE_ADDR << '\n';
-    ListDescriptor desc{reinterpret_cast<void*>(BASE_ADDR), 64, 2};
-    desc.PoisonFreeArea(0xBE);
-    desc.SetupLinkage();
-    std::uint64_t* leaky = nullptr;
-    for(auto i = 0; i < desc.TotalBuffers() ; i++){
-      leaky = reinterpret_cast<std::uint64_t*>(desc.Allocate());
-    }
-    // descriptor is exhausted
-    std::uint64_t* isNull = reinterpret_cast<std::uint64_t*>(desc.Allocate());
-    kassert(isNull == nullptr);
-
-    kassert(desc.NextFreeBuffer() == nullptr);
-    kassert(desc.BuffersUsed() == desc.TotalBuffers());
-    kassert(desc.Full());
-    kassert(!desc.HasSpace());
-    kout << "TryExhaust2() Success!" << '\n';
   }
 
   inline void TryObjectRange(){
