@@ -145,7 +145,9 @@ bool ListDescriptor::ObjectInRange(void* obj) const{
 
 void ListDescriptor::AddList(ListDescriptor* src){
   // kinda want to add more false tolerance...
-  kassert(src->BufferSize() == m_bufferSize);
+  if(src->BufferSize() != m_bufferSize){
+    return;
+  }
   if(this == src){
     // self assignment
     return;
