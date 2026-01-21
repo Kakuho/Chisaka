@@ -6,7 +6,10 @@ TEST_SRC="./list_descriptor/linkage.cpp
           ./list_descriptor/init.cpp
           ./list_descriptor/allocation.cpp
           ./list_descriptor/memory_patterns.cpp"
-TEST_SRC="./list_descriptor/memory_patterns.cpp"
+TEST_SRC="
+  ./list_descriptor/memory_patterns.cpp
+  ./list_descriptor/memory_patterns_page.cpp
+"
 
 g++ -std=c++20 -D USERMODE_TESTING -g -o tests \
       ${TEST_SRC} ${CPPSRC} \
