@@ -71,4 +71,3 @@ inline void kassert_fail_impl(
   kout << "halting..." << '\n';
   X8664::HaltCatchFire();
 }
-

@@ -4,7 +4,7 @@
 
 #include "./../../list_descriptor.hpp"
 
-namespace Mem::Heap::Test::List::Linked{
+namespace Chisaka::Slab{
 
   static constexpr std::uintptr_t BASE_ADDR = 0x55000;
   static constexpr std::uintptr_t VBASE_ADDR = 0xFFFF800000055000;
