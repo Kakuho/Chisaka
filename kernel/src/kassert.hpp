@@ -13,61 +13,71 @@
 // hacky way to obtain the file path and the line number of code
 // for any file
 
-#ifdef DEBUG_KASSERTS
+#ifdef USERMODE_TESTING
 
-#define kassert(expr)                                   \
-  if((expr)){}                                          \
-  else                                                  \
-    kassert_fail_debug_impl(__func__, __FILE__, __LINE__, #expr)  \
+  #define kassert(expr) \
+    assert(#expr)
 
-#else
+  #else
+    // the failure handlers
 
-#define kassert(expr)                         \
-  if((expr)){}                                \
-  else                                        \
-    kassert_fail_impl(__FILE__, __LINE__)     \
+    // debug handler contains more information, but at the cost of allocating more
+    // strings, which leads to increased binary size
+
+    void kassert_fail_debug_impl(
+        const char* functionName, 
+        const char* filename, 
+        std::size_t lineNumber, 
+        const char* expression
+    );
+
+    void kassert_fail_impl(
+        const char* filename, 
+        std::size_t
+    );
+
+    inline void kassert_fail_debug_impl(
+      const char* functionName, 
+      const char* filename, 
+      std::size_t lineNumber,
+      const char* expression
+    ){
+      kout << "KASSERT FAILURE\n";
+      kout << filename << " :: " << 
+              functionName << "() ::  "<< 
+              "line " << intmode::dec << lineNumber << '\n';
+      kout << "assertion '" << expression << "' failed" << '\n';
+      kout << "halting..." << '\n';
+      X8664::HaltCatchFire();
+    }
+
+    inline void kassert_fail_impl(
+      const char* filename, 
+      std::size_t lineNumber
+    ){
+      kout << "KASSERT FAILURE\n";
+      kout << filename << " :: " << 
+              "line " << intmode::dec << lineNumber << '\n';
+      kout << "halting..." << '\n';
+      X8664::HaltCatchFire();
+    }
+
+    #ifdef DEBUG_KASSERTS
+    
+      #define kassert(expr)                                   \
+        if((expr)){}                                          \
+        else                                                  \
+          kassert_fail_debug_impl(__func__, __FILE__, __LINE__, #expr)  \
+      
+    #else
+    
+      #define kassert(expr)                         \
+        if((expr)){}                                \
+        else                                        \
+          kassert_fail_impl(__FILE__, __LINE__)     \
+    
+    #endif
 
 #endif
 
-// the failure handlers
 
-// debug handler contains more information, but at the cost of allocating more
-// strings, which leads to increased binary size
-
-void kassert_fail_debug_impl(
-    const char* functionName, 
-    const char* filename, 
-    std::size_t lineNumber, 
-    const char* expression
-);
-
-void kassert_fail_impl(
-    const char* filename, 
-    std::size_t
-);
-
-inline void kassert_fail_debug_impl(
-  const char* functionName, 
-  const char* filename, 
-  std::size_t lineNumber,
-  const char* expression
-){
-  kout << "KASSERT FAILURE\n";
-  kout << filename << " :: " << 
-          functionName << "() ::  "<< 
-          "line " << intmode::dec << lineNumber << '\n';
-  kout << "assertion '" << expression << "' failed" << '\n';
-  kout << "halting..." << '\n';
-  X8664::HaltCatchFire();
-}
-
-inline void kassert_fail_impl(
-  const char* filename, 
-  std::size_t lineNumber
-){
-  kout << "KASSERT FAILURE\n";
-  kout << filename << " :: " << 
-          "line " << intmode::dec << lineNumber << '\n';
-  kout << "halting..." << '\n';
-  X8664::HaltCatchFire();
-}
