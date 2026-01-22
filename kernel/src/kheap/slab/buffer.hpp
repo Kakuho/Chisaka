@@ -26,12 +26,17 @@ class Buffer{
     std::uint16_t BufferSize() const { return m_bufferSize;}
     void SetBufferSize(std::uint16_t sz){ m_bufferSize = sz;}
 
+    ListDescriptor*& FreeListHead(){return m_freeLists;}
+    ListDescriptor*& PartialListHead(){return m_partialLists;}
+    ListDescriptor*& FullListHead(){return m_fullLists;}
+
     void AddList(ListDescriptor* list);
     void TryAddFreeList(ListDescriptor* list);
     void TryAddPartialList(ListDescriptor* list);
     void TryAddFullList(ListDescriptor* list);
 
     // Move* is used to move list descriptors between lists
+
     void MoveFreeHead();
     void MovePartialHead();
     void MoveFullHead();
@@ -52,10 +57,6 @@ class Buffer{
 
     void RemoveListDescriptor(ListDescriptor* ld);
     void Reap();
-
-    ListDescriptor*& FreeListHead(){return m_freeLists;}
-    ListDescriptor*& PartialListHead(){return m_partialLists;}
-    ListDescriptor*& FullListHead(){return m_fullLists;}
 
     // Linked List Api - I need to refactor this because its duplicated from 
     // list descriptor

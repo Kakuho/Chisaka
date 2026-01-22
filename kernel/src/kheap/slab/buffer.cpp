@@ -113,7 +113,6 @@ void Buffer::MovePartialHead(){
     ListDescriptor* prevHead = m_partialLists->ExtractSelf();
     AddList(prevHead);
     m_partialLists = nextHead;
-
   }
 }
 
