@@ -4,17 +4,25 @@ SRC_DIR="/home/ka/C++/projects/os/Chisaka/git/slab_tests/kernel/src"
 CPPSRC="${SRC_DIR}/kheap/slab/list_descriptor.cpp
         ${SRC_DIR}/kheap/slab/buffer.cpp"
 
-LISTDESC_SRC="./list_descriptor/linkage.cpp 
-          ./list_descriptor/init.cpp
-          ./list_descriptor/allocation.cpp
-          ./list_descriptor/memory_patterns.cpp
-          ./list_descriptor/memory_patterns.cpp
-          ./list_descriptor/memory_patterns_page.cpp
-          "
+LISTDESC_SRC="
+  ./list_descriptor/linkage.cpp 
+  ./list_descriptor/init.cpp
+  ./list_descriptor/allocation.cpp
+  ./list_descriptor/memory_patterns.cpp
+  ./list_descriptor/memory_patterns.cpp
+  ./list_descriptor/memory_patterns_page.cpp
+"
 
-BUFFER_SRC="./buffer/init.cpp"
+BUFFER_SRC="
+  ./buffer/init.cpp 
+  ./buffer/alloc.cpp
+  ./buffer/list_management.cpp
+"
 
-TEST_SRC=${BUFFER_SRC}
+TEST_SRC="
+  ${BUFFER_SRC}
+  ${LISTDESC_SRC}
+"
 
 g++ -std=c++20 -D USERMODE_TESTING -g -o tests \
       ${TEST_SRC} ${CPPSRC} \
