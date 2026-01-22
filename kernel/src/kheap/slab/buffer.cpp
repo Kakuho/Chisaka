@@ -173,10 +173,7 @@ void* Buffer::Allocate(){
     alloc = AddToFree();
   }
   if(!alloc){
-    // grow and then allocate it
-    Grow();
-    alloc = AddToFree();
-    kassert(alloc != nullptr);
+    return nullptr;
   }
   m_opCount++;  // for gc
   return alloc;
@@ -268,17 +265,6 @@ Buffer::DeStatus Buffer::DeallocFull(void* objaddr){
   }while(it != m_fullLists->end());
 
   return status;
-}
-
-void Buffer::Grow(){
-  // Grow create a new list descriptor
-  ListDescriptor* list = Allocator::Get().NewListDescriptor(m_bufferSize, 1);
-  if(m_freeLists){
-    m_freeLists->AddList(list);
-  }
-  else{
-    m_freeLists = list;
-  }
 }
 
 void Buffer::Reap(){

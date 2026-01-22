@@ -50,14 +50,8 @@ class Buffer{
     DeStatus DeallocPartial(void* objaddr);   
     DeStatus DeallocFull(void* objaddr);
 
-    void Grow();
-
     void RemoveListDescriptor(ListDescriptor* ld);
     void Reap();
-
-    // REQUIRES CONTIGOUS
-    void Grow(unsigned pages);
-    void Reap(unsigned pages);
 
     ListDescriptor*& FreeListHead(){return m_freeLists;}
     ListDescriptor*& PartialListHead(){return m_partialLists;}

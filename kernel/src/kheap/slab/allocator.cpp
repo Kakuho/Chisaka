@@ -121,6 +121,7 @@ ListDescriptor* Allocator::NewListDescriptor(void* baseAddr, std::uint16_t buffe
 void* Allocator::AllocateObject(std::size_t bytes){
   Buffer* buf = GetBuffer(bytes);
   if(buf){
+    // tries to allocate, if it fails then we create a new list descriptor for buffer
     return buf->Allocate();
   }
   else{
