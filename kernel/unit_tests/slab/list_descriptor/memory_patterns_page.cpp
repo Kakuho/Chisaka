@@ -71,16 +71,26 @@ TEST_CASE("list descriptor page sized memory pattern: alloc, dealloc"){
   CHECK(pagemem[0] == 0xDEADBEEF);
 
   desc.Deallocate(obj1);
-  CHECK(desc.NextFreeBuffer() != nullptr);
+  CHECK(desc.NextFreeBuffer() == pagemem);
   CHECK(desc.BuffersUsed() == 0);
   CHECK(desc.Empty());
   CHECK(desc.HasSpace());
 }
 
 TEST_CASE("list descriptor page sized memory pattern: (alloc, dealloc) x 10"){
-  CHECK(false);
-}
+  auto page = std::make_unique<Mocks::Page>();
+  Slab::ListDescriptor desc{page.get(), sizeof(BufferType), 1};
+  desc.SetupLinkage();
+  BufferType* pagemem = reinterpret_cast<BufferType*>(&page->bytes[0]);
 
-TEST_CASE("list descriptor page sized memory pattern: alloc dealloc dealloc"){
-  CHECK(false);
+  for(int i = 0; i < 10; i++){
+    BufferType* obj1 = reinterpret_cast<BufferType*>(desc.Allocate());
+    *obj1 = 0x00FEEDBEBE00;
+    CHECK(pagemem[0] == 0x00FEEDBEBE00);
+    REQUIRE(desc.Full());
+
+    desc.Deallocate(obj1);
+    CHECK(pagemem[0] != 0xDEADBEEF);
+    REQUIRE(desc.Empty());
+  }
 }
