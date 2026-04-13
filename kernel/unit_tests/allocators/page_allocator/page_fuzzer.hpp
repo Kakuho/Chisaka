@@ -4,12 +4,30 @@
 
 #include <cstddef>
 #include <string>
-#include <stack>
+#include <queue>
 #include <unordered_set>
 #include <random>
+#include <optional>
+#include <format>
+#include <fstream>
+#include <stdexcept>
 
 namespace Chisaka::Tests{
-  enum class FuzzAction{Allocate, Deallocate};
+  enum class FuzzAction{
+    Allocate, 
+    Deallocate
+  };
+    
+  constexpr const char* ToString(FuzzAction action){
+    switch(action){
+      case FuzzAction::Allocate:
+        return "Allocate";
+      case FuzzAction::Deallocate:
+        return "Deallocate";
+      default:
+        return "???";
+    }
+  }
   
   struct FuzzActionGenerator{
     FuzzActionGenerator(std::size_t seed, float balance):
@@ -28,37 +46,52 @@ namespace Chisaka::Tests{
 
     std::mt19937 gen;
     std::bernoulli_distribution d;
+    std::size_t seed;
   };
 
-  struct FuzzAllocatedPicker{
-    FuzzAllocatedPicker(std::size_t seed, std::size_t elements):
-      gen{std::mt19937{seed}},
-      d{balance}{
+  template<typename Generator>
+  struct FuzzIndexPicker{
+    FuzzIndexPicker(Generator& gen, std::size_t elements):
+      gen{gen},
+      d{0, elements-1}{
     }
 
-    FuzzAction Gen(){ 
-      if(d(gen) == false){
-        return FuzzAction::Allocate;
-      }
-      else{
-        return FuzzAction::Deallocate;
-      }
+    FuzzIndexPicker(std::size_t elements):
+      d{0, elements-1}{
     }
 
-    std::mt19937 gen;
-    std::bernoulli_distribution d;
+    void SetGenerator(Generator& generator){
+      gen = generator;
+    }
+
+    std::size_t Gen(){ 
+      return d(gen);
+    }
+
+    Generator& gen;
+    std::uniform_int_distribution<std::size_t> d;
   };
 
   class PageFuzzer{
     using Allocator = void*(*)();
     using Deallocator = void(*)(void*);
 
+    struct ValidationResult{
+      bool result;
+      std::optional<std::size_t> reason;
+      static ValidationResult Failure(std::size_t reason){ return ValidationResult{false, reason};}
+      static ValidationResult Success(){ return ValidationResult{true, std::nullopt};}
+    };
+
     struct FuzzResult{
       FuzzAction action;
-      bool result;
+      void* address;
+      ValidationResult result;
     };
 
     public:
+      PageFuzzer(std::size_t seed, float balance);
+
       void Run(std::size_t iterations);
       void RunDeallocateOnly(std::size_t iterations);
       void RunAllocateOnly(std::size_t iterations);
@@ -66,23 +99,23 @@ namespace Chisaka::Tests{
       constexpr void SetAllocationFunction(Allocator alloc){ m_alloc = alloc;}
       constexpr void SetDeallocationFunction(Deallocator dealloc){ m_dealloc = dealloc;}
 
-      void DumpHistory(const std::string& name);
+      ValidationResult ValidateAllocated(void* page); 
+      ValidationResult ValidateDeallocated(void* page); 
 
-      bool ValidateAllocated(void* page); 
-      bool ValidateDeallocated(void* page); 
+      void DumpHistory(const std::string& file_name);
 
     private:
       FuzzAction GenAction() const;
       void* PickFromAllocated() const;
-      void AddToHistory(FuzzAction action, bool result);
+      void AddToHistory(FuzzAction action, void* page, ValidationResult result);
 
       bool IsAllocated(void* page);
 
     private:
       Allocator m_alloc;
       Deallocator m_dealloc;
-      FuzzActionGenerator m_actionGenerator;
-      std::stack<FuzzResult> m_history;
+      mutable FuzzActionGenerator m_actionGenerator;
+      std::queue<FuzzResult> m_history;
       std::unordered_set<void*> m_allocated;
   };
 }
