@@ -80,11 +80,14 @@ void PageFuzzer::DumpHistory(const std::string& file_name){
   std::ofstream ofst{file_name};
   while(!m_history.empty()){
     FuzzResult result = m_history.front();
-    ofst << std::format("{:>10} {:>8x} {:>8}", 
+    ofst << std::format("{:>10} 0x{:0>16x} {:>8}", 
                         ToString(result.action), 
                         reinterpret_cast<std::uintptr_t>(result.address),
                         result.result.result ? "Success!" : "Fail!") 
          << '\n';
+    if(result.result.result == false){
+
+    }
     m_history.pop();
   }
 }
