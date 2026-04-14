@@ -30,7 +30,7 @@ class Freelist{
 
     ListEntry& Head(){return m_head;};
     ListEntry& LowHead(){return m_lowHead;}
-    std::size_t FreePages() const{ return m_freePages;}
+    std::size_t& FreePages() { return m_freePages;}
 
     void* AllocatePage() noexcept;
     void* AllocatePage(RamOptions options) noexcept;
@@ -58,7 +58,6 @@ class Freelist{
     void* AllocatePagesImpl(ListEntry& listHead, unsigned pages) noexcept;
     void* AllocatePageImpl(ListEntry& listHead) noexcept;
     void ExtractImpl(ListEntry& listHead, void* pageaddr, unsigned pages) noexcept;
-
 
     ListEntry m_head;   
     ListEntry m_lowHead;
@@ -96,6 +95,9 @@ void Freelist<M>::InitialiseList() noexcept{
       }
     }
   }
+  if(lastAddr == 0){
+    return;
+  }
   ListEntry* lastEntry = reinterpret_cast<ListEntry*>(lastAddr);
   lastEntry->next = nullptr;
 }
@@ -126,7 +128,6 @@ void Freelist<M>::InitialiseLowList() noexcept{
   ListEntry* lastEntry = reinterpret_cast<ListEntry*>(lastAddr);
   lastEntry->next = nullptr;
 };
-
 
 template<Concepts::MemoryMap M>
 auto Freelist<M>::SetupRegion(AddrType base, std::size_t length, AddrType lastAddr) -> AddrType{
