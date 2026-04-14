@@ -15,6 +15,7 @@ void Deallocate(void* base){
   //free(base);
 }
 
+
 void PrintPtr(void* ptr){
   std::println("0x{:0>16x}", reinterpret_cast<std::uintptr_t>(ptr));
 }
@@ -26,6 +27,7 @@ void RunFuzzer(){
   fuzzer.Run(10);
   fuzzer.DumpHistory("test.log");
 }
+
 
 void RunMemMapMock(){
   auto memmap = Chisaka::Tests::MemoryMapMock::Get();
@@ -40,10 +42,37 @@ void RunFreelist(){
 
   Chisaka::PageAllocators::Freelist<Chisaka::Tests::MemoryMapMock> freelist;
   freelist.Init();
+
   auto page = freelist.AllocatePage();
   PrintPtr(page);
 }
 
+void* FreeListAllocate(){
+  using MemmapMock = Chisaka::Tests::MemoryMapMock;
+  using PageAllocator = Chisaka::PageAllocators::Freelist<Chisaka::Tests::MemoryMapMock>;
+  return PageAllocator::Get().AllocatePage();
+}
+
+void FreeListDeallocate(void* base){
+  using MemmapMock = Chisaka::Tests::MemoryMapMock;
+  using PageAllocator = Chisaka::PageAllocators::Freelist<Chisaka::Tests::MemoryMapMock>;
+  PageAllocator::Get().DeallocPage(base);
+}
+
+void RunFuzzyPageAlloc(){
+  using MemmapMock = Chisaka::Tests::MemoryMapMock;
+  MemmapMock::Get().InitFlat(6000);
+
+  using PageAllocator = Chisaka::PageAllocators::Freelist<Chisaka::Tests::MemoryMapMock>;
+  PageAllocator::Get().Init();
+
+  Chisaka::Tests::PageFuzzer fuzzer{1, 0.5};
+  fuzzer.SetAllocationFunction(FreeListAllocate);
+  fuzzer.SetDeallocationFunction(FreeListDeallocate);
+  fuzzer.Run(10);
+  fuzzer.DumpHistory("log/test.log");
+}
+
 int main(){
-  RunFreelist();
+  RunFuzzyPageAlloc();
 }
