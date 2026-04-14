@@ -10,16 +10,16 @@
 namespace Chisaka::Tests{
   class MemoryMapMock{
     std::size_t PAGESIZE = 0x1000;
-    enum class EntryType{Useable, Unuseable};
-
-    struct EntryInit_t{
-      EntryType type;
-      std::uint64_t length;
-    };
-
     public:
       struct Entry_t{
+        enum class Type{Useable, Unuseable};
         std::uint64_t base;
+        std::uint64_t length;
+        Type type;
+      };
+
+      struct EntryInit_t{
+        Entry_t::Type type;
         std::uint64_t length;
       };
 
@@ -33,6 +33,9 @@ namespace Chisaka::Tests{
       constexpr std::size_t TotalUseablePageFrames() const noexcept{
         return m_totalUseableBytes / PAGESIZE;
       }
+
+      std::size_t Entries() const { return m_entries.size();}
+      const Entry_t& Entry(std::size_t i) const { return m_entries[i];}
 
       void DumpMemory(const std::string& filename) const;
 

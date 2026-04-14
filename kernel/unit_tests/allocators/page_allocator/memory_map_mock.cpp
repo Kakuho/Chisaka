@@ -23,7 +23,7 @@ namespace Chisaka::Tests{
       else{
         m_entries.emplace_back(m_entries[count-1].base + m_entries[count-1].length, e.length);
       }
-      if(e.type == EntryType::Useable){
+      if(e.type == Entry_t::Type::Useable){
         useable += e.length;
       }
     }
