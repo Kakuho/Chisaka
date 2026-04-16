@@ -10,7 +10,9 @@
 #include <optional>
 #include <format>
 #include <fstream>
-#include <stdexcept>
+#include <iostream>
+
+#include "integrity_check.hpp"
 
 namespace Chisaka::Tests{
   enum class FuzzAction{
@@ -75,6 +77,7 @@ namespace Chisaka::Tests{
   class PageFuzzer{
     using Allocator = void*(*)();
     using Deallocator = void(*)(void*);
+    using Exhausted = bool(*)();
 
     struct ValidationResult{
       bool result;
@@ -93,16 +96,33 @@ namespace Chisaka::Tests{
       PageFuzzer(std::size_t seed, float balance);
 
       void Run(std::size_t iterations);
+      void RunStrict(std::size_t iterations);
+      void RunStrict();
       void RunDeallocateOnly(std::size_t iterations);
       void RunAllocateOnly(std::size_t iterations);
+      bool RunRound();
 
       constexpr void SetAllocationFunction(Allocator alloc){ m_alloc = alloc;}
       constexpr void SetDeallocationFunction(Deallocator dealloc){ m_dealloc = dealloc;}
+      constexpr void SetExhaustedFunction(Exhausted exhaust){ m_exhausted = exhaust;}
 
       ValidationResult ValidateAllocated(void* page); 
       ValidationResult ValidateDeallocated(void* page); 
 
       void DumpHistory(const std::string& file_name);
+      void PrintValidationResult(FuzzAction action, void* page, ValidationResult& vr) const;
+
+      void AddIntegrityCheck(
+          IntegrityCheckers::IntegrityCheck_T checker, 
+          std::string&& succMessage, 
+          std::string&& failMessage
+      ){
+        m_integrity.AddChecker(checker, std::move(succMessage), std::move(failMessage));
+      }
+
+      bool IntegrityCheck(bool output){
+        return m_integrity.Check(output);
+      }
 
     private:
       FuzzAction GenAction() const;
@@ -114,8 +134,10 @@ namespace Chisaka::Tests{
     private:
       Allocator m_alloc;
       Deallocator m_dealloc;
+      Exhausted m_exhausted;
       mutable FuzzActionGenerator m_actionGenerator;
       std::queue<FuzzResult> m_history;
       std::unordered_set<void*> m_allocated;
+      IntegrityCheckers m_integrity;
   };
 }

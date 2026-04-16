@@ -5,6 +5,8 @@
 #include <vector>
 #include <cstdint>
 #include <fstream>
+#include <format>
+#include <iostream>
 #include <iomanip>
 
 namespace Chisaka::Tests{
@@ -38,6 +40,9 @@ namespace Chisaka::Tests{
       const Entry_t& Entry(std::size_t i) const { return m_entries[i];}
 
       void DumpMemory(const std::string& filename) const;
+      std::uintptr_t BufferBase() const { return reinterpret_cast<std::uintptr_t>(m_buffer.data());}
+
+      void PrintDetails() const;
 
     private:
       std::vector<std::uint8_t> m_buffer;
