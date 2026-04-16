@@ -12,17 +12,29 @@
 
 #include "types.hpp"
 
+// Properties of the Free List Allocator:
+//  * At all times, the address of previous entries in the free list 
+//    should be < later entries in the free list
+//
+//  * At all times, there should be no cycle present within the free list
+//
+//  * An entry must not be duplicated
+//
+//  * Deallocation of a nullptr does nothing
+
 namespace Chisaka::PageAllocators{
 
 template<Concepts::MemoryMap M>
 class Freelist{
   using AddrType = PhysAddr;
-  static constexpr std::uint16_t PAGESIZE = 0x1000;
 
   struct ListEntry{
     ListEntry* next;
   };
   static_assert(sizeof(ListEntry) == 8);
+
+  static constexpr std::size_t CUTOFF = 0xFFFF'FFFF; // 32-bit cutoff, needed for some drivers
+  static constexpr std::uint16_t PAGESIZE = 0x1000;
 
   public:
     static Freelist& Get(){ static Freelist g_fl; return g_fl;}
@@ -30,7 +42,9 @@ class Freelist{
 
     ListEntry& Head(){return m_head;};
     ListEntry& LowHead(){return m_lowHead;}
-    std::size_t& FreePages() { return m_freePages;}
+
+    std::size_t& FreePages() { return m_freePagesTop;}
+    std::size_t& FreePagesLow() { return m_freePagesLow;}
 
     void* AllocatePage() noexcept;
     void* AllocatePage(RamOptions options) noexcept;
@@ -58,17 +72,20 @@ class Freelist{
     void* AllocatePagesImpl(ListEntry& listHead, unsigned pages) noexcept;
     void* AllocatePageImpl(ListEntry& listHead) noexcept;
     void ExtractImpl(ListEntry& listHead, void* pageaddr, unsigned pages) noexcept;
+    void DeallocPageImpl(ListEntry& listHead, void* base) noexcept;
 
     ListEntry m_head;   
     ListEntry m_lowHead;
-    std::size_t m_freePages;
+    std::size_t m_freePagesTop;
+    std::size_t m_freePagesLow;
 };
 
 // Impl
 
 template<Concepts::MemoryMap M>
 void Freelist<M>::Init() noexcept{
-  m_freePages = 0;
+  m_freePagesTop = 0;
+  m_freePagesLow = 0;
   InitialiseList();
   InitialiseLowList();
 }
@@ -82,7 +99,7 @@ void Freelist<M>::InitialiseList() noexcept{
   AddrType lastAddr = 0;
   for(std::uint8_t i = 0; i < memMap.Entries(); i++){
     const typename M::Entry_t& entry = memMap.Entry(i);
-    if(entry.base > 0xFFFF'FFFF){
+    if(entry.base + entry.length > CUTOFF){
       if(entry.type == M::Entry_t::Type::Useable){
         if(firstIteration){
           Head().next = reinterpret_cast<ListEntry*>(entry.base);
@@ -92,10 +109,12 @@ void Freelist<M>::InitialiseList() noexcept{
         else{
           lastAddr = SetupRegion(entry.base, entry.length, lastAddr);
         }
+        FreePages() += entry.length / PAGESIZE;
       }
     }
   }
-  if(lastAddr == 0){
+  if(!lastAddr){
+    m_head.next = nullptr;
     return;
   }
   ListEntry* lastEntry = reinterpret_cast<ListEntry*>(lastAddr);
@@ -112,7 +131,7 @@ void Freelist<M>::InitialiseLowList() noexcept{
   for(std::uint8_t i = 0; i < memMap.Entries(); i++){
     const typename M::Entry_t& entry = memMap.Entry(i);
     // assuming entries are physical
-    if(entry.base + entry.length <= 0xFFFF'FFFF){
+    if(entry.base + entry.length <= CUTOFF){
       if(entry.type == M::Entry_t::Type::Useable){
         if(firstIteration){
           LowHead().next = reinterpret_cast<ListEntry*>(entry.base);
@@ -122,8 +141,13 @@ void Freelist<M>::InitialiseLowList() noexcept{
         else{
           lastAddr = SetupRegion(entry.base, entry.length, lastAddr);
         }
+        FreePagesLow() += entry.length / PAGESIZE;
       }
     }
+  }
+  if(!lastAddr){
+    m_lowHead.next = nullptr;
+    return;
   }
   ListEntry* lastEntry = reinterpret_cast<ListEntry*>(lastAddr);
   lastEntry->next = nullptr;
@@ -140,7 +164,6 @@ auto Freelist<M>::SetupRegion(AddrType base, std::size_t length, AddrType lastAd
     if(current + PAGESIZE < base + length){
       ListEntry* currentEntry = reinterpret_cast<ListEntry*>(current);
       currentEntry->next = reinterpret_cast<ListEntry*>(current + PAGESIZE);
-      FreePages()++;
     }
     current += PAGESIZE;
   }
@@ -151,8 +174,8 @@ template<Concepts::MemoryMap M>
 void Freelist<M>::PrintFreeBases() noexcept{
   ListEntry* current = Head().next;
   while(current != nullptr){
-    current = current->next;
     kout << reinterpret_cast<std::uint64_t>(current) << '\n';
+    current = current->next;
   }
 }
 
@@ -160,14 +183,24 @@ template<Concepts::MemoryMap M>
 void Freelist<M>::PrintFreeBasesLow() noexcept{
   ListEntry* current = LowHead().next;
   while(current != nullptr){
+    kout << intmode::hex << reinterpret_cast<std::uint64_t>(current) << '\n';
     current = current->next;
-    kout << reinterpret_cast<std::uint64_t>(current) << '\n';
   }
 }
 
 template<Concepts::MemoryMap M>
 void* Freelist<M>::AllocatePage() noexcept{ 
-  return AllocatePageImpl(Head());
+  if(Head().next != nullptr){
+    FreePages()--;
+    return AllocatePageImpl(Head());
+  }
+  else if(LowHead().next != nullptr){
+    FreePagesLow()--;
+    return AllocatePageImpl(LowHead());
+  }
+  else{
+    return nullptr;
+  }
 }
 
 template<Concepts::MemoryMap M>
@@ -185,16 +218,16 @@ void* Freelist<M>::AllocatePage(RamOptions options) noexcept{
   return allocd;
 }
 
-
 template<Concepts::MemoryMap M>
 void* Freelist<M>::AllocatePageImpl(ListEntry& listHead) noexcept{
-  void* allocd = listHead.next;
+  ListEntry* allocd = listHead.next;
   if(allocd){
     listHead.next = listHead.next->next;
   }
   else{
     listHead.next = nullptr;
   }
+  allocd->next = nullptr;
   return allocd;
 }
 
@@ -315,15 +348,32 @@ void* Freelist<M>::AllocatePagesImpl(ListEntry& listHead, unsigned pages) noexce
 
 template<Concepts::MemoryMap M>
 void Freelist<M>::DeallocPage(void* base) noexcept{
+  if(!base)   // nullptr
+    return;
+  if(reinterpret_cast<std::uintptr_t>(base) <= CUTOFF){
+    DeallocPageImpl(LowHead(), base);
+    FreePagesLow()++;
+    return;
+  }
+  else{
+    DeallocPageImpl(Head(), base);
+    FreePages()++;
+    return;
+  }
+}
+
+template<Concepts::MemoryMap M>
+void Freelist<M>::DeallocPageImpl(ListEntry& listHead, void* base) noexcept{
   // Assumption base != head of any lists
   ListEntry* allocd = reinterpret_cast<ListEntry*>(base);
-  ListEntry*& currentHead = Head().next;
+  ListEntry*& currentHead = listHead.next;
   if(!currentHead){
     currentHead = allocd;
     currentHead->next = nullptr;
+    return;
   }
   else if(allocd < currentHead){
-    ListEntry* oldHead = Head().next;
+    ListEntry* oldHead = listHead.next;
     currentHead = allocd;
     // fetch how many pages the allocated page block spans by using the page map 
     // since it might be a non zero block of pages allocated by AllocatePages(unsigned)
@@ -343,6 +393,7 @@ void Freelist<M>::DeallocPage(void* base) noexcept{
       next = current->next;
       if(!next) break;
     }
+
     current->next = allocd;
     allocd->next = next;
   }

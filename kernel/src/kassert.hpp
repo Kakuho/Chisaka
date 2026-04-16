@@ -14,6 +14,7 @@
 // for any file
 
 #ifdef USERMODE_TESTING
+  #include<cassert>
 
   #define kassert(expr) \
     assert(#expr)

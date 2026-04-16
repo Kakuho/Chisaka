@@ -3,6 +3,7 @@
 #include "limine/utility.hpp"
 #include "x86_64/utilites.hpp"
 #include "drivers/serial/kostream.hpp"
+#include "memmap/memory_map.hpp"
 
 // Extern declarations for global constructor array.
 
@@ -23,6 +24,9 @@ extern "C" void _start() {
   for (std::size_t i = 0; &__init_array[i] != __init_array_end; i++) {
       __init_array[i]();
   }
+
+  Chisaka::MemoryMap::Get().Init();
+  Chisaka::MemoryMap::Get().Print();
 
   kout << "Tottentemo Daisuke" << '\n';
   X8664::HaltCatchFire();
