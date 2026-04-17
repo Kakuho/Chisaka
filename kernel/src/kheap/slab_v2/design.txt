@@ -2,11 +2,13 @@ Design of kernel heap
   Kernel Heap will only manage memory from above 32-bit memory address
   Drivers which require 32-bit memory address will manage memory themselves, requesting pages from the page allocator
 
+-----------------------------------------------------------------------------------------
+
 List Descriptor (class ListDescriptor)
   Properties:
     * describes a region of memory where the allocations will actuall take place
     * the region of memory is 0x1000 bytes long (a page)
-    * the region of memory consists of a linked list of free object buffers, doubly linked
+    * the region of memory consists of a linked list of free object buffers, singly linked
     * the metadata is external to the free list, stored in the ListDescriptor Object which describes the region of memory
     * knows total data buffers, and how many free. Therefore, it knows if its free or not
     * double free - undefined behaviour
@@ -14,23 +16,31 @@ List Descriptor (class ListDescriptor)
 
   Allocation:
     * Allocates the head of the freelist first
+    * No more entries are left in the freelist if the head of the freelist is nullptr
     * If no more entries are left in the freelist, it returns nullptr
     * Each allocated address should be aligned to the size of the buffer
-    * Time Complexity: Theta(1) since doubly linked list
+    * Time Complexity: Theta(1), remove the header
 
   Deallocation: 
     * the list descriptor can only deallocates memory it owns
     * Each deallocated address should be aligned to the size of the buffer
     * the memory buffer is added to the end of the list
-    * Time Complexity: Theta(1) since doubly linked list
+    * Time Complexity: O(n) where n is number of elements in the free list
+
+  Linked List:
+    * Each list descriptor is the head of a doubly linked list of list descriptors
+    * if size 1, the list descriptor contains only itself, and links to itself
 
   Integrity Checks:
     * No duplicate entries within the list
     * No cycles within the list
+    * the region of memory should be aligned to a page
     * Check that if allocation is nullptr, that there is no more data buffers, total buffers stays the same
     * Check that if allocation is successful, free buffers go down, total buffers stay the same
     * Check that if deallocation is successful, that free buffers go up, total buffers stay the same
     * NO GUARANTEES ON THE SORTEDNESS OF THE FREELIST
+
+-----------------------------------------------------------------------------------------
 
 Object Buffer (class Buffer):
   Properties:
@@ -51,15 +61,26 @@ Object Buffer (class Buffer):
     * if no list descriptors own the memory address, nothing should happen
     * Time Complexity: O(n) where n is number of list descriptors
 
-  Ownership:
+  Ownership of memory:
     * the buffer owns a memory if that memory address is owned by one of the list descriptors that the buffer contains
     * able to determine if the buffer owns a memory address
+    * Time Complexity: O(n)
+
+  Ownership of lists:
+    * the buffer owns a list if the list descriptor describing the list is in the list of the buffer
+    * able to determine if the buffer owns a list
+    * Time Complexity: O(n)
+
+  Ownership of object:
+    * the buffer owns a object if there is a list descriptor which owns the object
     * Time Complexity: O(n)
 
   Integrity Checks:
     * list descriptors are in the sorted order by time added
     * each address should be aligned to the size of the buffer
-    * able to determine if some memory belongs to the buffer by checking buffer size and memory size
+
+
+-----------------------------------------------------------------------------------------
 
 Allocator - 
   Properties:
@@ -71,7 +92,7 @@ Allocator -
     * any requested size greater than 2048 will be given a nullptr, the heap should not give you pages
     * any other requested size is allocated to the next power of 2
     * requires the size of memory to allocate
-    * out of memory should return nullptr
+    * out of memory should return nullptr (this is when the page allocator is exhausted)
     * Time Complexity: O(n) where n is the number of list descriptors the buffer owns
 
   Deallocation:
@@ -86,9 +107,14 @@ Allocator -
     * deallocation occurs from the buffer with the same size
     * Time Complexity: O(n) where n is the number of list descriptors the buffer owns
 
+  List Descriptor:
+    * Manages the lifetime of list descriptors
+
+  Pages:
+
   Index mapping:
-    0 - 8, 
-    1 - 16, 
+    0 - 8,                        8 >> 3 = 0b1000 >> 3 = 0b
+    1 - 16,                       16 >> 3 = 0b1
     2 - 32, 
     3 - 64,
     4 - 128

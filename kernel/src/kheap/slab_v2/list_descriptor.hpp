@@ -9,8 +9,6 @@
 #include <utility>
 
 #include "kassert.hpp"
-#include "drivers/serial/kostream.hpp"
-#include "aii/array.hpp"
 
 namespace Chisaka::Slab::v2{
 
@@ -23,6 +21,7 @@ class ListDescriptor{
     ListDescriptor() = delete;
     ListDescriptor(void* baseAddr, std::uint16_t bufferSize);
     ListDescriptor(ListDescriptor&& src);
+    ListDescriptor& operator=(ListDescriptor&& src);
     ~ListDescriptor();
 
     void PoisonFreeArea(std::uint8_t val);
@@ -72,7 +71,6 @@ class ListDescriptor{
   private:
     void* m_baseAddress;
     ListEntry* m_nextFree; 
-    //std::uintptr_r* m_nextFree;
     ListDescriptor* m_nextList;
     ListDescriptor* m_prevList;
     std::uint16_t m_bufferSize;

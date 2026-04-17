@@ -19,6 +19,29 @@ ListDescriptor::ListDescriptor(
   kassert(m_bufferSize <= 2048);
 }
 
+ListDescriptor& ListDescriptor::operator=(ListDescriptor&& src){
+  this->m_baseAddress = src.m_baseAddress;
+  this->m_nextFree = src.m_nextFree;
+  this->m_bufferSize = src.m_bufferSize;
+  this->m_totalBuffers = src.m_totalBuffers;
+  this->m_buffersUsed = src.m_buffersUsed;
+
+  // linked list
+  this->m_nextList = src.m_nextList;
+  if(this->m_nextList){
+    src.m_nextList->m_prevList = this;
+    src.m_nextList = nullptr;
+  }
+
+  this->m_prevList = src.m_prevList;
+  if(this->m_prevList){
+    src.m_prevList->m_nextList = this;
+    src.m_prevList = nullptr;
+  }
+
+  return *this;
+}
+
 ListDescriptor::~ListDescriptor(){
   ExtractSelf();
   // returns the pages back to the page allocator
