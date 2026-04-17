@@ -1,0 +1,98 @@
+Design of kernel heap
+  Kernel Heap will only manage memory from above 32-bit memory address
+  Drivers which require 32-bit memory address will manage memory themselves, requesting pages from the page allocator
+
+List Descriptor (class ListDescriptor)
+  Properties:
+    * describes a region of memory where the allocations will actuall take place
+    * the region of memory is 0x1000 bytes long (a page)
+    * the region of memory consists of a linked list of free object buffers, doubly linked
+    * the metadata is external to the free list, stored in the ListDescriptor Object which describes the region of memory
+    * knows total data buffers, and how many free. Therefore, it knows if its free or not
+    * double free - undefined behaviour
+    * ownership - the list descriptor owns memory if the address of that memory is within the bounds of the list descriptor
+
+  Allocation:
+    * Allocates the head of the freelist first
+    * If no more entries are left in the freelist, it returns nullptr
+    * Each allocated address should be aligned to the size of the buffer
+    * Time Complexity: Theta(1) since doubly linked list
+
+  Deallocation: 
+    * the list descriptor can only deallocates memory it owns
+    * Each deallocated address should be aligned to the size of the buffer
+    * the memory buffer is added to the end of the list
+    * Time Complexity: Theta(1) since doubly linked list
+
+  Integrity Checks:
+    * No duplicate entries within the list
+    * No cycles within the list
+    * Check that if allocation is nullptr, that there is no more data buffers, total buffers stays the same
+    * Check that if allocation is successful, free buffers go down, total buffers stay the same
+    * Check that if deallocation is successful, that free buffers go up, total buffers stay the same
+    * NO GUARANTEES ON THE SORTEDNESS OF THE FREELIST
+
+Object Buffer (class Buffer):
+  Properties:
+    * contains a linked list of List Descriptors of the same size
+    * knows the size of its buffers
+    * can be added list descriptors to
+    * NO PAGE REAPING FOR NOW
+    * NO DIFFERENTIATION OF FULL / PARTIAL / FREE LIST DESCRIPTORS
+
+  Allocation:
+    * chooses the first list descriptor which has space in order to allocate from
+    * if there is no more space in every list descriptor, it returns nullptr
+    * out of memory should return nullptr
+    * Time Complexity: O(n) where n is number of list descriptors
+
+  Deallocation:
+    * chooses the list descriptor which owns the address and deallocates from there
+    * if no list descriptors own the memory address, nothing should happen
+    * Time Complexity: O(n) where n is number of list descriptors
+
+  Ownership:
+    * the buffer owns a memory if that memory address is owned by one of the list descriptors that the buffer contains
+    * able to determine if the buffer owns a memory address
+    * Time Complexity: O(n)
+
+  Integrity Checks:
+    * list descriptors are in the sorted order by time added
+    * each address should be aligned to the size of the buffer
+    * able to determine if some memory belongs to the buffer by checking buffer size and memory size
+
+Allocator - 
+  Properties:
+    * the frontend of the allocator
+    * contains an array of buffers, sizes 8, 16, 32, 64, 128, 256, 512, 1024, 2048
+
+  Allocation:
+    * any requested size less than 8 is rounded up to 8, and allocated from the List Buffer of size 8
+    * any requested size greater than 2048 will be given a nullptr, the heap should not give you pages
+    * any other requested size is allocated to the next power of 2
+    * requires the size of memory to allocate
+    * out of memory should return nullptr
+    * Time Complexity: O(n) where n is the number of list descriptors the buffer owns
+
+  Deallocation:
+    * implemented in two parts
+        Deallocate<T>(ptr)          - frontend
+        and 
+        Deallocate(ptr, size)       - backend
+    * requires the size of memory to deallocate
+    * double free is ub
+    * any requested size less than 8 is rounded up to 8
+    * any requested size greater than 2048 will do nothing to the internal data structures
+    * deallocation occurs from the buffer with the same size
+    * Time Complexity: O(n) where n is the number of list descriptors the buffer owns
+
+  Index mapping:
+    0 - 8, 
+    1 - 16, 
+    2 - 32, 
+    3 - 64,
+    4 - 128
+    5 - 256
+    6 - 512
+    7 - 1024
+    8 - 2048
