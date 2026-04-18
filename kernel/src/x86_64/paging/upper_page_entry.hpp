@@ -36,8 +36,27 @@ class UpperPageEntry{
     constexpr explicit UpperPageEntry(VirtAddr_t address, std::uint8_t flags) noexcept;
     constexpr explicit UpperPageEntry(void* address, std::uint8_t flags) noexcept:
       UpperPageEntry(reinterpret_cast<std::uint64_t>(address), flags){};
-
     constexpr explicit UpperPageEntry(std::uint64_t src) noexcept : m_buffer{src}{}
+
+    static constexpr UpperPageEntry CreateUser(void* address){
+      UpperPageEntry entry{address, UPeOpt::Present | UPeOpt::Writeable | UPeOpt::UserAccessible};
+      return entry;
+    }
+
+    static constexpr UpperPageEntry CreateUser(std::uint64_t address){
+      UpperPageEntry entry{address, UPeOpt::Present | UPeOpt::Writeable | UPeOpt::UserAccessible};
+      return entry;
+    }
+
+    static constexpr UpperPageEntry CreateSupervisor(void* address){
+      UpperPageEntry entry{address, UPeOpt::Present | UPeOpt::Writeable};
+      return entry;
+    }
+
+    static constexpr UpperPageEntry CreateSupervisor(std::uint64_t address){
+      UpperPageEntry entry{address, UPeOpt::Present | UPeOpt::Writeable};
+      return entry;
+    }
 
     constexpr const UpperPageEntry& operator=(std::uint64_t src);
     constexpr operator std::uint64_t() const noexcept{ return m_buffer;}
