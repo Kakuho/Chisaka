@@ -14,6 +14,10 @@ namespace Chisaka{
     public:
       static KHeap& Get(){ static KHeap kheap; return kheap;}
 
+      void Init(){
+        A::Get().Init();
+      }
+
       void* Allocate(std::size_t bytes){ 
         return A::Get().AllocateObject(bytes);
       }

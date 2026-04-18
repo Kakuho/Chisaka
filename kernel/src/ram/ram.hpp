@@ -15,10 +15,12 @@ namespace Chisaka{
   class Ram{
     public:
       static Ram& Get(){static Ram g_ram; return g_ram;}
+      
+      void Init(){A::Get().Init();}
 
-      void* Allocate(){ A::Get().AllocatePage();}
-      void* Allocate(unsigned npages){ A::Get().AllocatePages(npages);}
-      void Deallocate(void* base){ A::Get().DeallocPage(base);}
+      void* Allocate(){ return A::Get().AllocatePage();}
+      void* Allocate(unsigned npages){ return A::Get().AllocatePages(npages);}
+      void Deallocate(void* base){ return A::Get().DeallocPage(base);}
 
     private:
       FrameArray m_frames;
