@@ -18,6 +18,7 @@
 #include "drivers/serial/kostream.hpp"
 
 #include "kmalloc.hpp"
+#include "palloc.hpp"
 #include "kassert.hpp"
 
 #include "kcontext.hpp"

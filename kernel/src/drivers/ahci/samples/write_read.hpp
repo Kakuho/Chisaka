@@ -2,34 +2,32 @@
 
 #include <cstdint>
 
+#include "drivers/ahci/fis/h2d_register.hpp"
 #include "fixed_addresses.hpp"
 
-#include "drivers/ahci/class_interface/ahci_driver.hpp"
-#include "drivers/ahci/class_interface/ahci_port.hpp"
+#include "drivers/ahci/ahci_driver.hpp"
+#include "drivers/ahci/ahci_port.hpp"
 #include "drivers/ahci/structs/command_list.hpp"
 #include "drivers/ahci/structs/command_header.hpp"
 #include "drivers/ahci/structs/command_table.hpp"
 #include "drivers/ahci/structs/prdt_entry.hpp"
 #include "drivers/ahci/structs/recieved_fis.hpp"
 
-#include "drivers/sata/commands.hpp"
-#include "drivers/sata/fis/h2d_register.hpp"
-
 #include "x86_64/interrupts/controllers/pic.hpp"
 #include "x86_64/interrupts/interrupt_manager.hpp"
 #include "x86_64/segments/segment_manager.hpp"
 
-#include "memory/address.hpp"
-#include "memory/heap/allocator.hpp"
+#include "kcontext.hpp"
 
 #include "aii/string.h"
 
 namespace Drivers::Ahci::Class::Sample{
-inline Sata::Fis::H2DRegister::Frame CreateDmaWriteFrame(){
+
+inline Chisaka::Ahci::H2dRegisterFis CreateDmaWriteFrame(){
   // Construct the DMA WRITE EXT H2D Command Fis
   static constexpr std::uint8_t DMA_WRITE_EXT_CODE = 0x35;
 
-  Sata::Fis::H2DRegister::Frame dmaWriteFis{};
+  Chisaka::Ahci::H2dRegisterFis dmaWriteFis{};
   kassert(dmaWriteFis.m_type == 0x27);
   dmaWriteFis.m_sectorCountReg = 1;
 
@@ -93,17 +91,17 @@ inline std::uint8_t* SetDataArea(std::uint8_t* dataArea){
   return dataArea;
 }
 
-inline CommandTable* CreateCommandTable(Sata::Fis::H2DRegister::Frame& cfis, void* dataArea){
-  CommandTable* tablePtr = reinterpret_cast<CommandTable*>(COMMAND_TABLE_ADDR);
+inline Chisaka::Ahci::CommandTable* CreateCommandTable(Chisaka::Ahci::H2dRegisterFis& cfis, void* dataArea){
+  Chisaka::Ahci::CommandTable* tablePtr = reinterpret_cast<Chisaka::Ahci::CommandTable*>(COMMAND_TABLE_ADDR);
   tablePtr->SetCommandFis(cfis);
   tablePtr->SetPrdtEntry(0, 
-      PrdtEntry{reinterpret_cast<void*>(dataArea), true, 511}
+      Chisaka::Ahci::PrdtEntry{reinterpret_cast<void*>(dataArea), true, 511}
   );
   return tablePtr;
 }
 
-inline CommandHeader CreateCommandHeader(void* cmdtblPtr){
-  return CommandHeader{
+inline Chisaka::Ahci::CommandHeader CreateCommandHeader(void* cmdtblPtr){
+  return Chisaka::Ahci::CommandHeader{
     cmdtblPtr, 
     1, 
     0b0000'0'100,
@@ -128,11 +126,11 @@ inline void PrintDataArea(std::uint8_t* data){
   }
 }
 
-inline Sata::Fis::H2DRegister::Frame CreateDmaReadFrame(){
+inline Chisaka::Ahci::H2dRegisterFis CreateDmaReadFrame(){
   // Construct the DMA READ EXT H2D Command Fis
   static constexpr std::uint8_t DMA_WRITE_EXT_CODE = 0x25;
 
-  Sata::Fis::H2DRegister::Frame dmaReadFis{};
+  Chisaka::Ahci::H2dRegisterFis dmaReadFis{};
   kassert(dmaReadFis.m_type == 0x27);
   dmaReadFis.m_sectorCountReg = 1;
 
@@ -151,17 +149,17 @@ inline Sata::Fis::H2DRegister::Frame CreateDmaReadFrame(){
   return dmaReadFis;
 }
 
-inline CommandTable* DmaRead_CreateCommandTable(Sata::Fis::H2DRegister::Frame& cfis, void* dataArea){
-  CommandTable* tablePtr = reinterpret_cast<CommandTable*>(COMMAND_TABLE_ADDR);
+inline Chisaka::Ahci::CommandTable* DmaRead_CreateCommandTable(Chisaka::Ahci::H2dRegisterFis& cfis, void* dataArea){
+  Chisaka::Ahci::CommandTable* tablePtr = reinterpret_cast<Chisaka::Ahci::CommandTable*>(COMMAND_TABLE_ADDR);
   tablePtr->SetCommandFis(cfis);
   tablePtr->SetPrdtEntry(0, 
-      PrdtEntry{reinterpret_cast<void*>(dataArea), true, 511}
+      Chisaka::Ahci::PrdtEntry{reinterpret_cast<void*>(dataArea), true, 511}
   );
   return tablePtr;
 }
 
-inline CommandHeader DmaRead_CreateCommandHeader(void* cmdtblPtr){
-  return CommandHeader{
+inline Chisaka::Ahci::CommandHeader DmaRead_CreateCommandHeader(void* cmdtblPtr){
+  return Chisaka::Ahci::CommandHeader{
     cmdtblPtr, 
     1, 
     0b0000'0'100,
@@ -172,15 +170,21 @@ inline CommandHeader DmaRead_CreateCommandHeader(void* cmdtblPtr){
 //-------------------------------------------------------------
 
 inline void WriteRead(){
+  using namespace Chisaka::Ahci;
+  using namespace Chisaka;
   // Aim: Try to issue Write to the device
 
   const std::uint8_t PORT_NUMBER = 0;
 
   // Required to Perform BIOS OS Handoff??
+  
+  KContext::Memmap::Get().Init();
+  KContext::Ram::Get().Init();
+  KContext::Ram::Get().Allocate();
+  //KContext::KHeap::Get().Init();
 
-  Mem::PageAllocator::Initialise();
-  Mem::Heap::Allocator::Initialise();
   AhciDriver ahcidriver{};
+  ahcidriver.Init();
   ahcidriver.StartDMAEngines();
 
   auto ahciPorts = ahcidriver.GetPorts();
@@ -208,7 +212,6 @@ inline void WriteRead(){
   kout << "Prior: " << '\n';
   PrintDataArea(dataArea);
 
-
   //-------------------------------------------------------------
   //
   kout << "Attemping to read Sata Disk sector 0 into data area..." << '\n';
@@ -231,6 +234,7 @@ inline void WriteRead(){
   PrintDataArea(dataArea);
 }
 
+/*
 inline void WriteRead_AhciFuncs(){
   // Aim: Try to issue Write to the device
 
@@ -456,5 +460,6 @@ inline void WriteInterrupt(){
 
   PrintDataArea(dataArea);
 }
+*/
 
 }

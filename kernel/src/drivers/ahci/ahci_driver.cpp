@@ -122,14 +122,14 @@ void AhciDriver::SetPortDevices(){
 
 void AhciDriver::InitMemory(){
   kassert(AhciEnabled());
-  for(std::uint8_t i = 0; i < 32; i++){
+  for(std::uint8_t i = 0; i < 4; i++){
     if(Port(i).Present()){
       kout << "Setting up Memory for Port " << i << '\n';
-      void* portCommandBase = Kernel::kmalloc(sizeof(CommandList));
+      void* portCommandBase = Kernel::palloc();
       kassert(reinterpret_cast<std::uintptr_t>(portCommandBase) % 0x400 == 0);
       Port(i).SetCLB(reinterpret_cast<std::uintptr_t>(portCommandBase));
 
-      void* portFisBase = Kernel::kmalloc(sizeof(RecievedFis));
+      void* portFisBase = Kernel::palloc();
       kassert(reinterpret_cast<std::uintptr_t>(portFisBase) % 0x100 == 0);
       Port(i).SetCLB(reinterpret_cast<std::uintptr_t>(portFisBase));
       kout << "Finished Setting up Memory for Port " << i << '\n';
@@ -155,7 +155,8 @@ void AhciDriver::InitDisks(){
 void AhciDriver::SetupDisk(std::uint8_t port){
   m_disks[port] = AhciDisk{port};
   // perform identify device, and then set its total sectors
-  auto* identbuffer = KContext::KHeap::Get().New<IdentifyDeviceBuffer>();
+  //auto* identbuffer = KContext::KHeap::Get().New<IdentifyDeviceBuffer>();
+  IdentifyDeviceBuffer* identbuffer = reinterpret_cast<IdentifyDeviceBuffer*>(KContext::Ram::Get().Allocate());
   IdentifyDevice(port, identbuffer);
   m_disks[port].SetTotalSectors(identbuffer->NumSectors());
   kout << "Port " << port << " has " << m_disks[port].TotalSectors() << '\n';
@@ -403,7 +404,9 @@ void AhciDriver::IdentifyDevice(
 ){
   auto identFis = H2dRegisterFis::CreateIdentifyDevice();
   // create the command table
-  auto* cmdtable = KContext::KHeap::Get().New<CommandTable>();
+  //auto* cmdtable = KContext::KHeap::Get().New<CommandTable>();
+  CommandTable* cmdtable = reinterpret_cast<CommandTable*>(KContext::Ram::Get().Allocate());
+
   cmdtable->SetCommandFis(identFis);
   cmdtable->SetPrdtEntry(0,
       PrdtEntry{reinterpret_cast<void*>(buffer), true, 511}
@@ -429,7 +432,8 @@ void AhciDriver::IdentifyDevice(
     ;;
   }
 
-  KContext::KHeap::Get().Delete(cmdtable);
+  //KContext::KHeap::Get().Delete(cmdtable);
+  KContext::Ram::Get().Deallocate(cmdtable);
 }
 
 void AhciDriver::WriteSector(
