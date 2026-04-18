@@ -19,8 +19,9 @@ namespace Chisaka{
       static constexpr std::uint16_t PAGE_SIZE = 0x1000;
 
       // set up of the global kernel objects
+      using Memmap = MemoryMap;
 
-      using PageAllocator = PageAllocators::Freelist<MemoryMap>;
+      using PageAllocator = PageAllocators::Freelist<Memmap>;
       using Ram = Chisaka::Ram<PageAllocator>;
 
       using HeapAllocator = Slab::Allocator;
