@@ -29,32 +29,32 @@ namespace UPeOpt{
 }
 
 class UpperPageEntry{
-  using VirtAddr_t = std::uint64_t;
+  using PhysAddr_t = std::uint64_t;
   static inline constexpr std::uint64_t ADDRESS_MASK = (0xFFF'FFFFl << 12);
   public:
     constexpr explicit UpperPageEntry(): m_buffer{0}{}
-    constexpr explicit UpperPageEntry(VirtAddr_t address, std::uint8_t flags) noexcept;
-    constexpr explicit UpperPageEntry(void* address, std::uint8_t flags) noexcept:
-      UpperPageEntry(reinterpret_cast<std::uint64_t>(address), flags){};
+    constexpr explicit UpperPageEntry(PhysAddr_t pagebase, std::uint8_t flags) noexcept;
+    constexpr explicit UpperPageEntry(void* pagebase, std::uint8_t flags) noexcept:
+      UpperPageEntry(reinterpret_cast<std::uint64_t>(pagebase), flags){};
     constexpr explicit UpperPageEntry(std::uint64_t src) noexcept : m_buffer{src}{}
 
-    static constexpr UpperPageEntry CreateUser(void* address){
-      UpperPageEntry entry{address, UPeOpt::Present | UPeOpt::Writeable | UPeOpt::UserAccessible};
+    static constexpr UpperPageEntry CreateUser(void* pagebase){
+      UpperPageEntry entry{pagebase, UPeOpt::Present | UPeOpt::Writeable | UPeOpt::UserAccessible};
       return entry;
     }
 
-    static constexpr UpperPageEntry CreateUser(std::uint64_t address){
-      UpperPageEntry entry{address, UPeOpt::Present | UPeOpt::Writeable | UPeOpt::UserAccessible};
+    static constexpr UpperPageEntry CreateUser(std::uint64_t pagebase){
+      UpperPageEntry entry{pagebase, UPeOpt::Present | UPeOpt::Writeable | UPeOpt::UserAccessible};
       return entry;
     }
 
-    static constexpr UpperPageEntry CreateSupervisor(void* address){
-      UpperPageEntry entry{address, UPeOpt::Present | UPeOpt::Writeable};
+    static constexpr UpperPageEntry CreateSupervisor(void* pagebase){
+      UpperPageEntry entry{pagebase, UPeOpt::Present | UPeOpt::Writeable};
       return entry;
     }
 
-    static constexpr UpperPageEntry CreateSupervisor(std::uint64_t address){
-      UpperPageEntry entry{address, UPeOpt::Present | UPeOpt::Writeable};
+    static constexpr UpperPageEntry CreateSupervisor(std::uint64_t pagebase){
+      UpperPageEntry entry{pagebase, UPeOpt::Present | UPeOpt::Writeable};
       return entry;
     }
 
@@ -89,7 +89,7 @@ class UpperPageEntry{
     constexpr void SetAccessed(bool b) noexcept;
 
   private:
-    constexpr void InitialiseBuffer(VirtAddr_t address, std::uint8_t flags) noexcept;
+    constexpr void InitialiseBuffer(PhysAddr_t address, std::uint8_t flags) noexcept;
     constexpr void SetAttribute(bool val, UPeOpt::Underlying_T flag) noexcept;
 
   private:
@@ -103,23 +103,23 @@ static_assert(sizeof(UpperPageEntry) == 8);
 // impl
 
 constexpr X8664::UpperPageEntry::UpperPageEntry(
-    VirtAddr_t address, 
+    PhysAddr_t pagebase, 
     std::uint8_t flags
 ) noexcept
 {
-  InitialiseBuffer(address, flags);
+  InitialiseBuffer(pagebase, flags);
 }
 
 constexpr void 
-X8664::UpperPageEntry::InitialiseBuffer(VirtAddr_t address, std::uint8_t flags) noexcept{
+X8664::UpperPageEntry::InitialiseBuffer(PhysAddr_t pagebase, std::uint8_t flags) noexcept{
   // assumption: address is a kernel virtual address
   m_buffer = 0;
   m_buffer |= flags;
-  m_buffer |= (Chisaka::KContext::Get().VirtToPhysAddr(address) << 12);
+  m_buffer |= pagebase;
 }
 
 constexpr const X8664::UpperPageEntry& 
-X8664::UpperPageEntry::operator=( std::uint64_t src)
+X8664::UpperPageEntry::operator=(std::uint64_t src)
 {
   m_buffer = src;
   return *this;

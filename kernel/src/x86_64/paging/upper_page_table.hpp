@@ -7,7 +7,6 @@
 
 #include "constants.hpp"
 #include "upper_page_entry.hpp"
-#include "page_table.hpp"
 
 #include "aii/array.hpp"
 

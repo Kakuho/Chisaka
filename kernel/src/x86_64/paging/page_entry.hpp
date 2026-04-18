@@ -28,23 +28,44 @@ namespace PEOpt{
 }
 
 class PageEntry{
-  using VirtAddr_t = std::uint64_t;
+  using PhysAddr_t = std::uint64_t;
   static inline constexpr std::uint64_t ADDRESS_MASK = (0xFFF'FFFFl << 12);
 
   public:
     constexpr explicit PageEntry() noexcept: m_buffer{0}{}
-    constexpr explicit PageEntry(VirtAddr_t address, 
-                                      std::uint8_t flags) noexcept;
+    constexpr explicit PageEntry(PhysAddr_t pageBase, std::uint8_t flags) noexcept;
+    constexpr explicit PageEntry(void* pageBase, std::uint8_t flags) noexcept:
+      PageEntry{reinterpret_cast<PhysAddr_t>(pageBase), flags}{}
     constexpr explicit PageEntry(std::uint64_t src) noexcept: m_buffer{src}{}
-
     constexpr const PageEntry& operator=(std::uint64_t src);
+
+    static constexpr PageEntry CreateUser(void* pagebase){
+      PageEntry entry{pagebase, PEOpt::Present | PEOpt::Writeable | PEOpt::UserAccessible};
+      return entry;
+    }
+
+    static constexpr PageEntry CreateUser(std::uint64_t pagebase){
+      PageEntry entry{pagebase, PEOpt::Present | PEOpt::Writeable | PEOpt::UserAccessible};
+      return entry;
+    }
+
+    static constexpr PageEntry CreateSupervisor(void* pagebase){
+      PageEntry entry{pagebase, PEOpt::Present | PEOpt::Writeable};
+      return entry;
+    }
+
+    static constexpr PageEntry CreateSupervisor(std::uint64_t pagebase){
+      PageEntry entry{pagebase, PEOpt::Present | PEOpt::Writeable};
+      return entry;
+    }
+
     constexpr operator std::uint64_t() noexcept{ return m_buffer;}
     constexpr operator std::uint64_t() const noexcept{ return m_buffer;}
 
     void PrintValues() const noexcept;
 
     constexpr std::uint64_t BaseAddress() const noexcept;
-    constexpr void SetBaseAddress(void* address) const noexcept;
+    constexpr void SetBaseAddress(void* pagebase) const noexcept;
 
     void* PageBase() const noexcept{
       return reinterpret_cast<void*>(BaseAddress());
@@ -75,7 +96,7 @@ class PageEntry{
     constexpr void SetGlobal(bool b) noexcept;
 
   private:
-    constexpr void InitialiseBuffer(VirtAddr_t address, std::uint8_t flags) noexcept;
+    constexpr void InitialiseBuffer(PhysAddr_t address, std::uint8_t flags) noexcept;
     constexpr void SetAttribute(bool val, PEOpt::Underlying_T flag) noexcept;
 
   private:
@@ -88,18 +109,16 @@ static_assert(sizeof(PageEntry) == 8);
 
 // Impl
 
-constexpr X8664::PageEntry::PageEntry(VirtAddr_t address, 
-                                                std::uint8_t flags) noexcept
+constexpr X8664::PageEntry::PageEntry(PhysAddr_t pageBase, std::uint8_t flags) noexcept
 {
-  InitialiseBuffer(address, flags);
+  InitialiseBuffer(pageBase, flags);
 }
 
 constexpr void 
-X8664::PageEntry::InitialiseBuffer(VirtAddr_t address, std::uint8_t flags) noexcept{
-  // assumption: address is a kernel virtual address
+X8664::PageEntry::InitialiseBuffer(PhysAddr_t pageBase, std::uint8_t flags) noexcept{
   m_buffer = 0;
   m_buffer |= flags;
-  m_buffer |= (Chisaka::KContext::Get().VirtToPhysAddr(address) << 12);
+  m_buffer |= pageBase;
 }
 
 constexpr const X8664::PageEntry& 

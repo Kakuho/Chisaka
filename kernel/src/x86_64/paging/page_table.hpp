@@ -21,14 +21,12 @@ class PageTable{
     bool AreEntriesZero() const;
     void ClearEntries();
 
-    constexpr void AddEntry(std::size_t index, 
-                            EntryType& entry) noexcept{m_entries[index] = entry;}
-    constexpr void AddEntry(std::size_t index, 
-                            EntryType&& entry) noexcept{AddEntry(index, entry);}
+    constexpr void AddEntry(std::size_t index, EntryType entry) noexcept{m_entries[index] = entry;}
     constexpr void ClearEntry(std::size_t index) noexcept{m_entries[index] = 0;}
 
-    constexpr EntryType& operator[](std::size_t index)
-    {return m_entries[index];}
+
+    constexpr EntryType& GetEntry(std::size_t index){return m_entries[index];}
+    constexpr EntryType& operator[](std::size_t index){return m_entries[index];}
 
   private:
     Aii::Array<EntryType, PAGE_TABLE_ENTRIES> m_entries;
