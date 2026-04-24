@@ -16,6 +16,15 @@ namespace X8664{
     };
   }
 
+  void X86Pages::PrintIndicies(std::uintptr_t address){
+    auto indicies = ExtractPageIndicies(address);
+    kout << intmode::hex 
+         << "pm4le: " << indicies.pm4le << ", left shift 3: " << (indicies.pm4le << 3) << '\n'
+         << "pdpte: " << indicies.pdpte << ", left shift 3: " << (indicies.pdpte << 3) << '\n'
+         << "pde: " << indicies.pde << ", left shift 3: " << (indicies.pde << 3)       << '\n'
+         << "pte: " << indicies.pt << ", left shift 3: " << (indicies.pt << 3)         << '\n';
+  }
+
   std::uintptr_t X86Pages::VirtToPhys(std::uintptr_t virtAddr){
     kassert(IsCanoncial(virtAddr));
     PageIndices index = ExtractPageIndicies(virtAddr);

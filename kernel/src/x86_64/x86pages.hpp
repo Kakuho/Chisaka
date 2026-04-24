@@ -39,6 +39,8 @@ namespace X8664{
     public:
       X86Pages(UpperPageTable* pml4base): m_pml4{pml4base}{}
       std::uintptr_t VirtToPhys(std::uintptr_t virtAddr);     // std::expected would be good here...
+      UpperPageTable* Pml4(){ return m_pml4;}
+      void PrintIndicies(std::uintptr_t address);
 
       void MapUserPage(std::uint64_t vaddr, std::uint64_t pagebase);
       void MapKernelTable(std::uintptr_t vkbase);

@@ -13,6 +13,7 @@ bool PageTable::AreEntriesZero() const{
 void PageTable::ClearEntries(){
   for(std::size_t i = 0; i < PAGE_TABLE_ENTRIES; i++){
     m_entries[i] = 0;
+    InvalidateTlb();
   }
 }
 

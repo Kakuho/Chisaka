@@ -29,7 +29,7 @@ namespace PEOpt{
 
 class PageEntry{
   using PhysAddr_t = std::uint64_t;
-  static inline constexpr std::uint64_t ADDRESS_MASK = (0xFFF'FFFFl << 12);
+  static inline constexpr std::uint64_t ADDRESS_MASK = ~0xFFF;
 
   public:
     constexpr explicit PageEntry() noexcept: m_buffer{0}{}

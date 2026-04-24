@@ -4,6 +4,7 @@
 
 #include "types.hpp"
 #include "drivers/serial/kostream.hpp"
+#include "registers/control_registers.hpp"
 
 namespace X8664{
 
@@ -13,6 +14,16 @@ inline void HaltCatchFire(){
   for(;;){
     asm("hlt");
   }
+}
+
+inline void InvalidateTlb(){
+  // intel 4.10.4.1
+  // move to cr0 causes an invalidation
+  volatile std::uint64_t cr0 = readcr0();
+  cr0 &= 0xEFFF'FFFF;
+  writecr0(cr0);
+  cr0 |= 0x8000'0000;
+  writecr0(cr0);
 }
 
 struct PageIndices{

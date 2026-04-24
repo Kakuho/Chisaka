@@ -9,6 +9,7 @@
 #include "constants.hpp"
 
 #include "aii/array.hpp"
+#include "utilities.hpp"
 
 namespace X8664{
 
